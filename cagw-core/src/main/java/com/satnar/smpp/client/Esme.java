@@ -94,22 +94,31 @@ public class Esme {
     public void start() throws SmppServiceException {
         // first check if we have everything in order to start connecting...
         this.validateInitializeConfig();
+        LogService.appLog.debug("Config initialized for :" + this.username + "@" + this.systemType );
         
         try {
             if (this.canUseTrx) {
                 // lets try to connect...
                 this.trxChannel = new TcpConnection(this.trxConfig);
                 this.trxChannel.connect();
+                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
+                
                 this.trxWriter = new WriteHelper(this.trxChannel);
+                LogService.appLog.debug("Lazy Write Ready for :" + this.username + "@" + this.systemType );
+                
                 this.trxReader = new ReadHelper(this.trxChannel);
                 new Thread(this.trxReader).start();
+                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.username + "@" + this.systemType );
+                
                 if (this.isEnquireLinkEnabled) {
                     this.enquireLinkSchedule = new Timer("EnquireLink-TRX-" + this.trxChannel.getEsmeLabel());
                     this.enquireLinkSchedule.schedule(new EnquireLinkTask(this), this.enquireLinkPeriod, this.enquireLinkPeriod);
+                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.username + "@" + this.systemType );
                 }
                 
                 // lets try to bind...
                 this.bindTransceiver();
+                LogService.appLog.debug("Bind Success for :" + this.username + "@" + this.systemType );
                 StackMap.addSession(this.trxChannel.getEsmeLabel(), this);
                 
                 LogService.stackTraceLog.info("Esme-start:BindingTransiever is successful!!");
@@ -118,6 +127,7 @@ public class Esme {
                 this.txChannel = new TcpConnection(this.txConfig);
                 // ----- this is a dirty hack only for 5h1tty fucking Huawei SMPP+ crappy motherass fucking implementation
                 ((TcpConnection)this.txChannel).validateInitializeConfig();
+                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
                 
                 
                 /*this.txChannel.connect();
@@ -131,13 +141,20 @@ public class Esme {
                 
                 this.rxChannel = new TcpConnection(this.rxConfig);
                 this.rxChannel.connect();
+                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
+                
                 this.rxWriter = new WriteHelper(this.rxChannel);
+                LogService.appLog.debug("Lazy Write Ready for :" + this.username + "@" + this.systemType );
+                
                 this.rxReader = new ReadHelper(this.rxChannel);
                 new Thread(this.rxReader).start();
+                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.username + "@" + this.systemType );
+                
                 if (this.isEnquireLinkEnabled) {
                     this.enquireLinkSchedule = new Timer("EnquireLink-RX-" + this.rxChannel.getEsmeLabel());
                     this.enquireLinkSchedule.schedule(new EnquireLinkTask(this), this.enquireLinkPeriod, this.enquireLinkPeriod);
-                }
+                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.username + "@" + this.systemType );
+               }
                 
                 // lets try to bind...
                 // lets bind TX first....
@@ -147,9 +164,9 @@ public class Esme {
                 
                 // lets bind RX next....
                 this.bindReceiver();
+                LogService.appLog.debug("Bind Success for :" + this.username + "@" + this.systemType );
                 StackMap.addSession(this.txChannel.getEsmeLabel(), this);
                 
-                LogService.stackTraceLog.info("Esme-start:BindingReceiver is successful!!");
             }
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting

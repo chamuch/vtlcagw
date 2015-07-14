@@ -44,13 +44,18 @@ public class SmppSession {
 	        String[] smppSessionList = param.split(",");
 	        LogService.appLog.debug("SmppSessionList..:"+smppSessionList.length);
 	        for (String smppSection: smppSessionList) {
-	        	 LogService.appLog.debug("SmppSession-start:Loop..");
+	        	LogService.appLog.debug("SmppSession-start:Init SMPP Session with: " + smppSection);
 	            Properties smppSessionProperties = SpringHelper.getConfig().getProperties(smppSection);
 	            Esme smppSession = new Esme(smppSessionProperties);
-	            smppSession.start();
+	            
+	            // to avoid bad network or connection issues in preventing the init logic to block forever, the smpp stack start will now happen in backend
+	            new Thread(new BackgroundStackStart(smppSession)).start();
+                
+	            
+	            LogService.appLog.debug("SmppSession-start:Async init started for SMPP Session with: " + smppSection);
 	            this.smppSessions.put(smppSection, smppSession);
 	        }
-            LogService.appLog.error("SmppSession-start:All stacks are up and running!!");
+            LogService.appLog.error("SmppSession-start:All stacks are triggered to init!!");
 	        
 	        this.state = State.RUNNING;
 	    } catch (SmppServiceException e) {
@@ -80,5 +85,7 @@ public class SmppSession {
 //	public void stop(Runnable callback) {
 //		this.smppSession.stop();
 //	}
+	
+	
 
 }
