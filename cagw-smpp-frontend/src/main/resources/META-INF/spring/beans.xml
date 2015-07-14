@@ -24,6 +24,13 @@
 	<context:property-placeholder properties-ref="cgProperties" />
 	
 	<!-- ESME Instances - One instance for each SMSC -->
+	
+	<bean id="esmeSmsc1"
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('GLOBAL')}" />
+	</bean>
+	<!-- 
 	<bean id="esmeSmsc1"
 		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
@@ -63,7 +70,7 @@
 		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc8')}" />
-	</bean>
+	</bean> -->
 
 	<bean id="parsingDelegate" class="com.satnar.smpp.pdu.ParsingDelegate">
 		<constructor-arg name="context" ref="com.ericsson.raso.cac.smppfe" />

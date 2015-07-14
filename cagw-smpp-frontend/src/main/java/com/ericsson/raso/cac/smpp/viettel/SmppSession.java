@@ -42,7 +42,9 @@ public class SmppSession {
 	            throw new SmppServiceException(cfgSmppSessionList + " was not defined in " + GLOBAL + " section in the config.xml");
 	        
 	        String[] smppSessionList = param.split(",");
+	        LogService.appLog.debug("SmppSessionList..:"+smppSessionList.length);
 	        for (String smppSection: smppSessionList) {
+	        	 LogService.appLog.debug("SmppSession-start:Loop..");
 	            Properties smppSessionProperties = SpringHelper.getConfig().getProperties(smppSection);
 	            Esme smppSession = new Esme(smppSessionProperties);
 	            smppSession.start();
