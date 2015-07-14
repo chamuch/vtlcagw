@@ -1,4 +1,4 @@
-package com.satnar.charging.diameter;
+package com.satnar.common.charging.diameter;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

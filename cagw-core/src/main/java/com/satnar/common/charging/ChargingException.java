@@ -1,4 +1,4 @@
-package com.satnar.charging;
+package com.satnar.common.charging;
 
 public class ChargingException extends Exception {
     private static final long serialVersionUID = -6006046576603556499L;

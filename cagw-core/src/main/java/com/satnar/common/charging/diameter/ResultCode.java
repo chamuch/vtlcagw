@@ -1,4 +1,4 @@
-package com.satnar.charging.diameter;
+package com.satnar.common.charging.diameter;
 
 public enum ResultCode {
     DIAMETER_MULTI_ROUND_AUTH               (1001, "DIAMETER_MULTI_ROUND_AUTH"),
