@@ -35,38 +35,32 @@
 			value="#{cfg.getProperties('Esme_Props_Smsc2')}" />
 	</bean>
 	<bean id="esmeSmsc3"
-		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
-		scope="prototype">
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc3')}" />
 	</bean>
 	<bean id="esmeSmsc4"
-		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
-		scope="prototype">
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc4')}" />
 	</bean>
 	<bean id="esmeSmsc5"
-		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
-		scope="prototype">
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc5')}" />
 	</bean>
 	<bean id="esmeSmsc6"
-		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
-		scope="prototype">
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc6')}" />
 	</bean>
 	<bean id="esmeSmsc7"
-		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
-		scope="prototype">
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc7')}" />
 	</bean>
 	<bean id="esmeSmsc8"
-		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
-		scope="prototype">
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig"
 			value="#{cfg.getProperties('Esme_Props_Smsc8')}" />
 	</bean>

@@ -60,6 +60,8 @@
 			com.satnar.charging.diameter,
 			com.satnar.charging.diameter.dcc.server,
 			com.satnar.common,
+			com.satnar.common.charging,
+			com.satnar.common.charging.diameter,
 			com.satnar.smpp,
 			com.satnar.smpp.client,
 			com.satnar.smpp.codec,
