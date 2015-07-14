@@ -5,9 +5,9 @@ import com.satnar.smpp.codec.SmppParameter;
 import com.satnar.smpp.codec.SmppParameter.Type;
 
 public enum WinMoMtFlag {
-	MO ((Byte)SmppParameter.getInstance(Type.BYTE, 1)),
-	MT ((Byte)SmppParameter.getInstance(Type.BYTE, 2)),
-	RESERVED ((Byte)SmppParameter.getInstance(Type.BYTE, 3));
+	MO ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)1)),
+	MT ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)2)),
+	RESERVED ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)3));
 	
 	
 	private Byte value = null;

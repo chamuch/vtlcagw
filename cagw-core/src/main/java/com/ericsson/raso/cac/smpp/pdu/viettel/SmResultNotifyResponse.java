@@ -11,6 +11,8 @@ import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandStatus;
 import com.satnar.smpp.codec.Integer;
 import com.satnar.smpp.codec.SmppCodecException;
+import com.satnar.smpp.codec.SmppParameter;
+import com.satnar.smpp.codec.SmppParameter.Type;
 import com.satnar.smpp.pdu.SmppPdu;
 import com.satnar.smpp.transport.SmppSessionState;
 
@@ -50,7 +52,7 @@ public class SmResultNotifyResponse extends SmppPdu {
 			encoder.writeInt(super.getCommandSequence().getValue());
 			
 			encoder.writeInt(this.operationResult.getValue().getValue());
-			
+            
 			encoder.close();
 			encoder = null;
 			LogService.appLog.info("SmResultNotifyResponse-encode:Success");
@@ -76,9 +78,19 @@ public class SmResultNotifyResponse extends SmppPdu {
 	}
 
 	@Override
-    public Integer getCommandLength() {
-	    // TODO Auto-generated method stub
-	    return null;
+	public Integer getCommandLength() {
+        if (this.commandLength == 0) {
+            this.commandLength = 4 + // length of command length 
+                                    super.getCommandId().getLength() + 
+                                    super.getCommandStatus().getLength() + 
+                                    super.getCommandSequence().getLength() + 
+                                    this.operationResult.getValue().getLength();
+        }
+
+        Integer len  = (Integer) SmppParameter.getInstance(Type.INTEGER);
+        len.setValue(this.commandLength);
+       
+        return len;
     }
 
 

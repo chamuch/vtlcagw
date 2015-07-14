@@ -5,10 +5,10 @@ import com.satnar.smpp.codec.SmppParameter;
 import com.satnar.smpp.codec.SmppParameter.Type;
 
 public enum WinNotifyMode {
-	ALWAYS_NOTIFY ((Byte)SmppParameter.getInstance(Type.BYTE, 1)),
-	NOTIFY_FAILURE ((Byte)SmppParameter.getInstance(Type.BYTE, 2)),
-	NOTIFY_SUCCESS ((Byte)SmppParameter.getInstance(Type.BYTE, 3)),
-	NOTIFY_NEVER ((Byte)SmppParameter.getInstance(Type.BYTE, 4));
+	ALWAYS_NOTIFY ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)1)),
+	NOTIFY_FAILURE ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)2)),
+	NOTIFY_SUCCESS ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)3)),
+	NOTIFY_NEVER ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)4));
 	
 	
 	private Byte value = null;
