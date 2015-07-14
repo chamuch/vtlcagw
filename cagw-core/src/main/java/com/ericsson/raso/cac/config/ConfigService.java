@@ -20,7 +20,11 @@ public class ConfigService implements IConfig {
 		init();
 	}
 
-	public void init() {
+	/* (non-Javadoc)
+     * @see com.ericsson.raso.cac.config.IConfigService#init()
+     */
+	@Override
+    public void init() {
 		try {
 			String filename = "config.xml";
 			String finalfile = "";
@@ -50,7 +54,11 @@ public class ConfigService implements IConfig {
 		LogService.appLog.info("ConfigService-init:Config loaded successfully!!");
 	}
 	
-	public Properties getProperties(String sectionName){
+	/* (non-Javadoc)
+     * @see com.ericsson.raso.cac.config.IConfigService#getProperties(java.lang.String)
+     */
+	@Override
+    public Properties getProperties(String sectionName){
 		Section section = getSection(sectionName);
 		if ( section == null)
 			throw new IllegalArgumentException(String.format("%s is not configured in the config.xml", sectionName));
@@ -63,7 +71,11 @@ public class ConfigService implements IConfig {
 		return properties;
 	}
 	
-	public Section getSection(String sectionId) {
+	/* (non-Javadoc)
+     * @see com.ericsson.raso.cac.config.IConfigService#getSection(java.lang.String)
+     */
+	@Override
+    public Section getSection(String sectionId) {
 		ArrayList<Section> list = conf.getSection();
 		Section section = null;
 		for (Section sectionList : list) {
@@ -75,12 +87,20 @@ public class ConfigService implements IConfig {
 		return section;
 	}
 
-	public List<Property> getProperties(Section section) {
+	/* (non-Javadoc)
+     * @see com.ericsson.raso.cac.config.IConfigService#getProperties(com.ericsson.raso.cac.config.Section)
+     */
+	@Override
+    public List<Property> getProperties(Section section) {
 		ArrayList<Property> propertyList = section.getProperty();
 		return propertyList;
 	}
 
-	public String getValue(String sectionId, String propKey) {
+	/* (non-Javadoc)
+     * @see com.ericsson.raso.cac.config.IConfigService#getValue(java.lang.String, java.lang.String)
+     */
+	@Override
+    public String getValue(String sectionId, String propKey) {
 		String retVal = null;
 		Section section = getSection(sectionId);
 		if (section != null) {
@@ -96,7 +116,11 @@ public class ConfigService implements IConfig {
 		return retVal;
 	}
 
-	public Value getRoute(String sectionId, long locate) {
+	/* (non-Javadoc)
+     * @see com.ericsson.raso.cac.config.IConfigService#getRoute(java.lang.String, long)
+     */
+	@Override
+    public Value getRoute(String sectionId, long locate) {
 		// return RangeRouter.getInstance().getRoute(sectionId, locate);
 		return null;
 	}

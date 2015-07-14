@@ -4,6 +4,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.ericsson.raso.cac.config.ConfigService;
+import com.ericsson.raso.cac.config.IConfig;
+
 public class SpringHelper implements ApplicationContextAware {
     
     private static ApplicationContext context = null;
@@ -23,6 +26,10 @@ public class SpringHelper implements ApplicationContextAware {
 
     public static IClusterService getClusterService() {
         return context.getBean(IClusterService.class);
+    }
+    
+    public static IConfig getConfig() {
+        return context.getBean(ConfigService.class);
     }
     
 }

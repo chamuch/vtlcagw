@@ -14,4 +14,6 @@ public interface IConfig {
 	public Properties getProperties(String sectionName);
 	
 	public List<Property> getProperties(Section section);
+
+    Value getRoute(String sectionId, long locate);
 }
