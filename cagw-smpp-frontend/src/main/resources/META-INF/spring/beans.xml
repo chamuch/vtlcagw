@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:q0="http://nsn.com/ossbss/charge.once/wsdl/entity/Tis/xsd/1"
+	xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:cxf="http://camel.apache.org/schema/cxf" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<import resource="classpath:META-INF/cagw-core/beans.xml" />
+	
+	<!-- Retrieve loaded configuration properties -->
+	<bean id="cfg" class="com.ericsson.raso.cac.config.ConfigService" />
+	<bean id="cgProperties"
+		class="com.ericsson.raso.cac.config.ComponentPropertiesBean">
+		<constructor-arg name="config" ref="cfg" />
+		<constructor-arg name="component" value="Cagw_EndPoint" />
+	</bean>
+	<context:property-placeholder properties-ref="cgProperties" />
+	
+	<!-- ESME Instances - One instance for each SMSC -->
+	<bean id="esmeSmsc1" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc1')}" />
+	</bean>
+	<bean id="esmeSmsc2" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc2')}" />
+	</bean>
+	<bean id="esmeSmsc3" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc3')}" />
+	</bean>
+	<bean id="esmeSmsc4" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc4')}" />
+	</bean>		
+	<bean id="esmeSmsc5" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc5')}" />
+	</bean>
+	<bean id="esmeSmsc6" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc6')}" />
+	</bean>
+	<bean id="esmeSmsc7" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc7')}" />
+	</bean>
+	<bean id="esmeSmsc8" class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="esmeConfig"
+			value="#{cfg.getProperties('Esme_Props_Smsc8')}" />
+	</bean>
+	
+	<bean id="parsingDelegate" class="com.satnar.smpp.pdu.ParsingDelegate">
+		<constructor-arg name="context" ref="com.ericsson.raso.cac.smppfe" />
+	</bean>
+	
+	<!-- Register request and response beans -->
+	<bean id="1000001" 
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc">
+	</bean>
+	<bean id="81000001"
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse">
+	</bean>
+	<bean id="1000002"
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify">
+	</bean>
+	<bean id="81000002"
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse">
+	</bean>
+	
+	<!-- Unmarshall Request Pojo to ESME -->
+	<bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
+		<!-- we want to unmarshal to ChargingInfo pojo -->
+		<property name="unmarshalType" value="com.satnar.smpp.pdu.SmppPdu" />
+	</bean>
+	
+	<!-- For Http communication with backend -->
+	<bean id="http4" class="org.apache.camel.component.http4.HttpComponent">
+		<property name="camelContext" ref="com.ericsson.raso.cac.smppfe" />
+		<property name="maxTotalConnections" value="500" />
+		<property name="connectionsPerRoute" value="500" />
+		<!-- <property name="connectionTimeToLive" value="1000" /> -->
+	</bean>
+
+	<!-- Routing request to cagw-backend over REST -->
+	<camelContext id="com.ericsson.raso.cac.smppfe" xmlns="http://camel.apache.org/schema/spring">
+		<propertyPlaceholder id="properties" location="ref:cgProperties" />
+		<threadPoolProfile id="defaultProfile"
+			defaultProfile="true" poolSize="1200" maxPoolSize="1200" maxQueueSize="10" />
+		<threadPool id="smpp-frontend" poolSize="1200" maxPoolSize="1200"
+			threadName="smpp-frontend" camelContextId="com.ericsson.raso.cac.smppfe" />
+		<route id="com.ericsson.raso.cac.smppfe">
+			<from uri="seda:cagw-backend?concurrentConsumers=500" />
+			<camel:log message="Entered smpp front end camel route:${body}"
+						logName="com.ericsson.raso.cac.smppfe" />
+			<camel:marshal ref="gson" />
+			<setHeader headerName="CamelHttpMethod">
+				<constant>POST</constant>
+			</setHeader>
+			<camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to>
+			<camel:log message="Exit smpp front end camel route:${body}"
+						logName="com.ericsson.raso.cac.smppfe" />
+			<camel:unmarshal ref="gson"/>
+		</route>
+	</camelContext>	
+</beans>

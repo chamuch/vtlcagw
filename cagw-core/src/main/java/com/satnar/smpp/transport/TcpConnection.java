@@ -1,0 +1,396 @@
+package com.satnar.smpp.transport;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.AlreadyConnectedException;
+import java.nio.channels.AsynchronousCloseException;
+import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.ConnectionPendingException;
+import java.nio.channels.NoConnectionPendingException;
+import java.nio.channels.NotYetConnectedException;
+import java.nio.channels.SocketChannel;
+import java.nio.channels.UnresolvedAddressException;
+import java.nio.channels.UnsupportedAddressTypeException;
+import java.util.Properties;
+
+import com.satnar.common.LogService;
+import com.satnar.smpp.client.ChannelMode;
+
+public class TcpConnection extends Connection {
+    
+    private static final String TCP_ADDRESS      = "tcpAddress";
+    private static final String TCP_PORT         = "tcpPort";
+    private static final String ESME_LABEL       = "esmeLabel";
+    private static final String LAZY_WRITE_WAIT  = "lazyWriteWait";
+    private static final String THREAD_POOL_SIZE = "threadPoolSize";
+    
+    private Properties          config          = null;
+    
+    private String              label           = null;
+    private String              address         = null;
+    private int                 port            = 0;
+    private int                 lazyWriteWait   = 0;
+    private int                 threadPoolSize  = 0;
+    
+    private SocketChannel       connection      = null;
+    private ByteBuffer          requestBuffer   = null;
+    private ByteBuffer          responseBuffer  = null;
+    private ChannelMode mode = null;
+    
+    
+    
+    public TcpConnection(Properties connectionConfig) {
+        this.config = connectionConfig;
+        
+        requestBuffer = ByteBuffer.allocate(1024);
+        requestBuffer.order(ByteOrder.BIG_ENDIAN);
+        
+        responseBuffer = ByteBuffer.allocate(1024);
+        responseBuffer.order(ByteOrder.BIG_ENDIAN);
+    }
+    
+    
+    
+    @Override
+    public void connect() throws SmppTransportException {
+        try {
+            // First validate the config if properly defined...
+            this.validateInitializeConfig();
+            
+            this.connection = SocketChannel.open();
+            this.connection.configureBlocking(false);
+            this.connection.connect(new InetSocketAddress(this.address, this.port));
+            while (!this.connection.finishConnect())
+                continue;
+            this.setConnectionState(SmppSessionState.OPEN);
+            LogService.stackTraceLog.info("TcpConnection-connect:Connected successfully. Address:"+this.address);
+            
+        } catch (AlreadyConnectedException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Already Connected!!",e);
+            throw new SmppTransportException("Illegal Transport State - Already Connected!!", e);
+        } catch (NoConnectionPendingException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - No Connection Pending!!",e);
+            throw new SmppTransportException("Illegal Transport State - No Connection Pending!!", e);
+        } catch (ConnectionPendingException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect: Illegal Transport State - Async Connection Pending!!",e);
+            throw new SmppTransportException("Illegal Transport State - Async Connection Pending!!", e);
+        } catch (ClosedByInterruptException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Concurrent Interrupt Closed this Socket!!",e);
+            throw new SmppTransportException("Illegal Transport State - Concurrent Interrupt Closed this Socket!!", e);
+        } catch (AsynchronousCloseException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Concurrent Close Attempted!!",e);
+            throw new SmppTransportException("Illegal Transport State - Concurrent Close Attempted!!", e);
+        } catch (ClosedChannelException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Socket Already CLosed!!",e);
+            throw new SmppTransportException("Illegal Transport State - Socket Already CLosed!!", e);
+        } catch (UnresolvedAddressException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Unresolved Address!!",e);
+            throw new SmppTransportException("Transport Failure - Unresolved Address!!", e);
+        } catch (UnsupportedAddressTypeException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Unsupported Address Type!!",e);
+            throw new SmppTransportException("Transport Failure - Unsupported Address Type!!", e);
+        } catch (IllegalArgumentException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Port is not in valid range for TCP Stack!!",e);
+            throw new SmppTransportException("Transport Failure - Port is not in valid range for TCP Stack!!", e);
+        } catch (SecurityException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Security Sandbox Rejects Access to this EndPoint!!",e);
+            throw new SmppTransportException("Transport Failure - Security Sandbox Rejects Access to this EndPoint!!", e);
+        } catch (IOException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Localised in TCP Stack",e);
+            throw new SmppTransportException("Transport Failure - Localised in TCP Stack", e);
+        } catch (Exception e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Unforeseen Realtime Exception!!",e);
+            throw new SmppTransportException("Transport Failure - Unforeseen Realtime Exception!!", e);
+        }
+        
+    }
+    
+    @Override
+    public void disconnect() throws SmppTransportException {
+        try {
+            switch (this.getConnectionState()) {
+                case UNBOUND:
+                case INIT_IDLE:
+                case OPEN:
+                    this.connection.close();
+                    break;
+                case BOUND_RX:
+                case BOUND_TRX:
+                case BOUND_TX:
+                    throw new SmppTransportException("Unbind First");
+                case CLOSED:
+                    break;
+            }
+            
+            this.requestBuffer.clear();
+            this.responseBuffer.clear();
+            this.setConnectionState(SmppSessionState.CLOSED);
+        } catch (IOException e) {
+            // TODO: Logger
+        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Localised in TCP Stack or Memory Buffers",e);
+            throw new SmppTransportException("Transport Failure - Localised in TCP Stack or Memory Buffers", e);
+        }
+    }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        this.connection = null;
+        this.requestBuffer = null;
+        this.responseBuffer = null;
+        System.gc();
+        super.finalize();
+    }
+    
+    
+    
+
+    @Override
+    public void write(ByteBuffer writeBuffer) throws SmppTransportException {
+        try {
+            int windowSize = writeBuffer.remaining();
+            this.connection.write(writeBuffer);
+            writeBuffer.clear();
+            LogService.appLog.debug("Successfully transmitted writeBuffer Window Size: " + windowSize);
+        } catch (ClosedByInterruptException e) {
+            //TODO - Log for troubleshooting;
+            LogService.stackTraceLog.debug("TcpConnection-write:Socket closed by interruption!!",e);
+            throw new SmppTransportException("Socket closed by interruption!!", e);
+        } catch (AsynchronousCloseException e) {
+            //TODO - Log for troubleshooting;
+            LogService.stackTraceLog.debug("TcpConnection-write:Socket is in closing phase!!",e);
+            throw new SmppTransportException("Socket is in closing phase!!", e);
+        } catch (ClosedChannelException e) {
+            //TODO - Log for troubleshooting;
+        	LogService.stackTraceLog.debug("TcpConnection-write:Socket already closed!!",e);
+            throw new SmppTransportException("Socket already closed!!", e);
+        } catch (NotYetConnectedException e) {
+            //TODO - Log for troubleshooting;
+            LogService.stackTraceLog.debug("TcpConnection-write:Socket not yet ready for transmission!!",e);
+            throw new SmppTransportException("Socket not yet ready for transmission!!", e);
+        } catch (IOException e) {
+            //TODO - Log for troubleshooting;
+        	LogService.stackTraceLog.debug("TcpConnection-write:Failed transmitting the payload!",e);
+            throw new SmppTransportException("Failed transmitting the payload!", e);
+        } catch (Exception e) {
+            //TODO - Log for troubleshooting;
+            LogService.stackTraceLog.debug("TcpConnection-write:Unknown error!!",e);
+            throw new SmppTransportException("Unknown error!!", e);
+        } 
+        
+    }
+
+    @Override
+    public void read(ByteBuffer readBuffer) throws SmppTransportException {
+        try {
+            this.connection.read(readBuffer);
+            readBuffer.flip();
+        } catch(NotYetConnectedException e) {
+            //TODO - Log for troubleshooting;
+        	LogService.stackTraceLog.debug("TcpConnection-read:Socket not yet ready for reception!",e);
+            throw new SmppTransportException("Socket not yet ready for reception!", e);
+        } catch(IOException e) {
+            //TODO - Log for troubleshooting;
+        	LogService.stackTraceLog.debug("TcpConnection-read:Failed receiving the payload!",e);
+            throw new SmppTransportException("Failed receiving the payload!", e);
+        }
+    }
+
+
+
+    @Override
+    public ByteBuffer getRequestBuffer() {
+        return this.requestBuffer;
+    }
+
+
+
+    @Override
+    public ByteBuffer getResponseBuffer() {
+        return this.responseBuffer;
+    }
+
+
+
+    @Override
+    public int getThreadPoolSize() {
+        return this.threadPoolSize;
+    }
+
+
+
+    @Override
+    public ChannelMode getMode() {
+        return this.mode;
+    }
+
+
+
+    @Override
+    public void setMode(ChannelMode mode) {
+        this.mode = mode;
+    }
+
+
+
+    public void validateInitializeConfig() throws SmppTransportException {
+        String param = null;
+        
+        // check the label...
+        param = this.config.getProperty(ESME_LABEL);
+        if (param == null || param.equalsIgnoreCase(""))
+            throw new SmppTransportException("'esmeLabel' was not defined or empty!!");
+        this.label = param;
+        
+        // check the port...
+        param = this.config.getProperty(TCP_PORT);
+        if (param == null || param.equalsIgnoreCase(""))
+            throw new SmppTransportException("'tcpPort' was not defined or empty!!");
+        
+        try {
+            this.port = Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+            throw new SmppTransportException("'tcpPort' was defined but not integer!! Found: " + param);
+        }
+        
+        // check the address...
+        param = this.config.getProperty(TCP_ADDRESS);
+        if (param == null || param.equalsIgnoreCase("")) {
+        	LogService.appLog.debug("TcpConnection-validateInitializeConfig: Missing TCP_ADDRESS");
+            throw new SmppTransportException("'tcpAddress' MUST be defined!!");
+        }
+        
+        try {
+            InetAddress.getByName(param);
+            this.address = param;
+        } catch (UnknownHostException e) {
+        	LogService.appLog.debug("TcpConnection-validateInitializeConfig: Invalid TCP or DNS Address");
+            throw new SmppTransportException("'tcpAddress' is not a valid TCP or DNS Address!! Found: " + param);
+        }
+        
+        // check the lazy write...
+        param = this.config.getProperty(LAZY_WRITE_WAIT);
+        if (param == null || param.equalsIgnoreCase("")){
+        	LogService.appLog.debug("TcpConnection-validateInitializeConfig: lazyWriteWait was not defined or empty");
+            throw new SmppTransportException("'lazyWriteWait' was not defined or empty!!");
+        }
+        try {
+            this.lazyWriteWait = Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+        	LogService.appLog.debug("TcpConnection-validateInitializeConfig: lazyWriteWait  was defined but not integer!!",e);
+            throw new SmppTransportException("'lazyWriteWait' was defined but not integer!! Found: " + param);
+        }
+        
+        // check the thread pool...
+        param = this.config.getProperty(THREAD_POOL_SIZE);
+        if (param == null || param.equalsIgnoreCase("")){
+        	LogService.appLog.debug("TcpConnection-validateInitializeConfig: threadPoolSize  was not defined or empty!!");
+            throw new SmppTransportException("'threadPoolSize' was not defined or empty!!");
+        }
+        try {
+            this.threadPoolSize = Integer.parseInt(param);
+            
+            int maxThreadLimit = getMaxThreadLimit();
+            if (this.threadPoolSize > maxThreadLimit){
+            	LogService.appLog.debug("TcpConnection-validateInitializeConfig: 'threadPoolSize' configured too high to be stable!! Found: " + param + ", Allowed: " + maxThreadLimit);
+                throw new SmppTransportException("'threadPoolSize' configured too high to be stable!! Found: " + param + ", Allowed: " + maxThreadLimit);                           
+            }
+            if (this.threadPoolSize < 20){
+            	LogService.appLog.debug("TcpConnection-validateInitializeConfig: 'threadPoolSize' configured too low to be perform!! Found: " + param);
+                throw new SmppTransportException("'threadPoolSize' configured too low to be perform!! Found: " + param);
+            }
+        } catch (NumberFormatException e) {
+        	LogService.appLog.debug("TcpConnection-validateInitializeConfig: 'threadPoolSize' was defined but not integer!! Found: " + param);
+            throw new SmppTransportException("'threadPoolSize' was defined but not integer!! Found: " + param);
+        }
+        
+    }
+    
+    private static int getMaxThreadLimit() {
+        String currOsName = System.getProperty("os.name");
+        
+        if (currOsName == null || currOsName.isEmpty())
+            return 400;
+        
+        if (currOsName.contains("inux"))
+            return 600;
+        
+        if (currOsName.contains("nix"))
+            return 800;
+        
+        if (currOsName.contains("olaris"))
+            return 1100;
+        
+        if (currOsName.contains("indows"))
+            return 1800;
+        
+        
+        return 400; // absolute fallback
+    }
+    
+    public Properties getConfig() {
+        return config;
+    }
+    
+    public void setConfig(Properties config) {
+        this.config = config;
+    }
+    
+    @Override
+    public String getEsmeLabel() {
+        return label;
+    }
+    
+    public void setEsmeLabel(String label) {
+        this.label = label;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
+    public int getPort() {
+        return port;
+    }
+    
+    public void setPort(int port) {
+        this.port = port;
+    }
+    
+    @Override
+    public int getLazyWriteWait() {
+        return lazyWriteWait;
+    }
+
+    public void setLazyWriteWait(int lazyWriteWait) {
+        this.lazyWriteWait = lazyWriteWait;
+    }
+
+    public SocketChannel getConnection() {
+        return connection;
+    }
+
+
+    
+    
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:ctx="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   					http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                     http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<ctx:annotation-config />
+	<bean id="configservice" class="com.ericsson.raso.cac.config.ConfigService" />
+	
+	<bean id ="commonSpringHelper" class="com.satnar.common.SpringHelper" />
+	
+	<bean id ="smppSpringHelper" class="com.satnar.smpp.SpringHelper" />
+	
+		
+	<bean id="waterGate" class="com.satnar.common.WaterGate">
+		<constructor-arg name="frontend"
+			value="#{configservice.getValue('Water_Gate','frontend')}" />
+		<constructor-arg name="nodeThreshold"
+			value="#{configservice.getValue('Water_Gate','nodeThreshold')}" />
+		<constructor-arg name="systemWideThreshold"
+			value="#{configservice.getValue('Water_Gate','systemWideThreshold')}" />
+	</bean>
+	
+	<bean id="clusterService" class="com.satnar.common.ClusterService" />
+		
+	<!-- <bean id="dccServiceEndPoint" class="com.satnar.charging.diameter.dcc.server.DccServiceEndpoint" >
+		<constructor-arg name="dccConfig"
+			value="#{configservice.getProperties('Dcc_Props1')}" />
+	</bean> -->
+	<!-- <bean id="smppPdu" class="com.satnar.smpp.pdu.SmppPdu" /> -->
+
+</beans>

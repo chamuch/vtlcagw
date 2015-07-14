@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:q0="http://nsn.com/ossbss/charge.once/wsdl/entity/Tis/xsd/1"
+	xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:cxf="http://camel.apache.org/schema/cxf" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<import resource="classpath:META-INF/cagw-core/beans.xml" />
+	<!-- <import resource="classpath:META-INF/cagw-api/beans.xml" /> -->
+
+	<bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType"
+			value="com.satnar.smpp.pdu.SmppPdu" />
+	</bean>
+	
+	<cxf:rsServer id="cgeServer" address="http://0.0.0.0:9090/cagw-backend/"
+		serviceClass="com.ericsson.raso.cac.cagw.web.CgWeb" />
+
+	<camelContext id="com.ericsson.raso.cac.cagw"
+		xmlns="http://camel.apache.org/schema/spring">
+		<route id="cg-engine-route">
+			<from uri="cxfrs://bean://cgeServer" />			
+			<camel>
+				<camel:unmarshal ref="gson" />
+				<camel:bean
+					beanType="com.ericsson.raso.cac.cagw.processor.SmsChargingProcessor" />
+			</camel>
+		</route>
+	</camelContext>
+</beans>

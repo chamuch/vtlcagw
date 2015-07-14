@@ -1,0 +1,162 @@
+package com.ericsson.raso.cac.cagw.processor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
+import com.ericsson.raso.cac.cagw.dao.Archive;
+import com.ericsson.raso.cac.cagw.dao.MoveTransactionToArchive;
+import com.ericsson.raso.cac.cagw.dao.PersistenceException;
+import com.ericsson.raso.cac.cagw.dao.Transaction;
+import com.ericsson.raso.cac.cagw.dao.TransactionDao;
+import com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify;
+import com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse;
+import com.ericsson.raso.cac.smpp.pdu.viettel.WinOperationResult;
+import com.satnar.air.ucip.client.UcipException;
+import com.satnar.air.ucip.client.command.UpdateBalanceAndDateCommand;
+import com.satnar.air.ucip.client.request.DedicatedAccountUpdateInformation;
+import com.satnar.air.ucip.client.request.UpdateBalanceAndDateRequest;
+import com.satnar.air.ucip.client.response.UpdateBalanceAndDateResponse;
+import com.satnar.common.LogService;
+import com.satnar.smpp.CommandStatus;
+
+public class SmsRefundProcessor implements Processor {
+
+	@Override
+	public void process(Exchange exchange) throws Exception {
+		//System.out.println("We have entered into SmsRefundProcessor");
+		LogService.appLog.info("Entered into SmsRefundProcessor");
+		    SmResultNotify smppRequest = (SmResultNotify) exchange.getIn().getBody();
+		    
+		    StringBuilder logMsg = new StringBuilder("");
+		    logMsg.append("CommandSequence:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    logMsg.append(":SmId:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    logMsg.append(":SourceAddres:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    logMsg.append(":DestinationAddress:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    
+		    // successful delivery... nothing to do
+		    if (smppRequest.getFinalState().getValue() == 0) {
+		    	LogService.appLog.debug("SmsRefundProcessor-process:No need to refund.."+logMsg.toString());
+		        SmResultNotifyResponse smppResponse = this.getSuccessSmppResponse(smppRequest);
+		        exchange.getOut().setBody(smppResponse);
+		        this.moveToArchive(smppRequest);
+		        return;
+		    }
+		    
+		    Transaction txn = null;
+		    try {
+		            // check for data to refund		    
+		        txn = new TransactionDao().fetchSmsCharging(smppRequest.getSmId().getString(), 
+		            smppRequest.getSourceAddress().getString(), 
+		            smppRequest.getDestinationAddress().getString());
+		    } catch (PersistenceException e) {
+	            throw new ServiceLogicException("Unable to query Transaction!!", e);
+	        }
+		    
+		    // no data, potentially nothing to refund (for e.g., free sms or wrong transactionid
+		    if (txn == null || txn.getAccountId() == null || txn.getAccountId().equalsIgnoreCase("")) {
+		    	LogService.appLog.debug("SmsRefundProcessor-process:No need to refund, as ther is no data."+logMsg.toString());
+		    	
+		        SmResultNotifyResponse smppResponse = this.getSuccessSmppResponse(smppRequest);
+                return;
+		    }
+		    
+		    // lets refund
+		    String[] accounts = txn.getAccountId().split("|");
+		    String[] amounts = txn.getAmount().split("|");
+		    String[] accountTypes = txn.getAccountType().split("|");
+		    
+		    UpdateBalanceAndDateRequest ubdRequest = new UpdateBalanceAndDateRequest();
+		    ubdRequest.setSubscriberNumber(txn.getChargedParty());
+		    ubdRequest.setSubscriberNumberNAI(1);
+		    ubdRequest.setSiteId("1");
+		    ubdRequest.setNegotiatedCapabilities(805646916);
+		    ubdRequest.setTransactionCode(smppRequest.getDestinationAddress().getString());
+		    
+		    StringBuilder sbLog = new StringBuilder("");
+		    sbLog.append(":SubscriberNumber:");sbLog.append(ubdRequest.getSubscriberNumber());
+		    
+		    List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
+		    for (int i = 0; i < accounts.length; i++) {
+		        DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
+		        dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
+		        dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
+                dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
+                dasToUpdate.add(dauInfo); 
+                
+                sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:Id:");sbLog.append(dauInfo.getDedicatedAccountID());
+                sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AccountUnitType:");sbLog.append(dauInfo.getDedicatedAccountUnitType());
+                sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AdjustmentAmountRelative:");sbLog.append(dauInfo.getAdjustmentAmountRelative());
+		    }		    
+		    //TODO: logger... packed all account info
+		    LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR request:"+logMsg.toString()+sbLog.toString());
+		    sbLog = null;
+		    
+		    boolean refundResult = false;
+		    try {
+		        UpdateBalanceAndDateCommand command = new UpdateBalanceAndDateCommand(ubdRequest);
+		        UpdateBalanceAndDateResponse ubdResponse = command.execute();
+		        
+		        LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR response:"+logMsg.toString()+":AirResponseCode:"+ubdResponse.getResponseCode());
+		        refundResult = true;
+		    } catch (UcipException e) {
+		    	LogService.stackTraceLog.debug("SmsRefundProcessor-process:Failed to refund !!",e);
+		        SmResultNotifyResponse smppResponse = this.getRefundFailedSmppResponse(smppRequest);
+                exchange.getOut().setBody(smppResponse);
+                return;
+	        }  
+		    
+		    //now delete txn and move to archive now
+		    this.moveToArchive(txn, smppRequest.getFinalState().getValue(), refundResult, System.currentTimeMillis());
+		    
+		    LogService.appLog.debug("SmsRefundProcessor-process:Refund Done."+logMsg.toString());
+		    
+		    logMsg = null;		
+	}
+
+    private void moveToArchive(Transaction txn, int deliveryResult, boolean refundResult, long sysTime) {
+        Archive archive = new Archive(txn);
+        archive.setDeliveryStatus(deliveryResult == 0);
+        archive.setRefundStatus(refundResult);
+        archive.setRefundTime(sysTime);
+        new Thread(new MoveTransactionToArchive(txn, archive)).start();
+        
+    }
+
+    private void moveToArchive(SmResultNotify smppRequest) {
+        Transaction transaction = null;
+        try {
+                // check for data to refund         
+            transaction = new TransactionDao().fetchSmsCharging(smppRequest.getSmId().getString(), 
+                smppRequest.getSourceAddress().getString(), 
+                smppRequest.getDestinationAddress().getString());
+        } catch (PersistenceException e) {                    	
+		    LogService.stackTraceLog.debug("SmsRefundProcessor-moveToArchive: Failed:SmId:"+smppRequest.getSmId().getValue(),e);
+        }
+        
+        if (transaction != null) {
+            Archive archive = new Archive(transaction);
+            archive.setDeliveryStatus(smppRequest.getFinalState().getValue() == 0);
+            archive.setRefundStatus(false);
+            archive.setRefundTime(System.currentTimeMillis());
+            new Thread(new MoveTransactionToArchive(transaction, archive)).start();
+        }
+    }
+
+    private SmResultNotifyResponse getSuccessSmppResponse(SmResultNotify smppRequest) {
+        SmResultNotifyResponse smppResponse = new SmResultNotifyResponse();
+        smppResponse.setCommandSequence(smppRequest.getCommandSequence());
+        smppResponse.setOperationResult(WinOperationResult.SUCCESS);
+        return smppResponse;
+    }
+
+    private SmResultNotifyResponse getRefundFailedSmppResponse(SmResultNotify smppRequest) {
+        SmResultNotifyResponse smppResponse = new SmResultNotifyResponse();
+        smppResponse.setCommandSequence(smppRequest.getCommandSequence());
+        smppResponse.setOperationResult(WinOperationResult.OTHER_ERRORS);
+        return smppResponse;
+    }
+
+}

@@ -1,0 +1,229 @@
+<!DOCTYPE config SYSTEM "config.dtd">
+<config>
+	<section id="Cagw_EndPoint" description="cagw backend url">
+		<property key="Mmsc_Cagw_BackendUrl"
+			value="http://0.0.0.0:9090/cagw-backend/CgWeb/process/mmsc" />
+		<property key="Smpp_Cagw_BackendUrl"
+		value="http://0.0.0.0:9090/cagw-backend/CgWeb/process/smpp" />
+	</section>
+	
+	<section id="DB_PROP" description="cagw backend url">
+		<property key="cassandraAddress" value="192.168.1065" />
+		<property key="keySpaceName" value="CAGW_SPACE" />
+	</section>
+
+	<!-- ESME Properties : Considering 4 SMSC servers -->
+	<section id="Esme_Props_Smsc1" description="esmeSmsc1">
+		<property key="username" value="username" />
+		<property key="password" value="password" />
+		<property key="systemType" value="" />
+		<property key="interfaceVersion" value="" />
+		<property key="esmeTon" value="" />
+		<property key="esmeNpi" value="" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="" />
+		<property key="canUseTrx" value="" />
+		<property key="tx.tcpAddress" value="" />
+		<property key="tx.tcpPort" value="" />
+		<property key="tx.esmeLabel" value="" />
+		<property key="tx.lazyWriteWait" value="" />
+		<property key="rx.tcpAddress" value="" />
+		<property key="rx.tcpPort" value="" />
+		<property key="rx.esmeLabel" value="" />
+		<property key="rx.lazyWriteWait" value="" />
+		<property key="trx.tcpAddress" value="" />
+		<property key="trx.tcpPort" value="" />
+		<property key="trx.esmeLabel" value="" />
+		<property key="trx.lazyWriteWait" value="" />
+	</section>
+	<section id="Esme_Props_Smsc2" description="esmeSmsc2">
+		<property key="username" value="username" />
+		<property key="password" value="password" />
+		<property key="systemType" value="" />
+		<property key="interfaceVersion" value="" />
+		<property key="esmeTon" value="" />
+		<property key="esmeNpi" value="" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="" />
+		<property key="canUseTrx" value="" />
+		<property key="tx.tcpAddress" value="" />
+		<property key="tx.tcpPort" value="" />
+		<property key="tx.esmeLabel" value="" />
+		<property key="tx.lazyWriteWait" value="" />
+		<property key="rx.tcpAddress" value="" />
+		<property key="rx.tcpPort" value="" />
+		<property key="rx.esmeLabel" value="" />
+		<property key="rx.lazyWriteWait" value="" />
+		<property key="trx.tcpAddress" value="" />
+		<property key="trx.tcpPort" value="" />
+		<property key="trx.esmeLabel" value="" />
+		<property key="trx.lazyWriteWait" value="" />
+	</section>
+	<section id="Esme_Props_Smsc3" description="esmeSmsc3">
+		<property key="username" value="username" />
+		<property key="password" value="password" />
+		<property key="systemType" value="" />
+		<property key="interfaceVersion" value="" />
+		<property key="esmeTon" value="" />
+		<property key="esmeNpi" value="" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="" />
+		<property key="canUseTrx" value="" />
+		<property key="tx.tcpAddress" value="" />
+		<property key="tx.tcpPort" value="" />
+		<property key="tx.esmeLabel" value="" />
+		<property key="tx.lazyWriteWait" value="" />
+		<property key="rx.tcpAddress" value="" />
+		<property key="rx.tcpPort" value="" />
+		<property key="rx.esmeLabel" value="" />
+		<property key="rx.lazyWriteWait" value="" />
+		<property key="trx.tcpAddress" value="" />
+		<property key="trx.tcpPort" value="" />
+		<property key="trx.esmeLabel" value="" />
+		<property key="trx.lazyWriteWait" value="" />
+	</section>
+	<section id="Esme_Props_Smsc4" description="esmeSmsc4">
+		<property key="username" value="username" />
+		<property key="password" value="password" />
+		<property key="systemType" value="" />
+		<property key="interfaceVersion" value="" />
+		<property key="esmeTon" value="" />
+		<property key="esmeNpi" value="" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="" />
+		<property key="canUseTrx" value="" />
+		<property key="tx.tcpAddress" value="" />
+		<property key="tx.tcpPort" value="" />
+		<property key="tx.esmeLabel" value="" />
+		<property key="tx.lazyWriteWait" value="" />
+		<property key="rx.tcpAddress" value="" />
+		<property key="rx.tcpPort" value="" />
+		<property key="rx.esmeLabel" value="" />
+		<property key="rx.lazyWriteWait" value="" />
+		<property key="trx.tcpAddress" value="" />
+		<property key="trx.tcpPort" value="" />
+		<property key="trx.esmeLabel" value="" />
+		<property key="trx.lazyWriteWait" value="" />
+	</section>
+
+	<!-- DCC : Considering 2 MMSC servers -->
+	<section id="Dcc_Props1" description="Dcc_Props1">
+		<property key="originRealm" value="" />
+		<property key="acceptUnknownPeers" value="" />
+		<property key="accountId" value="0" />
+		<property key="authId" value="0" />
+		<property key="ownProductId" value="" />
+		<property key="ownFqdn" value="" />
+		<property key="ownTcpPort" value="0" />
+		<property key="ownTcpAddress" value="" />
+		<property key="threadPoolSize" value="0" />
+		<property key="eventQueueSize" value="0" />
+		<property key="sendQueueSize" value="0" />
+		<property key="sendMessageLimit" value="0" />
+		<property key="vendorId" value="0" />
+		<property key="messageTimeout" value="0" />
+	</section>
+	<section id="Dcc_Props2" description="Dcc_Props2">
+		<property key="originRealm" value="" />
+		<property key="acceptUnknownPeers" value="" />
+		<property key="accountId" value="0" />
+		<property key="authId" value="0" />
+		<property key="ownProductId" value="" />
+		<property key="ownFqdn" value="" />
+		<property key="ownTcpPort" value="0" />
+		<property key="ownTcpAddress" value="" />
+		<property key="threadPoolSize" value="0" />
+		<property key="eventQueueSize" value="0" />
+		<property key="sendQueueSize" value="0" />
+		<property key="sendMessageLimit" value="0" />
+		<property key="vendorId" value="0" />
+		<property key="messageTimeout" value="0" />
+	</section>
+
+	<!-- SCAPv2 : Considering 4 peers for commercial test -->
+	<section id="Scap_Props_Occ" description="Scap_Props_Occ">
+		<property key="ownProductId" value="" />
+		<property key="originRealm" value="" />
+		<property key="ownFqdn" value="0" />
+		<property key="ownTcpPort" value="0" />
+		<property key="ownTcpAddress" value="" />
+		<property key="peerCount" value="4" />
+		<property key="threadPoolSize" value="0" />
+		<property key="eventQueueSize" value="" />
+		<property key="sendQueueSize" value="0" />
+		<property key="sendMessageLimit" value="0" />
+		<property key="supportedVendor" value="0" />
+		<property key="peer.1.address" value="0" />
+		<property key="peer.1.hostId" value="0" />
+		<property key="peer.1.realm" value="0" />
+		<property key="peer.1.siteId" value="0" />
+		<property key="peer.2.address" value="0" />
+		<property key="peer.2.hostId" value="0" />
+		<property key="peer.2.realm" value="0" />
+		<property key="peer.2.siteId" value="0" />
+		<property key="peer.3.address" value="0" />
+		<property key="peer.3.hostId" value="0" />
+		<property key="peer.3.realm" value="0" />
+		<property key="peer.3.siteId" value="0" />
+		<property key="peer.4.address" value="0" />
+		<property key="peer.4.hostId" value="0" />
+		<property key="peer.4.realm" value="0" />
+		<property key="peer.4.siteId" value="0" />
+	</section>
+	<section id="cs-air1" description="">
+		<property key="originNodeType" value="ADM" />
+		<property key="originHostName" value="IL" />
+		<property key="csair protocol" value="air" />
+		<property key="type" value="client" />
+		<property key="username" value="fdsuser" />
+		<property key="password" value="fdsuser" />
+		<property key="userAgent" value="UGw Server/5.0/1.0" />
+		<property key="connectionTimeout" value="30000" />
+		<property key="idleConnctionTimeout" value="360000" />
+		<property key="idleConnectionTimeoutInterval" value="60000" />
+		<property key="maxConnections" value="32" />
+		<property key="maxConnectionsPerHost" value="32" />
+		<property key="staleCheckingEnabled" value="true" />
+		<property key="retryCount" value="3" />
+		<property key="useApacheHttpClient" value="true" />
+		<property key="soTimeout" value="120000" />
+		<property key="endpointId" value="air" />
+		<property key="staticRoute realm" value="smart.com.ph" />
+		<!-- <property key="address" value="http://10.245.144.65:10010/Air"/> -->
+		<property key="address" value="http://172.20.0.126:10010/Air" />
+		<property key="hostId" value="air-lb1.smart.com.ph" />
+		<property key="siteId" value="Vietnem" />
+	</section>
+	<section id="Cs-Air1" description="">
+		<property key="originNodeType" value="ADM" />
+		<property key="originHostName" value="IL" />
+		<property key="csair protocol" value="air" />
+		<property key="type" value="client" />
+		<property key="username" value="fdsuser" />
+		<property key="password" value="fdsuser" />
+		<property key="userAgent" value="UGw Server/5.0/1.0" />
+		<property key="connectionTimeout" value="30000" />
+		<property key="idleConnctionTimeout" value="360000" />
+		<property key="idleConnectionTimeoutInterval" value="60000" />
+		<property key="maxConnections" value="32" />
+		<property key="maxConnectionsPerHost" value="32" />
+		<property key="staleCheckingEnabled" value="true" />
+		<property key="retryCount" value="3" />
+		<property key="useApacheHttpClient" value="true" />
+		<property key="soTimeout" value="120000" />
+		<property key="endpointId" value="air" />
+		<property key="staticRoute realm" value="smart.com.ph" />
+		<property key="address" value="http://172.20.0.126:10010/Air" />
+		<property key="hostId" value="air-lb1.smart.com.ph" />
+		<property key="siteId" value="Vietnem" />
+	</section>
+	<section id="Water_Gate" description="">
+		<property key="frontend" value="500" />
+		<property key="nodeThreshold" value="1000" />
+		<property key="systemWideThreshold" value="2000" />
+	</section>
+</config>
