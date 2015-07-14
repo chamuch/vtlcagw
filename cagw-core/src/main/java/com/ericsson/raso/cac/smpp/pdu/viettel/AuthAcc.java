@@ -37,7 +37,7 @@ public class AuthAcc extends SmppPdu {
 	private Integer smLength = null;
 	private Integer serviceId = null;
 	
-	private int commandLength = 0;
+	private int myCommandLength = 0;
 	
 	
 	
@@ -60,8 +60,8 @@ public class AuthAcc extends SmppPdu {
 	
 	@Override
     public Integer getCommandLength() {
-		if (this.commandLength == 0) {
-			this.commandLength = 4 + // length of command length
+		if (this.myCommandLength == 0) {
+			this.myCommandLength = 4 + // length of command length
 									super.getCommandId().getLength() +
 									super.getCommandStatus().getLength() +
 									super.getCommandSequence().getLength() +
@@ -79,7 +79,7 @@ public class AuthAcc extends SmppPdu {
 		}
 	    
         Integer len  = (Integer) SmppParameter.getInstance(Type.INTEGER);
-        len.setValue(this.commandLength);
+        len.setValue(this.myCommandLength);
 
         return len;
     }
