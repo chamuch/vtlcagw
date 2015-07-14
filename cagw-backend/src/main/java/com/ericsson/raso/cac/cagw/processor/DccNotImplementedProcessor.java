@@ -5,8 +5,8 @@ import org.apache.camel.Processor;
 
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
-import com.satnar.charging.diameter.ResultCode;
 import com.satnar.common.LogService;
+import com.satnar.common.charging.diameter.ResultCode;
 
 public class DccNotImplementedProcessor implements Processor {
 	

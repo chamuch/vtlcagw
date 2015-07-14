@@ -31,6 +31,8 @@
 			com.satnar.charging.diameter.dcc.server,
 			com.ericsson.raso.cac.smpp.pdu.viettel,
 			com.satnar.common,
+			com.satnar.common.charging,
+			com.satnar.common.charging.diameter,
 			com.satnar.smpp,
 			com.satnar.smpp.client,
 			com.satnar.smpp.codec,

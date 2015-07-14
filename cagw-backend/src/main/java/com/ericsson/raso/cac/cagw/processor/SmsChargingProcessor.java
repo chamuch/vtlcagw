@@ -32,9 +32,9 @@ import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse;
 import com.ericsson.raso.cac.smpp.pdu.viettel.WinMoMtFlag;
 import com.ericsson.raso.cac.smpp.pdu.viettel.WinNotifyMode;
 import com.ericsson.raso.cac.smpp.pdu.viettel.WinOperationResult;
-import com.satnar.charging.diameter.Peer;
 import com.satnar.charging.diameter.scap.client.ScapChargingEndpoint;
 import com.satnar.common.LogService;
+import com.satnar.common.charging.diameter.Peer;
 import com.satnar.smpp.CommandStatus;
 
 public class SmsChargingProcessor implements Processor {

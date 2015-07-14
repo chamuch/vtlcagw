@@ -17,8 +17,8 @@ import com.ericsson.pps.diameter.rfcapi.base.message.ApplicationRequestListener;
 import com.ericsson.pps.diameter.rfcapi.base.message.BadMessageException;
 import com.ericsson.pps.diameter.rfcapi.base.message.DiameterAnswer;
 import com.ericsson.pps.diameter.rfcapi.base.message.DiameterRequest;
-import com.satnar.charging.diameter.ResultCode;
 import com.satnar.common.LogService;
+import com.satnar.common.charging.diameter.ResultCode;
 
 public class RequestHandler implements ApplicationRequestListener {
     

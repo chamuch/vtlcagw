@@ -6,10 +6,10 @@ import org.springframework.context.SmartLifecycle;
 
 import com.ericsson.pps.diameter.rfcapi.base.PeerConnectionListener;
 import com.ericsson.pps.diameter.rfcapi.base.message.ApplicationRequestListener;
-import com.satnar.charging.ChargingStackLifeCycleException;
 import com.satnar.charging.diameter.dcc.server.DccServiceEndpoint;
 import com.satnar.charging.diameter.dcc.server.DiameterServiceEndpoint;
 import com.satnar.common.LogService;
+import com.satnar.common.charging.ChargingStackLifeCycleException;
 
 public class DccService implements SmartLifecycle {
     

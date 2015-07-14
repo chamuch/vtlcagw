@@ -4,7 +4,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-import com.satnar.charging.ChargingStackLifeCycleException;
+import com.satnar.common.charging.ChargingStackLifeCycleException;
+
+
 
 public abstract class ConfigHelper {
     

@@ -1,6 +1,8 @@
 package com.satnar.charging.diameter.scap.client;
 
-import com.satnar.charging.ChargingStackLifeCycleException;
+import com.satnar.common.charging.ChargingStackLifeCycleException;
+
+
 
 public interface IScapCharging {
     

@@ -11,10 +11,10 @@ import com.ericsson.pps.diameter.dccapi.DCCStack;
 import com.ericsson.pps.diameter.rfcapi.base.DiameterConfig;
 import com.ericsson.pps.diameter.rfcapi.base.DiameterConfigException;
 import com.ericsson.pps.diameter.scapv2.SCAPStack;
-import com.satnar.charging.ChargingStackLifeCycleException;
-import com.satnar.charging.diameter.LoadBalancer;
-import com.satnar.charging.diameter.Peer;
 import com.satnar.common.LogService;
+import com.satnar.common.charging.ChargingStackLifeCycleException;
+import com.satnar.common.charging.diameter.LoadBalancer;
+import com.satnar.common.charging.diameter.Peer;
 
 public class ScapChargingEndpoint implements IScapCharging {
     

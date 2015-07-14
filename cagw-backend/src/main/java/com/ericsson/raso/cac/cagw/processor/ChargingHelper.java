@@ -7,8 +7,8 @@ import com.ericsson.raso.cac.cagw.SpringHelper;
 import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc;
 import com.ericsson.raso.cac.smpp.pdu.viettel.WinMoMtFlag;
 import com.ericsson.raso.cac.smpp.pdu.viettel.WinOperationResult;
-import com.satnar.charging.diameter.ResultCode;
 import com.satnar.charging.diameter.scap.client.ScapChargingEndpoint;
+import com.satnar.common.charging.diameter.ResultCode;
 
 public class ChargingHelper {
     

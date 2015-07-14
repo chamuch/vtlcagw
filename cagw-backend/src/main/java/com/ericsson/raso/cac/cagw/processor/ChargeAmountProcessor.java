@@ -32,9 +32,9 @@ import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdTypeAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TimeZoneAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TrafficCaseAvp;
 import com.ericsson.raso.cac.cagw.SpringHelper;
-import com.satnar.charging.diameter.Peer;
 import com.satnar.charging.diameter.scap.client.ScapChargingEndpoint;
 import com.satnar.common.LogService;
+import com.satnar.common.charging.diameter.Peer;
 
 
 
