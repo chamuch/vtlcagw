@@ -14,9 +14,12 @@ public class SmppSession {
 	private State state = null;
 	
 	public SmppSession(Properties esmeConfig) {
-		LogService.appLog.debug("SmppSession:Constructor...");
+		LogService.appLog.debug("SmppSession:Constructor changed...");
 		this.state = State.NOT_INIT;
 		this.smppSession = new Esme(esmeConfig);
+		
+		//14-Jul-2015: init from bean is behaving as singleton
+		this.start();
 	}
 
 	public boolean isRunning() {
