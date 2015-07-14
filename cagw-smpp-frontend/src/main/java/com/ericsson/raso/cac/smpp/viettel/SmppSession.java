@@ -19,14 +19,14 @@ public class SmppSession {
 		this.smppSession = new Esme(esmeConfig);
 		
 		//14-Jul-2015: init from bean is behaving as singleton
-		this.start();
+		this.startStackSession();
 	}
 
-	public boolean isRunning() {
-		return (this.state == State.RUNNING);
-	}
+//	public boolean isRunning() {
+//		return (this.state == State.RUNNING);
+//	}
 
-	public void start() {
+	public void startStackSession() {
 		try {
 			LogService.appLog.debug("SmppSession-start:Initiated...");
 			this.smppSession.start();
@@ -38,23 +38,23 @@ public class SmppSession {
 		}
 	}
 
-	public void stop() {
+	public void stopStackSession() {
 		this.smppSession.stop();
 	}
 
 
-	public int getPhase() {
-		return 0;
-	}
-
-
-	public boolean isAutoStartup() {
-		return true;
-	}
-
-
-	public void stop(Runnable callback) {
-		this.smppSession.stop();
-	}
+//	public int getPhase() {
+//		return 0;
+//	}
+//
+//
+//	public boolean isAutoStartup() {
+//		return true;
+//	}
+//
+//
+//	public void stop(Runnable callback) {
+//		this.smppSession.stop();
+//	}
 
 }
