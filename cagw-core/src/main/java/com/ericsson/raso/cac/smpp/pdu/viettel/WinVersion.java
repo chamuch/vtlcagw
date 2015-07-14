@@ -5,9 +5,9 @@ import com.satnar.smpp.codec.SmppParameter;
 import com.satnar.smpp.codec.SmppParameter.Type;
 
 public enum WinVersion {
-	V_1 ((Byte)SmppParameter.getInstance(Type.BYTE, 1)),
-	V_2 ((Byte)SmppParameter.getInstance(Type.BYTE, 2)),
-	V_3 ((Byte)SmppParameter.getInstance(Type.BYTE, 3));
+	V_1 ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)1)),
+	V_2 ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)2)),
+	V_3 ((Byte)SmppParameter.getInstance(Type.BYTE, (byte)3));
 	
 	
 	private Byte value = null;
