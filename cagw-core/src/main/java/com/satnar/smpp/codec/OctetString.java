@@ -49,7 +49,7 @@ public class OctetString extends SmppParameter {
     private String prettyPrint(byte[] serialized) {
         StringBuilder sbPrettyPrint = new StringBuilder();
         for (byte atom: serialized) {
-            sbPrettyPrint.append(java.lang.Integer.toHexString((0xff|atom)));
+            sbPrettyPrint.append(java.lang.Integer.toHexString((0xff&atom)));
             sbPrettyPrint.append(" ");
         }
         return sbPrettyPrint.toString();

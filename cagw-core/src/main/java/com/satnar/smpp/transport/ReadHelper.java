@@ -147,7 +147,7 @@ public class ReadHelper implements Runnable {
     private String prettyPrint(byte[] serialized) {
         StringBuilder sbPrettyPrint = new StringBuilder();
         for (byte atom: serialized) {
-            sbPrettyPrint.append(Integer.toHexString( (0xff|atom)));
+            sbPrettyPrint.append(Integer.toHexString( (0xff&atom)));
             sbPrettyPrint.append(" ");
         }
         return sbPrettyPrint.toString();
