@@ -178,39 +178,48 @@ public class Esme {
     
     public void stop() {
         String label = null;
-        this.enquireLinkSchedule.cancel();
-        this.enquireLinkSchedule = null;
+        
+        
+        if (this.enquireLinkSchedule != null) {
+            this.enquireLinkSchedule.cancel();
+            this.enquireLinkSchedule = null;
+            LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - Watchdog thread stopped");
+        }
 
         try {
             if (this.canUseTrx) {
                 if (this.trxChannel.getConnectionState() == SmppSessionState.BOUND_TRX) {
+                    LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - TRX Mode in valid BOUND state... Unbinding");
                     this.unbindTrx();
                 }
                
-                this.trxWriter.stop();
-                this.trxReader.stop();
+                if(this.trxWriter != null) this.trxWriter.stop();
+                if(this.trxReader != null)this.trxReader.stop();
                 this.trxWriter = null;
                 this.trxReader = null;
-                
+                LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - Cleanup transport resources");
+               
                 label = this.trxChannel.getEsmeLabel();
                 StackMap.removeSession(label);
-                this.trxChannel.disconnect();
+                if(this.trxChannel != null) this.trxChannel.disconnect();
                 this.trxChannel = null;
                 
                 LogService.stackTraceLog.info("Esme-stop:Transiever is successful!!");
             } else {
                 if (this.txChannel.getConnectionState() == SmppSessionState.BOUND_TX) {
+                    LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
                     this.unbindTx();
                 }
                 
                 if (this.rxChannel.getConnectionState() == SmppSessionState.BOUND_RX) {
+                    LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
                     this.unbindRx();
                 }
                 
-                this.txWriter.stop();
-                this.txReader.stop();
-                this.rxWriter.stop();
-                this.rxReader.stop();
+                if(this.txWriter != null) this.txWriter.stop();
+                if(this.txReader != null) this.txReader.stop();
+                if(this.rxWriter != null) this.rxWriter.stop();
+                if(this.rxWriter != null) this.rxReader.stop();
                 this.txWriter = null;
                 this.rxWriter = null;
                 this.txReader = null;
@@ -218,11 +227,11 @@ public class Esme {
                 
                 label = this.txChannel.getEsmeLabel();
                 StackMap.removeSession(label);
-                this.txChannel.disconnect();
+                if(this.txChannel != null) this.txChannel.disconnect();
                 this.txChannel = null;
                 
                 LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Transmitter is successful!!");
-                this.rxChannel.disconnect();
+                if(this.rxChannel != null) this.rxChannel.disconnect();
                 this.rxChannel = null;
                 
                 LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Receiver is successful!!");
