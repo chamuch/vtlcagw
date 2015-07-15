@@ -102,14 +102,14 @@ public class Esme {
                 // lets try to connect...
                 this.trxChannel = new TcpConnection(this.trxConfig, ChannelMode.TRX);
                 this.trxChannel.connect();
-                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Socket Conneted for :" + this.trxChannel.getEsmeLabel() );
                 
                 this.trxWriter = new WriteHelper(this.trxChannel);
-                LogService.appLog.debug("Lazy Write Ready for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Lazy Write Ready for :" + this.trxChannel.getEsmeLabel() );
                 
                 this.trxReader = new ReadHelper(this.trxChannel);
                 new Thread(this.trxReader).start();
-                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.trxChannel.getEsmeLabel() );
                 
                 if (this.isEnquireLinkEnabled) {
                     this.enquireLinkSchedule = new Timer("EnquireLink-TRX-" + this.trxChannel.getEsmeLabel());
@@ -142,37 +142,38 @@ public class Esme {
                 
                 this.rxChannel = new TcpConnection(this.rxConfig, ChannelMode.RX);
                 this.rxChannel.connect();
-                LogService.appLog.debug("Socket Connected for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Socket Connected for :" + this.rxChannel.getEsmeLabel() );
                 
                 this.rxWriter = new WriteHelper(this.rxChannel);
-                LogService.appLog.debug("Lazy Write Ready for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Lazy Write Ready for :" + this.rxChannel.getEsmeLabel() );
                 
                 this.rxReader = new ReadHelper(this.rxChannel);
                 new Thread(this.rxReader).start();
-                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.rxChannel.getEsmeLabel() );
                 
                 if (this.isEnquireLinkEnabled) {
                     this.enquireLinkSchedule = new Timer("EnquireLink-RX-" + this.rxChannel.getEsmeLabel());
                     this.enquireLinkSchedule.schedule(new EnquireLinkTask(this), this.enquireLinkPeriod, this.enquireLinkPeriod);
-                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.username + "@" + this.systemType );
+                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.rxChannel.getEsmeLabel() );
                }
                 
                 // lets try to bind...
                 // lets bind TX first....
 //                this.bindTransmitter();
+//                LogService.appLog.debug("Bind Success for :" + this.txChannel.getEsmeLabel() );
+//                StackMap.addSession(this.txChannel.getEsmeLabel(), this);
                 
-//                LogService.stackTraceLog.info("Esme-start:BindingTransmitter is successful!!");
                 
                 // lets bind RX next....
                 this.bindReceiver();
-                LogService.appLog.debug("Bind Success for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Bind Success for :" + this.rxChannel.getEsmeLabel() );
                 StackMap.addSession(this.rxChannel.getEsmeLabel(), this);
                 
             }
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-start:Unable to connect & bind!:",e);
-            throw new SmppServiceException(this.username + "@" + this.systemType + "Unable to connect & bind!", e);
+        	LogService.stackTraceLog.debug(this.rxChannel.getEsmeLabel() + "-Esme-start:Unable to connect & bind!:",e);
+            throw new SmppServiceException(this.rxChannel.getEsmeLabel() + "-Unable to connect & bind!", e);
         }
     }
     

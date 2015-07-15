@@ -97,5 +97,14 @@ public class EnquireLink extends SmppPdu {
     public Integer getCommandLength() {
         return (Integer) SmppParameter.getInstance(Type.INTEGER, 16);
     }
+
+
+    @Override
+    public String toString() {
+        return "EnquireLink [getCommandId()=" + getCommandId() + ", getCommandLength()=" + getCommandLength() + ", getCommandStatus()=" + getCommandStatus()
+                + ", getCommandSequence()=" + getCommandSequence() + "]";
+    }
+    
+    
     
 }

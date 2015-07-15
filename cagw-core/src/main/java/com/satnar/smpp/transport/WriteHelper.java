@@ -24,6 +24,7 @@ public class WriteHelper {
         this.lazyWriteBuffer = new LazyWriteBuffer();
         lazyWritePeriod = this.smppConnection.getLazyWriteWait();
         this.lazyWriteSchedule = new Timer("LazyWriter-" + this.smppConnection.getEsmeLabel());
+        LogService.appLog.info("Lazy Writer Scheduled with Frequency: " + this.lazyWritePeriod);
         this.lazyWriteSchedule.schedule(new LazyWriterTask(this.smppConnection, this.lazyWriteBuffer), this.lazyWritePeriod, this.lazyWritePeriod);
     }
     

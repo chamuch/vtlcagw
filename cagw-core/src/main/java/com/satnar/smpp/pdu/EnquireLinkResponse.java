@@ -94,5 +94,14 @@ public class EnquireLinkResponse extends SmppPdu {
         length.setValue(16);
         return length;
     }
+
+
+    @Override
+    public String toString() {
+        return "EnquireLinkResponse [getCommandId()=" + getCommandId() + ", getCommandLength()=" + getCommandLength() + ", getCommandStatus()=" + getCommandStatus()
+                + ", getCommandSequence()=" + getCommandSequence() + "]";
+    }
+    
+    
     
 }
