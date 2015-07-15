@@ -41,7 +41,13 @@ public class ReadHelper implements Runnable {
             if ( this.smppConnection.getConnectionState() != SmppSessionState.CLOSED ||
                     this.smppConnection.getConnectionState() != SmppSessionState.UNBOUND) {
                 
-                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Current SMPP Connection State: " + this.smppConnection.getConnectionState());
+                boolean networkConnectionState = ((TcpConnection)this.smppConnection).getConnection().isConnected();
+                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Current SMPP Connection State: " + networkConnectionState);
+                if (!networkConnectionState) {
+                    LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - ReadHelper-run: Socket already seems to be broken. Proactive & Preventive measure to shutdown stack!!");
+                    Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
+                    session.stop();
+                }
                 
                 ByteBuffer readBuffer = this.smppConnection.getResponseBuffer();
                 
@@ -104,7 +110,6 @@ public class ReadHelper implements Runnable {
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Current Packet processed, lets wait for next...");
                             
                         } catch (IOException e) {
-                            //TODO: Log - whatever pending in this window has gone bad. Dumping the current window. Potentially subsequent windows will fail too.
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - ReadHelper-run: whatever pending in this window has gone bad. Dumping the current window. Potentially subsequent windows will fail too:",e);
                             Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                             session.stop();
