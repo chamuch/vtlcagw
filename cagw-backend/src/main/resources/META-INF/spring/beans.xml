@@ -44,8 +44,12 @@
     <constructor-arg name="keySpaceName" value="#{cfg.getValue('DB_PROP','keySpaceName')}" />
   </bean>
 
-  <bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
+  <!-- <bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
     <property name="unmarshalType" value="com.satnar.smpp.pdu.SmppPdu" />
+  </bean> -->
+  
+  <bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
+    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc" />
   </bean>
 
   <bean id="gsonCca" class="org.apache.camel.component.gson.GsonDataFormat">
