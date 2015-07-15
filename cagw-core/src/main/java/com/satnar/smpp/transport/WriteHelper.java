@@ -15,14 +15,16 @@ public class WriteHelper {
     
     private int lazyWritePeriod = 0;
     private Timer lazyWriteSchedule = null;
+    private LazyWriteBuffer lazyWriteBuffer = null;
     
     private Connection smppConnection = null;
     
     public WriteHelper(Connection connection) {
         this.smppConnection = connection;
+        this.lazyWriteBuffer = new LazyWriteBuffer();
         lazyWritePeriod = this.smppConnection.getLazyWriteWait();
         this.lazyWriteSchedule = new Timer("LazyWriter-" + this.smppConnection.getEsmeLabel());
-        this.lazyWriteSchedule.schedule(new LazyWriterTask(this.smppConnection), this.lazyWritePeriod, this.lazyWritePeriod);
+        this.lazyWriteSchedule.schedule(new LazyWriterTask(this.smppConnection, this.lazyWriteBuffer), this.lazyWritePeriod, this.lazyWritePeriod);
     }
     
     public void writeImmediate(SmppPdu payload) throws SmppCodecException, SmppTransportException  {
@@ -34,10 +36,13 @@ public class WriteHelper {
             ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
             byte[] serialized = payload.encode();
             LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + prettyPrint(serialized));
-            writeBuffer.put(serialized);
-            writeBuffer.flip();
-            this.smppConnection.write(writeBuffer);
-            writeBuffer.clear();
+            synchronized (writeBuffer) {
+                writeBuffer.clear();
+                writeBuffer.put(serialized);
+                writeBuffer.flip();
+                this.smppConnection.write(writeBuffer);
+                writeBuffer.clear();
+            }
             
             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
@@ -66,15 +71,16 @@ public class WriteHelper {
             throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
         
         try {
-            ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
             byte[] serialized = payload.encode();
             LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - buffering payload: " + prettyPrint(serialized));
+            this.lazyWriteBuffer.write(serialized);
             
-            synchronized (writeBuffer) {
-                writeBuffer.put(serialized);
-                
-                // if buffer is almost full, flush anyway
-                if ((writeBuffer.capacity() - writeBuffer.limit()) < 50) {
+            
+            if (this.lazyWriteBuffer.readyToTransmit()) {
+                ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
+                synchronized (writeBuffer) {
+                    writeBuffer.clear();
+                    writeBuffer.put(this.lazyWriteBuffer.flush());
                     writeBuffer.flip();
                     this.smppConnection.write(writeBuffer);
                     writeBuffer.clear();
@@ -109,9 +115,11 @@ public class WriteHelper {
     class LazyWriterTask extends TimerTask {
         
         private Connection connection = null;
+        private LazyWriteBuffer lazyWriteBuffer = null;
         
-        public LazyWriterTask(Connection connection) {
+        public LazyWriterTask(Connection connection, LazyWriteBuffer lazyWriteBuffer) {
             this.connection = connection;
+            this.lazyWriteBuffer = lazyWriteBuffer;
         }
 
         @Override
@@ -122,15 +130,18 @@ public class WriteHelper {
                         this.connection.getConnectionState() == SmppSessionState.BOUND_TRX) {
                     
                     LogService.appLog.debug("LazyWriter - connection state:" + this.connection.getConnectionState() + ", valid for write!!");
-                    ByteBuffer writeBuffer = this.connection.getRequestBuffer();
-                    if (writeBuffer.hasRemaining()) {
-                        LogService.appLog.debug("LazyWriter - Buffer has content ("  + writeBuffer.remaining() + "bytes) to send. Will flush now!!");
-                        writeBuffer.flip();
-                        this.connection.write(writeBuffer);
-                        writeBuffer.clear();
-                        LogService.appLog.debug("LazyWriter - Buffer flushed");
+                    if (this.lazyWriteBuffer.hasContent()) {
+                        ByteBuffer writeBuffer = this.connection.getRequestBuffer();
+                        synchronized (writeBuffer) {
+                            writeBuffer.clear();
+                            writeBuffer.put(this.lazyWriteBuffer.flush());
+                            writeBuffer.flip();
+                            this.connection.write(writeBuffer);
+                            writeBuffer.clear();
+                            LogService.stackTraceLog.debug(this.connection.getEsmeLabel() + " - flushed transmission window");
+                        }
                     } else {
-                        LogService.appLog.debug("LazyWriter - No Buffer Content to transmit!!");
+                        LogService.appLog.debug("LazyWriter - nothing to flush");
                     }
                 }
                 
