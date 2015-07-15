@@ -24,14 +24,16 @@ public class ParsingDelegate implements Callable<Void> {
     private static ProducerTemplate producerTemplate = null;
     
     private byte[] raw = null;
+    private String esmeLabel = null;
     private ChannelMode channelMode = null;
     
     public ParsingDelegate(CamelContext context) {
         producerTemplate = context.createProducerTemplate();
     }
     
-    public ParsingDelegate(byte[] serialized, ChannelMode channelMode) {
+    public ParsingDelegate(byte[] serialized, String esmeLabel, ChannelMode channelMode) {
         this.raw = serialized;
+        this.esmeLabel = esmeLabel;
         this.channelMode = channelMode;
     }
 
@@ -80,7 +82,7 @@ public class ParsingDelegate implements Callable<Void> {
                     return null;
                 case ENQUIRE_LINK:
                     LogService.appLog.debug("ENQUIRE_LINK Received and delegated");
-                    EsmeHelper.handleEnquireLinkRequest(rawPdu);
+                    EsmeHelper.handleEnquireLinkRequest(rawPdu, this.esmeLabel, this.channelMode);
                     return null;
                 case ENQUIRE_LINK_RESP:
                     LogService.appLog.debug("ENQUIRE_LINK_RESP Received and delegated");

@@ -324,14 +324,12 @@ public abstract class EsmeHelper {
     }
 
 
-    public static void handleEnquireLinkRequest(byte[] rawPdu) {
+    public static void handleEnquireLinkRequest(byte[] rawPdu, String esmeLabel, ChannelMode channelMode) {
         try {
             SmppPdu enquireLinkPdu = new EnquireLink();
             enquireLinkPdu.decode(rawPdu);
             
-            String sessionId = StackMap.getEsmeLabel("" + enquireLinkPdu.getCommandSequence().getValue());
-            LogService.appLog.debug("Found the ESME for Request: " + sessionId);
-            Esme session = StackMap.getStack(sessionId);
+            Esme session = StackMap.getStack(esmeLabel);
             LogService.appLog.debug("ESME Session found is available: " + (session != null));
             
             SmppPdu enquireLinkResponsePdu = new EnquireLinkResponse();
@@ -340,12 +338,17 @@ public abstract class EsmeHelper {
             
             if (session.isCanUseTrx()) {
                 session.sendPdu(enquireLinkResponsePdu, ChannelMode.TRX);
-                LogService.appLog.debug("Sending EnquireLink Response thru TRX: " + sessionId);
+                LogService.appLog.debug("Sending EnquireLink Response thru TRX: " + esmeLabel);
             } else {
                 // one of these will get a GNACK but that can be ignored
-//                session.sendPdu(enquireLinkResponsePdu, ChannelMode.TX);
-                session.sendPdu(enquireLinkResponsePdu, ChannelMode.RX);
-                LogService.appLog.debug("Sending EnquireLink Response thru TX/RX: " + sessionId);
+                if (channelMode == ChannelMode.TX) {
+                    session.sendPdu(enquireLinkResponsePdu, ChannelMode.TX);
+                    LogService.appLog.debug("Sending EnquireLink Response thru TX: " + esmeLabel);
+                } else {
+                    session.sendPdu(enquireLinkResponsePdu, ChannelMode.RX);
+                    LogService.appLog.debug("Sending EnquireLink Response thru RX: " + esmeLabel);
+                }
+                LogService.appLog.debug("Sending EnquireLink Response thru TX/RX: " + esmeLabel);
             }
         } catch (SmppCodecException e) {
             //TODO: Log this... Cant throw exceptions.... just drop the PDU...

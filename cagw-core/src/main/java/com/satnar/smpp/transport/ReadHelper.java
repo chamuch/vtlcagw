@@ -76,8 +76,9 @@ public class ReadHelper implements Runnable {
                         } // end of window size
                     } // end of sync block on read buffer
                     
-                    // adjust the sliding window
+                    // process only if we read anything from the socket..
                     if (windowSize > 0) {
+                        // adjust the sliding window
                         slidingWindow.push(currentWindow);
                         DataInputStream parser = new DataInputStream(slidingWindow.getConsumingStream());
                         
@@ -96,7 +97,7 @@ public class ReadHelper implements Runnable {
                                     // delgate to pdu facade now
                                     try {
                                         LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
-                                        ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getMode());
+                                        ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
                                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
