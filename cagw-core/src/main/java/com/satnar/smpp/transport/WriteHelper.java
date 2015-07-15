@@ -74,7 +74,7 @@ public class WriteHelper {
                 writeBuffer.put(serialized);
                 
                 // if buffer is almost full, flush anyway
-                if ((writeBuffer.capacity() - writeBuffer.position()) < 50) {
+                if ((writeBuffer.capacity() - writeBuffer.limit()) < 50) {
                     writeBuffer.flip();
                     this.smppConnection.write(writeBuffer);
                     writeBuffer.clear();

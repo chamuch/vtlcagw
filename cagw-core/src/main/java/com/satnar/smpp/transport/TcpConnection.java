@@ -129,7 +129,7 @@ public class TcpConnection extends Connection {
                 case UNBOUND:
                 case INIT_IDLE:
                 case OPEN:
-                    if (this.connection != null) this.connection.close();
+                    if (this.connection != null && this.connection.isConnected()) this.connection.close();
                     break;
                 case BOUND_RX:
                 case BOUND_TRX:

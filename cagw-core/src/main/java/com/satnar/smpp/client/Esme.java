@@ -179,7 +179,6 @@ public class Esme {
     public void stop() {
         String label = null;
         
-        
         if (this.enquireLinkSchedule != null) {
             this.enquireLinkSchedule.cancel();
             this.enquireLinkSchedule = null;
