@@ -170,8 +170,8 @@ public class Esme {
             }
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug("Esme-start:Unable to connect & bind!:",e);
-            throw new SmppServiceException("Unable to connect & bind!", e);
+        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-start:Unable to connect & bind!:",e);
+            throw new SmppServiceException(this.username + "@" + this.systemType + "Unable to connect & bind!", e);
         }
     }
     
@@ -220,19 +220,19 @@ public class Esme {
                 this.txChannel.disconnect();
                 this.txChannel = null;
                 
-                LogService.stackTraceLog.info("Esme-stop:Transmitter is successful!!");
+                LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Transmitter is successful!!");
                 this.rxChannel.disconnect();
                 this.rxChannel = null;
                 
-                LogService.stackTraceLog.info("Esme-stop:Receiver is successful!!");
+                LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Receiver is successful!!");
             }
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug("Esme-stop:Unable to stop!:",e);
+        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-stop:Unable to stop!:",e);
             StackMap.removeSession(label);
         } catch (SmppServiceException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug("Esme-stop:Unable to stop!:",e);
+        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-stop:Unable to stop!:",e);
             StackMap.removeSession(label);
         }
     }
@@ -241,26 +241,33 @@ public class Esme {
         try {
             if (this.canUseTrx) {
                 this.trxWriter.writeLazy(pdu);
+                LogService.appLog.debug(this.username + "@" + this.systemType + "TRX Lazy Write PDU:" + pdu.toString());
                 return;
             }
             
             if (pdu.getCommandId() == CommandId.EXTENDED) {
-                if (mode == ChannelMode.TX)
+                if (mode == ChannelMode.TX) {
                     this.txWriter.writeLazy(pdu);
-                else
+                    LogService.appLog.debug(this.username + "@" + this.systemType + "TX Lazy Write PDU:" + pdu.toString());
+                } else {
                     this.rxWriter.writeLazy(pdu);
+                    LogService.appLog.debug(this.username + "@" + this.systemType + "RX Lazy Write PDU:" + pdu.toString());
+                }
                 return;
             }
             
-            if (pdu.getCommandId().isTxCompatible())
+            if (pdu.getCommandId().isTxCompatible()) {
                 this.txWriter.writeLazy(pdu);
-            else
+                LogService.appLog.debug(this.username + "@" + this.systemType + "TX Lazy Write PDU:" + pdu.toString());
+            } else {
                 this.rxWriter.writeLazy(pdu);
+                LogService.appLog.debug(this.username + "@" + this.systemType + "RX Lazy Write PDU:" + pdu.toString());
+           }
             
-            LogService.stackTraceLog.debug("Esme-sendPdu:Successful. CommandId:"+pdu.getCommandId().name()+"CommandSequence:"+pdu.getCommandSequence().getValue());
+            LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-sendPdu:Successful. CommandId:"+pdu.getCommandId().name()+"CommandSequence:"+pdu.getCommandSequence().getValue());
         } catch (SmppTransportException e) {
             //TODO: Log for troubelshooting. Seems like the transport is broken. Must stop the stack.
-        	LogService.stackTraceLog.debug("Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
+        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
             this.stop();
         }
     }

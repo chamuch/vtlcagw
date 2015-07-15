@@ -330,18 +330,22 @@ public abstract class EsmeHelper {
             enquireLinkPdu.decode(rawPdu);
             
             String sessionId = StackMap.getEsmeLabel("" + enquireLinkPdu.getCommandSequence().getValue());
+            LogService.appLog.debug("Found the ESME for Request: " + sessionId);
             Esme session = StackMap.getStack(sessionId);
-
+            LogService.appLog.debug("ESME Session found is available: " + (session != null));
+            
             SmppPdu enquireLinkResponsePdu = new EnquireLinkResponse();
             enquireLinkResponsePdu.setCommandStatus(CommandStatus.ESME_ROK);
             enquireLinkResponsePdu.setCommandSequence(enquireLinkPdu.getCommandSequence());
             
             if (session.isCanUseTrx()) {
                 session.sendPdu(enquireLinkResponsePdu, ChannelMode.TRX);
+                LogService.appLog.debug("Sending EnquireLink Response thru TRX: " + sessionId);
             } else {
-                // once of these will get a GNACK but that can be ignored
-                session.sendPdu(enquireLinkResponsePdu, ChannelMode.TX);
+                // one of these will get a GNACK but that can be ignored
+//                session.sendPdu(enquireLinkResponsePdu, ChannelMode.TX);
                 session.sendPdu(enquireLinkResponsePdu, ChannelMode.RX);
+                LogService.appLog.debug("Sending EnquireLink Response thru TX/RX: " + sessionId);
             }
         } catch (SmppCodecException e) {
             //TODO: Log this... Cant throw exceptions.... just drop the PDU...
