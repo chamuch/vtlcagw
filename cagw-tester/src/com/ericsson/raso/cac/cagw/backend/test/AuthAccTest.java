@@ -82,6 +82,7 @@ public class AuthAccTest {
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(cagwUrl);
             post.setHeader("Content-Type", "application/json");
+            post.setHeader("Accept", "application/json");
             StringEntity body = new StringEntity(new Gson().toJson(authAccPdu));
             
             post.setEntity(body);
