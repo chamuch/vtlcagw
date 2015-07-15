@@ -207,19 +207,19 @@ public class Esme {
                 LogService.stackTraceLog.info("Esme-stop:Transiever is successful!!");
             } else {
                 if (this.txChannel.getConnectionState() == SmppSessionState.BOUND_TX) {
-                    LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.info(this.txChannel.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
                     this.unbindTx();
                 }
                 
                 if (this.rxChannel.getConnectionState() == SmppSessionState.BOUND_RX) {
-                    LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.info(this.rxChannel.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
                     this.unbindRx();
                 }
                 
                 if(this.txWriter != null) this.txWriter.stop();
                 if(this.txReader != null) this.txReader.stop();
                 if(this.rxWriter != null) this.rxWriter.stop();
-                if(this.rxWriter != null) this.rxReader.stop();
+                if(this.rxReader != null) this.rxReader.stop();
                 this.txWriter = null;
                 this.rxWriter = null;
                 this.txReader = null;
