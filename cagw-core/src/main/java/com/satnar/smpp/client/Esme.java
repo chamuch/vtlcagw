@@ -100,7 +100,7 @@ public class Esme {
         try {
             if (this.canUseTrx) {
                 // lets try to connect...
-                this.trxChannel = new TcpConnection(this.trxConfig);
+                this.trxChannel = new TcpConnection(this.trxConfig, ChannelMode.TRX);
                 this.trxChannel.connect();
                 LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
                 
@@ -125,7 +125,7 @@ public class Esme {
                 LogService.stackTraceLog.info("Esme-start:BindingTransiever is successful!!");
             } else {
                 // lets try to connect...
-                this.txChannel = new TcpConnection(this.txConfig);
+                this.txChannel = new TcpConnection(this.txConfig, ChannelMode.TX);
                 // ----- this is a dirty hack only for 5h1tty fucking Huawei SMPP+ crappy motherass fucking implementation
                 ((TcpConnection)this.txChannel).validateInitializeConfig();
 //                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
@@ -140,7 +140,7 @@ public class Esme {
                     this.enquireLinkSchedule.schedule(new EnquireLinkTask(this), this.enquireLinkPeriod, this.enquireLinkPeriod);
                 }*/
                 
-                this.rxChannel = new TcpConnection(this.rxConfig);
+                this.rxChannel = new TcpConnection(this.rxConfig, ChannelMode.RX);
                 this.rxChannel.connect();
                 LogService.appLog.debug("Socket Connected for :" + this.username + "@" + this.systemType );
                 
@@ -519,6 +519,7 @@ public class Esme {
             this.trxWriter.writeImmediate(bindTrx);
             StackMap.addMessageIndex("" + bindTrx.getCommandSequence().getValue(), this.trxChannel.getEsmeLabel());
             StackMap.addSession(this.trxChannel.getEsmeLabel(), this);
+            LogService.appLog.debug("Added Session to StackMap with key: " + this.trxChannel.getEsmeLabel());
         } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-bindTransceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindTrx.getCommandSequence().getValue(),e);
@@ -548,6 +549,7 @@ public class Esme {
             this.txWriter.writeImmediate(bindTx);
             StackMap.addMessageIndex("" + bindTx.getCommandSequence().getValue(), this.txChannel.getEsmeLabel());
             StackMap.addSession(this.txChannel.getEsmeLabel(), this);
+            LogService.appLog.debug("Added Session to StackMap with key: " + this.txChannel.getEsmeLabel());
 
         } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
@@ -577,6 +579,7 @@ public class Esme {
             this.rxWriter.writeImmediate(bindRx);
             StackMap.addMessageIndex("" + bindRx.getCommandSequence().getValue(), this.rxChannel.getEsmeLabel());
             StackMap.addSession(this.rxChannel.getEsmeLabel(), this);
+            LogService.appLog.debug("Added Session to StackMap with key: " + this.rxChannel.getEsmeLabel());
        } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
     	   LogService.stackTraceLog.debug("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);

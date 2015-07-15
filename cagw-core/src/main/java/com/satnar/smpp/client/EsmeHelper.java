@@ -330,7 +330,7 @@ public abstract class EsmeHelper {
             enquireLinkPdu.decode(rawPdu);
             
             Esme session = StackMap.getStack(esmeLabel);
-            LogService.appLog.debug("ESME Session found is available: " + (session != null));
+            LogService.appLog.debug("ESME Session found is available: " + (session != null)); 
             
             SmppPdu enquireLinkResponsePdu = new EnquireLinkResponse();
             enquireLinkResponsePdu.setCommandStatus(CommandStatus.ESME_ROK);
