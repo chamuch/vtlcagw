@@ -345,6 +345,8 @@ public abstract class EsmeHelper {
         } catch (SmppCodecException e) {
             //TODO: Log this... Cant throw exceptions.... just drop the PDU...
         	LogService.stackTraceLog.debug("EsmeHelper-handleEnquireLinkRequest:Encountered exception",e);
+        } catch(Exception e){
+        	LogService.stackTraceLog.debug("EsmeHelper-handleEnquireLinkRequest:Encountered gen exception",e);
         }
     }
 
