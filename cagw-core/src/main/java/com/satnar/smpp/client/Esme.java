@@ -102,25 +102,25 @@ public class Esme {
                 // lets try to connect...
                 this.trxChannel = new TcpConnection(this.trxConfig, ChannelMode.TRX);
                 this.trxChannel.connect();
-                LogService.appLog.debug("Socket Conneted for :" + this.trxChannel.getEsmeLabel() );
+                LogService.appLog.debug("Socket Conneted for :" + this.getEsmeLabel() );
                 
                 this.trxWriter = new WriteHelper(this.trxChannel);
-                LogService.appLog.debug("Lazy Write Ready for :" + this.trxChannel.getEsmeLabel() );
+                LogService.appLog.debug("Lazy Write Ready for :" + this.getEsmeLabel() );
                 
                 this.trxReader = new ReadHelper(this.trxChannel);
                 new Thread(this.trxReader).start();
-                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.trxChannel.getEsmeLabel() );
+                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.getEsmeLabel() );
                 
                 if (this.isEnquireLinkEnabled) {
-                    this.enquireLinkSchedule = new Timer("EnquireLink-TRX-" + this.trxChannel.getEsmeLabel());
+                    this.enquireLinkSchedule = new Timer("EnquireLink-TRX-" + this.getEsmeLabel());
                     this.enquireLinkSchedule.schedule(new EnquireLinkTask(this), this.enquireLinkPeriod, this.enquireLinkPeriod);
-                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.username + "@" + this.systemType );
+                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.getEsmeLabel() );
                 }
                 
                 // lets try to bind...
                 this.bindTransceiver();
-                LogService.appLog.debug("Bind Success for :" + this.username + "@" + this.systemType );
-                StackMap.addSession(this.trxChannel.getEsmeLabel(), this);
+                LogService.appLog.debug("Bind Success for :" + this.getEsmeLabel() );
+                StackMap.addSession(this.getEsmeLabel(), this);
                 
                 LogService.stackTraceLog.info("Esme-start:BindingTransiever is successful!!");
             } else {
@@ -142,19 +142,19 @@ public class Esme {
                 
                 this.rxChannel = new TcpConnection(this.rxConfig, ChannelMode.RX);
                 this.rxChannel.connect();
-                LogService.appLog.debug("Socket Connected for :" + this.rxChannel.getEsmeLabel() );
+                LogService.appLog.debug("Socket Connected for :" + this.getEsmeLabel() );
                 
                 this.rxWriter = new WriteHelper(this.rxChannel);
-                LogService.appLog.debug("Lazy Write Ready for :" + this.rxChannel.getEsmeLabel() );
+                LogService.appLog.debug("Lazy Write Ready for :" + this.getEsmeLabel() );
                 
                 this.rxReader = new ReadHelper(this.rxChannel);
                 new Thread(this.rxReader).start();
-                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.rxChannel.getEsmeLabel() );
+                LogService.appLog.debug("Sliding Window Reader Ready for :" + this.getEsmeLabel() );
                 
                 if (this.isEnquireLinkEnabled) {
-                    this.enquireLinkSchedule = new Timer("EnquireLink-RX-" + this.rxChannel.getEsmeLabel());
+                    this.enquireLinkSchedule = new Timer("EnquireLink-RX-" + this.getEsmeLabel());
                     this.enquireLinkSchedule.schedule(new EnquireLinkTask(this), this.enquireLinkPeriod, this.enquireLinkPeriod);
-                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.rxChannel.getEsmeLabel() );
+                    LogService.appLog.debug("Connection Watchdog Ready for :" + this.getEsmeLabel() );
                }
                 
                 // lets try to bind...
@@ -166,14 +166,14 @@ public class Esme {
                 
                 // lets bind RX next....
                 this.bindReceiver();
-                LogService.appLog.debug("Bind Success for :" + this.rxChannel.getEsmeLabel() );
-                StackMap.addSession(this.rxChannel.getEsmeLabel(), this);
+                LogService.appLog.debug("Bind Success for :" + this.getEsmeLabel() );
+                StackMap.addSession(this.getEsmeLabel(), this);
                 
             }
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug(this.rxChannel.getEsmeLabel() + "-Esme-start:Unable to connect & bind!:",e);
-            throw new SmppServiceException(this.rxChannel.getEsmeLabel() + "-Unable to connect & bind!", e);
+        	LogService.stackTraceLog.debug(this.getEsmeLabel() + "-Esme-start:Unable to connect & bind!:",e);
+            throw new SmppServiceException(this.getEsmeLabel() + "-Unable to connect & bind!", e);
         }
     }
     
@@ -183,13 +183,13 @@ public class Esme {
         if (this.enquireLinkSchedule != null) {
             this.enquireLinkSchedule.cancel();
             this.enquireLinkSchedule = null;
-            LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - Watchdog thread stopped");
+            LogService.appLog.info(this.getEsmeLabel() + " - Watchdog thread stopped");
         }
 
         try {
             if (this.canUseTrx) {
                 if (this.trxChannel.getConnectionState() == SmppSessionState.BOUND_TRX) {
-                    LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - TRX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.info(this.getEsmeLabel() + " - TRX Mode in valid BOUND state... Unbinding");
                     this.unbindTrx();
                 }
                
@@ -197,22 +197,22 @@ public class Esme {
                 if(this.trxReader != null)this.trxReader.stop();
                 this.trxWriter = null;
                 this.trxReader = null;
-                LogService.appLog.info(this.trxChannel.getEsmeLabel() + " - Cleanup transport resources");
+                LogService.appLog.info(this.getEsmeLabel() + " - Cleanup transport resources");
                
-                label = this.trxChannel.getEsmeLabel();
+                label = this.getEsmeLabel();
                 StackMap.removeSession(label);
                 if(this.trxChannel != null) this.trxChannel.disconnect();
                 this.trxChannel = null;
                 
-                LogService.stackTraceLog.info("Esme-stop:Transiever is successful!!");
+                LogService.stackTraceLog.info(this.getEsmeLabel() + " Esme-stop:Transiever is successful!!");
             } else {
                 if (this.txChannel.getConnectionState() == SmppSessionState.BOUND_TX) {
-                    LogService.appLog.info(this.txChannel.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.info(this.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
                     this.unbindTx();
                 }
                 
                 if (this.rxChannel.getConnectionState() == SmppSessionState.BOUND_RX) {
-                    LogService.appLog.info(this.rxChannel.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.info(this.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
                     this.unbindRx();
                 }
                 
@@ -230,57 +230,57 @@ public class Esme {
 //                if(this.txChannel != null) this.txChannel.disconnect();
 //                this.txChannel = null;
                 
-                LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Transmitter is successful!!");
+                LogService.stackTraceLog.info(this.getEsmeLabel() + "Esme-stop:Transmitter is successful!!");
                 if(this.rxChannel != null) this.rxChannel.disconnect();
                 this.rxChannel = null;
                 
-                LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Receiver is successful!!");
+                LogService.stackTraceLog.info(this.getEsmeLabel() + "Esme-stop:Receiver is successful!!");
             }
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-stop:Unable to stop!:",e);
+        	LogService.stackTraceLog.debug(this.getEsmeLabel() + "Esme-stop:Unable to stop!:",e);
             StackMap.removeSession(label);
         } catch (SmppServiceException e) {
             // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-stop:Unable to stop!:",e);
+        	LogService.stackTraceLog.debug(this.getEsmeLabel() + "Esme-stop:Unable to stop!:",e);
             StackMap.removeSession(label);
         }
     }
     
     public void sendPdu(SmppPdu pdu, ChannelMode mode) throws SmppCodecException {
-        LogService.stackTraceLog.debug(this.trxChannel.getEsmeLabel() + " - Esme-sendPdu: Attempting... CommandId:"+pdu.getCommandId().name()+", CommandSequence:"+pdu.getCommandSequence().getValue());
+        LogService.stackTraceLog.debug(this.getEsmeLabel() + " - Esme-sendPdu: Attempting... CommandId:"+pdu.getCommandId().name()+", CommandSequence:"+pdu.getCommandSequence().getValue());
 
         try {
             if (this.canUseTrx) {
-                LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - TRX Lazy Write PDU:" + pdu.toString());
+                LogService.appLog.debug(this.getEsmeLabel() + " - TRX Lazy Write PDU:" + pdu.toString());
                 this.trxWriter.writeLazy(pdu);
                 return;
             }
             
-            LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - Command ID: " + pdu.getCommandId());
+            LogService.appLog.debug(this.getEsmeLabel() + " - Command ID: " + pdu.getCommandId());
             if (pdu.getCommandId() == CommandId.EXTENDED) {
                 if (mode == ChannelMode.TX) {
-                    LogService.appLog.debug(this.txChannel.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
+                    LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                     this.txWriter.writeLazy(pdu);
                 } else {
-                    LogService.appLog.debug(this.rxChannel.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
+                    LogService.appLog.debug(this.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
                     this.rxWriter.writeLazy(pdu);
                 }
                 return;
             }
             
-            LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - Standard Command ID: " + pdu.getCommandId());
+            LogService.appLog.debug(this.getEsmeLabel() + " - Standard Command ID: " + pdu.getCommandId());
             if (pdu.getCommandId().isTxCompatible()) {
-                LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
+                LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                 this.txWriter.writeLazy(pdu);
             } else {
-                LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
+                LogService.appLog.debug(this.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
                 this.rxWriter.writeLazy(pdu);
            }
             
         } catch (SmppTransportException e) {
             //TODO: Log for troubelshooting. Seems like the transport is broken. Must stop the stack.
-        	LogService.stackTraceLog.debug(this.trxChannel.getEsmeLabel() + " - Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
+        	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
             this.stop();
         }
     }
@@ -843,6 +843,16 @@ public class Esme {
 
     public WriteHelper getTrxWriter() {
         return trxWriter;
+    }
+    
+    public String getEsmeLabel() {
+        if (this.trxChannel != null)
+            return this.trxChannel.getEsmeLabel();
+        
+        if (this.txChannel != null)
+            return this.txChannel.getEsmeLabel();
+        else
+            return this.rxChannel.getEsmeLabel();
     }
 
     @Override
