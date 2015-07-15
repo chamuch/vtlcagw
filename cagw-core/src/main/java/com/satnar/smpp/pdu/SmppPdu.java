@@ -1,7 +1,5 @@
 package com.satnar.smpp.pdu;
 
-import java.nio.ByteBuffer;
-
 import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandSequence;
 import com.satnar.smpp.CommandStatus;

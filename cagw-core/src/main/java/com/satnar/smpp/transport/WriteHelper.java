@@ -21,29 +21,29 @@ public class WriteHelper {
     public WriteHelper(Connection connection) {
         this.smppConnection = connection;
         lazyWritePeriod = this.smppConnection.getLazyWriteWait();
-        this.lazyWriteSchedule = new Timer("LazyWriter-" + this.hashCode());
+        this.lazyWriteSchedule = new Timer("LazyWriter-" + this.smppConnection.getEsmeLabel());
         this.lazyWriteSchedule.schedule(new LazyWriterTask(this.smppConnection), this.lazyWritePeriod, this.lazyWritePeriod);
     }
     
     public void writeImmediate(SmppPdu payload) throws SmppCodecException, SmppTransportException  {
         if (this.smppConnection.getConnectionState() == SmppSessionState.CLOSED ||
                 this.smppConnection.getConnectionState() == SmppSessionState.UNBOUND)
-            throw new SmppTransportException("SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
+            throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
         
         try {
             ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
             byte[] serialized = payload.encode();
-            LogService.stackTraceLog.debug("transmitting payload: " + prettyPrint(serialized));
+            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + prettyPrint(serialized));
             writeBuffer.put(serialized);
             writeBuffer.flip();
             this.smppConnection.write(writeBuffer);
             writeBuffer.clear();
             
-            LogService.stackTraceLog.info("WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
+            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 //TODO: Log - socket seems to be broken.
-            	LogService.stackTraceLog.debug("WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
+            	LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                 session.stop();
             }
@@ -63,11 +63,12 @@ public class WriteHelper {
     public void writeLazy(SmppPdu payload) throws SmppCodecException, SmppTransportException  {
         if (this.smppConnection.getConnectionState() == SmppSessionState.CLOSED ||
                 this.smppConnection.getConnectionState() == SmppSessionState.UNBOUND)
-            throw new SmppTransportException("SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
+            throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
         
         try {
             ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
             byte[] serialized = payload.encode();
+            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - buffering payload: " + prettyPrint(serialized));
             
             synchronized (writeBuffer) {
                 writeBuffer.put(serialized);
@@ -77,14 +78,15 @@ public class WriteHelper {
                     writeBuffer.flip();
                     this.smppConnection.write(writeBuffer);
                     writeBuffer.clear();
+                    LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
                 }
             }
             
-            LogService.stackTraceLog.info("WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
+            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 //TODO: Log - socket seems to be broken.
-            	LogService.stackTraceLog.debug("WriteHelper-writeLazy:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
+            	LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                 session.stop();
             }
