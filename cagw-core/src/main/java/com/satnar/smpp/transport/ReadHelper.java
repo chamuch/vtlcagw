@@ -112,6 +112,7 @@ public class ReadHelper implements Runnable {
                         } catch (IOException e) {
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - ReadHelper-run: whatever pending in this window has gone bad. Dumping the current window. Potentially subsequent windows will fail too:",e);
                             Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
+                            LogService.appLog.info("Checking Smpp Session: " + this.smppConnection.getEsmeLabel() + " in session store: " + (session != null));
                             session.stop();
                         } // end of try block
                     } // end of window size

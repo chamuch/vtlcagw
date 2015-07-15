@@ -1,5 +1,6 @@
 package com.satnar.smpp.client;
 
+import java.util.Date;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -165,7 +166,7 @@ public class Esme {
                 // lets bind RX next....
                 this.bindReceiver();
                 LogService.appLog.debug("Bind Success for :" + this.username + "@" + this.systemType );
-                StackMap.addSession(this.txChannel.getEsmeLabel(), this);
+                StackMap.addSession(this.rxChannel.getEsmeLabel(), this);
                 
             }
         } catch (SmppTransportException e) {
@@ -509,6 +510,7 @@ public class Esme {
             LogService.stackTraceLog.trace("Encoded Write - " + bindTrx.toString());
             this.trxWriter.writeImmediate(bindTrx);
             StackMap.addMessageIndex("" + bindTrx.getCommandSequence().getValue(), this.trxChannel.getEsmeLabel());
+            StackMap.addSession(this.trxChannel.getEsmeLabel(), this);
         } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-bindTransceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindTrx.getCommandSequence().getValue(),e);
@@ -537,6 +539,7 @@ public class Esme {
             bindTx = EsmeHelper.getBindTransmitter(this.username, this.password, this.systemType, this.interfaceVersion, this.esmeTon, this.esmeNpi, this.addressRange);
             this.txWriter.writeImmediate(bindTx);
             StackMap.addMessageIndex("" + bindTx.getCommandSequence().getValue(), this.txChannel.getEsmeLabel());
+            StackMap.addSession(this.txChannel.getEsmeLabel(), this);
 
         } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
@@ -564,7 +567,8 @@ public class Esme {
         try {
             bindRx = EsmeHelper.getBindReceiver(this.username, this.password, this.systemType, this.interfaceVersion, this.esmeTon, this.esmeNpi, this.addressRange);
             this.rxWriter.writeImmediate(bindRx);
-            StackMap.addMessageIndex("" + bindRx.getCommandSequence().getValue(), this.txChannel.getEsmeLabel());
+            StackMap.addMessageIndex("" + bindRx.getCommandSequence().getValue(), this.rxChannel.getEsmeLabel());
+            StackMap.addSession(this.rxChannel.getEsmeLabel(), this);
        } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
     	   LogService.stackTraceLog.debug("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);
@@ -679,21 +683,24 @@ public class Esme {
                 if (this.session.isCanUseTrx()) {
                     if (this.session.trxChannel.getConnectionState() == SmppSessionState.BOUND_TRX) {
                         EnquireLink enquireLinkPdu = new EnquireLink();
+                        LogService.appLog.info("Sending Enquire Link for TRX session: " + session.trxChannel.getEsmeLabel() + " @" + new Date().toString());
                         this.session.sendPdu(enquireLinkPdu, ChannelMode.TRX);
                     }
                 } else {
                     if (this.session.txChannel.getConnectionState() == SmppSessionState.BOUND_TX) {
                         EnquireLink enquireLinkTxPdu = new EnquireLink();
+                        LogService.appLog.info("Sending Enquire Link for TX session: " + session.txChannel.getEsmeLabel() + " @" + new Date().toString());
                         this.session.sendPdu(enquireLinkTxPdu, ChannelMode.TX);
                     }
 
                     if (this.session.rxChannel.getConnectionState() == SmppSessionState.BOUND_RX) {
                         EnquireLink enquireLinkRxPdu = new EnquireLink();
+                        LogService.appLog.info("Sending Enquire Link for RX session: " + session.rxChannel.getEsmeLabel() + " @" + new Date().toString());
                         this.session.sendPdu(enquireLinkRxPdu, ChannelMode.RX);
                     }
                 }
             } catch(SmppCodecException e) {
-                //TODO: Log for troubleshooting... no need to throw exceptions in thread mode
+                LogService.appLog.error("Failed attempting to encode Enquire Link for session: " + session.txChannel.getEsmeLabel() + " @" + new Date().toString());
             }
         }
     }
