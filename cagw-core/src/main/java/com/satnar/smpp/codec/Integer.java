@@ -36,6 +36,11 @@ public class Integer extends SmppParameter {
     public int getLength() {
         return 4; // as per SMPP Specs 3.4 Issue 1.2
     }
+
+    @Override
+    public String toString() {
+        return String.format("Integer [value=%s]", value);
+    }
     
     
     

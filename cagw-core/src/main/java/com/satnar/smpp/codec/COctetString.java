@@ -81,6 +81,11 @@ public class COctetString extends SmppParameter {
     public String getString() {
         return this.value.substring(0, (this.value.length()-1));
     }
+
+    @Override
+    public String toString() {
+        return String.format("COctetString [value=%s]", value);
+    }
     
     
 }

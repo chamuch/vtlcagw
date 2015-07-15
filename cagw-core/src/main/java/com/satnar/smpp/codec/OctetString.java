@@ -1,5 +1,7 @@
 package com.satnar.smpp.codec;
 
+import java.util.Arrays;
+
 public class OctetString extends SmppParameter {
     
     private byte[] value = null;
@@ -39,6 +41,18 @@ public class OctetString extends SmppParameter {
         return this.value.length;
     }
 
-   
+    @Override
+    public String toString() {
+        return String.format("OctetString [value=%s]", prettyPrint(value));
+    }
+
+    private String prettyPrint(byte[] serialized) {
+        StringBuilder sbPrettyPrint = new StringBuilder();
+        for (byte atom: serialized) {
+            sbPrettyPrint.append(java.lang.Integer.toHexString((0xff|atom)));
+            sbPrettyPrint.append(" ");
+        }
+        return sbPrettyPrint.toString();
+    }
     
 }

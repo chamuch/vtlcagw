@@ -36,6 +36,11 @@ public class Byte extends SmppParameter {
     public int getLength() {
         return 1; // as per SMPP Specs 3.4 Issue 1.2
     }
+
+    @Override
+    public String toString() {
+        return String.format("Byte [value=%s]", value);
+    }
     
     
     
