@@ -59,14 +59,14 @@ public class ReadHelper implements Runnable {
                     synchronized (readBuffer) {
                         windowSize =  this.smppConnection.read(readBuffer);
                         
-                        // check the buffer...
+                        // check the incoming packet size...
                         if (windowSize > 0) {
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Read Buffer Window Size read: " + windowSize);
                             currentWindow = new byte[windowSize];
                             readBuffer.get(currentWindow); readBuffer.clear();
-                        } else {
+                        } else { // else, lets wait 0.5 sec (this can be optimized later)
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(500);
                             } catch (InterruptedException e) {
                                 // do nothing
                             } // end of catch
@@ -77,6 +77,7 @@ public class ReadHelper implements Runnable {
                     slidingWindow.push(currentWindow);
                     DataInputStream parser = new DataInputStream(slidingWindow.getConsumingStream());
                     
+                    // process the burst...
                     do {
                         if (parser.available() > 4) { // to ensure we have enough bytes to atleast decode PDU length...
                             int pduLength = parser.readInt();
