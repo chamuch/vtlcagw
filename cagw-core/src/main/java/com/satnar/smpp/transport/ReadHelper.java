@@ -84,6 +84,7 @@ public class ReadHelper implements Runnable {
                             do {
                                 int pduLength = parser.readInt();
                                 int remaining = parser.available();
+                                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Read Burst Cycle: pduLen" + pduLength + ", available payload: " + remaining);
                                 if ((pduLength - 4) <= remaining) {
                                     byte[] pduPayload = new byte[pduLength - 4]; // since 4 bytes is already read for PDU length
                                     parser.read(pduPayload);
