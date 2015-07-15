@@ -247,36 +247,39 @@ public class Esme {
     }
     
     public void sendPdu(SmppPdu pdu, ChannelMode mode) throws SmppCodecException {
+        LogService.stackTraceLog.debug(this.trxChannel.getEsmeLabel() + " - Esme-sendPdu: Attempting... CommandId:"+pdu.getCommandId().name()+", CommandSequence:"+pdu.getCommandSequence().getValue());
+
         try {
             if (this.canUseTrx) {
+                LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - TRX Lazy Write PDU:" + pdu.toString());
                 this.trxWriter.writeLazy(pdu);
-                LogService.appLog.debug(this.username + "@" + this.systemType + "TRX Lazy Write PDU:" + pdu.toString());
                 return;
             }
             
+            LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - Command ID: " + pdu.getCommandId());
             if (pdu.getCommandId() == CommandId.EXTENDED) {
                 if (mode == ChannelMode.TX) {
+                    LogService.appLog.debug(this.txChannel.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                     this.txWriter.writeLazy(pdu);
-                    LogService.appLog.debug(this.username + "@" + this.systemType + "TX Lazy Write PDU:" + pdu.toString());
                 } else {
+                    LogService.appLog.debug(this.rxChannel.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
                     this.rxWriter.writeLazy(pdu);
-                    LogService.appLog.debug(this.username + "@" + this.systemType + "RX Lazy Write PDU:" + pdu.toString());
                 }
                 return;
             }
             
+            LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - Standard Command ID: " + pdu.getCommandId());
             if (pdu.getCommandId().isTxCompatible()) {
+                LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                 this.txWriter.writeLazy(pdu);
-                LogService.appLog.debug(this.username + "@" + this.systemType + "TX Lazy Write PDU:" + pdu.toString());
             } else {
+                LogService.appLog.debug(this.trxChannel.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
                 this.rxWriter.writeLazy(pdu);
-                LogService.appLog.debug(this.username + "@" + this.systemType + "RX Lazy Write PDU:" + pdu.toString());
            }
             
-            LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-sendPdu:Successful. CommandId:"+pdu.getCommandId().name()+"CommandSequence:"+pdu.getCommandSequence().getValue());
         } catch (SmppTransportException e) {
             //TODO: Log for troubelshooting. Seems like the transport is broken. Must stop the stack.
-        	LogService.stackTraceLog.debug(this.username + "@" + this.systemType + "Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
+        	LogService.stackTraceLog.debug(this.trxChannel.getEsmeLabel() + " - Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
             this.stop();
         }
     }
