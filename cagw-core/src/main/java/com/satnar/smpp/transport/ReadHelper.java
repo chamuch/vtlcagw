@@ -56,6 +56,7 @@ public class ReadHelper implements Runnable {
                         this.smppConnection.read(readBuffer);
                     } catch (SmppTransportException e) {
                         if (e.getCause() != null) {
+                            this.canRun = false;
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - ReadHelper-run: Encountered Exception, underlying socket seems broken...:",e);
                             // underlying socket seems broken...                    	
                             Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
@@ -110,6 +111,7 @@ public class ReadHelper implements Runnable {
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Current Packet processed, lets wait for next...");
                             
                         } catch (IOException e) {
+                            this.canRun = false;
                             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - ReadHelper-run: whatever pending in this window has gone bad. Dumping the current window. Potentially subsequent windows will fail too:",e);
                             Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                             LogService.appLog.info("Checking Smpp Session: " + this.smppConnection.getEsmeLabel() + " in session store: " + (session != null));

@@ -128,7 +128,7 @@ public class Esme {
                 this.txChannel = new TcpConnection(this.txConfig);
                 // ----- this is a dirty hack only for 5h1tty fucking Huawei SMPP+ crappy motherass fucking implementation
                 ((TcpConnection)this.txChannel).validateInitializeConfig();
-                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
+//                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
                 
                 
                 /*this.txChannel.connect();
@@ -142,7 +142,7 @@ public class Esme {
                 
                 this.rxChannel = new TcpConnection(this.rxConfig);
                 this.rxChannel.connect();
-                LogService.appLog.debug("Socket Conneted for :" + this.username + "@" + this.systemType );
+                LogService.appLog.debug("Socket Connected for :" + this.username + "@" + this.systemType );
                 
                 this.rxWriter = new WriteHelper(this.rxChannel);
                 LogService.appLog.debug("Lazy Write Ready for :" + this.username + "@" + this.systemType );
@@ -225,10 +225,10 @@ public class Esme {
                 this.txReader = null;
                 this.rxReader = null;
                 
-                label = this.txChannel.getEsmeLabel();
-                StackMap.removeSession(label);
-                if(this.txChannel != null) this.txChannel.disconnect();
-                this.txChannel = null;
+//                label = this.txChannel.getEsmeLabel();
+//                StackMap.removeSession(label);
+//                if(this.txChannel != null) this.txChannel.disconnect();
+//                this.txChannel = null;
                 
                 LogService.stackTraceLog.info(this.username + "@" + this.systemType + "Esme-stop:Transmitter is successful!!");
                 if(this.rxChannel != null) this.rxChannel.disconnect();
