@@ -79,7 +79,6 @@
   <camelContext id="com.ericsson.raso.cac.cagw" xmlns="http://camel.apache.org/schema/spring">
     <route id="cg-engine-route">
       <from uri="cxfrs://bean://cgeServer" />
-      <camel:unmarshal ref="gson" />`
       <!-- <camel:bean beanType="com.ericsson.raso.cac.cagw.processor.SmsChargingProcessor" /> -->
       <camel:doTry>
         <camel:choice>
