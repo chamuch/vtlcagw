@@ -197,10 +197,12 @@ public class TcpConnection extends Connection {
     }
 
     @Override
-    public void read(ByteBuffer readBuffer) throws SmppTransportException {
+    public int read(ByteBuffer readBuffer) throws SmppTransportException {
+        int packetSize = 0;
         try {
-            this.connection.read(readBuffer);
+            packetSize = this.connection.read(readBuffer);
             readBuffer.flip();
+            return packetSize;
         } catch(NotYetConnectedException e) {
             //TODO - Log for troubleshooting;
         	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-read:Socket not yet ready for reception!",e);

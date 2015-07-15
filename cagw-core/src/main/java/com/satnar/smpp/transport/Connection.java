@@ -19,7 +19,7 @@ public abstract class Connection {
 	
 	public abstract void write(ByteBuffer writeBuffer) throws SmppTransportException;
 	
-	public abstract void read(ByteBuffer readBuffer) throws SmppTransportException;
+	public abstract int read(ByteBuffer readBuffer) throws SmppTransportException;
     
     public abstract int getLazyWriteWait();
 	

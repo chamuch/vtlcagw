@@ -51,11 +51,10 @@ public class ReadHelper implements Runnable {
                 
                 ByteBuffer readBuffer = this.smppConnection.getResponseBuffer();
                 
+                int windowSize = 0;
                 synchronized (readBuffer) {
                     try {
-                        this.smppConnection.read(readBuffer);
-                        readBuffer.flip();
-                        
+                       windowSize =  this.smppConnection.read(readBuffer);
                     } catch (SmppTransportException e) {
                         if (e.getCause() != null) {
                             this.canRun = false;
@@ -67,7 +66,7 @@ public class ReadHelper implements Runnable {
                     }
                     
                     // check the buffer...
-                    int windowSize = readBuffer.remaining();   LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Read Buffer Window Size read: " + windowSize);
+                    LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Read Buffer Window Size read: " + windowSize);
                     byte[] currentWindow = new byte[windowSize];
                     
                     if (windowSize > 4) {
