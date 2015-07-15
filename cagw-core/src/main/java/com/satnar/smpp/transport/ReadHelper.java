@@ -54,6 +54,8 @@ public class ReadHelper implements Runnable {
                 synchronized (readBuffer) {
                     try {
                         this.smppConnection.read(readBuffer);
+                        readBuffer.flip();
+                        
                     } catch (SmppTransportException e) {
                         if (e.getCause() != null) {
                             this.canRun = false;
@@ -69,7 +71,6 @@ public class ReadHelper implements Runnable {
                     byte[] currentWindow = new byte[windowSize];
                     
                     if (windowSize > 4) {
-                        readBuffer.flip();
                         readBuffer.get(currentWindow);
                         readBuffer.clear();
                         LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Current TCP Window: " + prettyPrint(currentWindow));
