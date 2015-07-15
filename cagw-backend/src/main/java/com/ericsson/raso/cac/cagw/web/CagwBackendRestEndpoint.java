@@ -13,7 +13,8 @@ public class CagwBackendRestEndpoint {
 
 	//private static Logger logger = LoggerFactory.getLogger(CagwBackendRestEndpoint.class);
 	@POST
-	@Path("/process/{fe}")
+	@Path("/process/")
+	//@Path("/process/{fe}")
 	//@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Consumes("application/json")
 	public void process(byte[] object) {

@@ -12,110 +12,109 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
-  <import resource="classpath:META-INF/cagw-core/beans.xml" />
+	<import resource="classpath:META-INF/cagw-core/beans.xml" />
 
-  <!-- Retrieve loaded configuration properties -->
-  <bean id="cfg" class="com.ericsson.raso.cac.config.ConfigService" />
-  <!-- <bean id="cgProperties"
-		class="com.ericsson.raso.cac.config.ComponentPropertiesBean">
-		<constructor-arg name="config" ref="cfg" />
-		<constructor-arg name="component" value="Cagw_EndPoint" />
-	</bean>
-	<context:property-placeholder properties-ref="cgProperties" /> -->
-  <!-- <bean id="iScapCharging" class="com.satnar.charging.diameter.scap.client.IScapCharging"/> -->
+	<!-- Retrieve loaded configuration properties -->
+	<bean id="cfg" class="com.ericsson.raso.cac.config.ConfigService" />
+	<!-- <bean id="cgProperties" class="com.ericsson.raso.cac.config.ComponentPropertiesBean"> 
+		<constructor-arg name="config" ref="cfg" /> <constructor-arg name="component" 
+		value="Cagw_EndPoint" /> </bean> <context:property-placeholder properties-ref="cgProperties" 
+		/> -->
+	<!-- <bean id="iScapCharging" class="com.satnar.charging.diameter.scap.client.IScapCharging"/> -->
 
-  <bean id="beSpringHelper" class="com.ericsson.raso.cac.cagw.SpringHelper" />
+	<bean id="beSpringHelper" class="com.ericsson.raso.cac.cagw.SpringHelper" />
 
-  <bean id="scapClient1" class="com.satnar.charging.diameter.scap.client.ScapChargingEndpoint"
-  init-method="start" destroy-method="stop">
-    <constructor-arg name="scapConfig"
+	<bean id="scapClient1"
+		class="com.satnar.charging.diameter.scap.client.ScapChargingEndpoint"
+		init-method="start" destroy-method="stop">
+		<constructor-arg name="scapConfig"
 			value="#{cfg.getProperties('Scap_Props_Occ')}" />
-  </bean>
+	</bean>
 
-  <bean id="airClient" class="com.satnar.air.ucip.client.internal.AirClientImpl">
-    <constructor-arg name="ucipConfig"
+	<bean id="airClient" class="com.satnar.air.ucip.client.internal.AirClientImpl">
+		<constructor-arg name="ucipConfig"
 			value="#{cfg.getProperties('cs-air1')}" />
-  </bean>
-  <bean id="xmlRpcClientFactory"
+	</bean>
+	<bean id="xmlRpcClientFactory"
 		class="com.satnar.air.ucip.client.xmlrpc.internal.DefaultXmlRpcClientFactory" />
 
-  <bean id="dbConnection" class="com.ericsson.raso.cac.cagw.dao.DataStaxConnection">
-    <constructor-arg name="cassandraAddress" value="#{cfg.getValue('DB_PROP','cassandraAddress')}" />
-    <constructor-arg name="keySpaceName" value="#{cfg.getValue('DB_PROP','keySpaceName')}" />
-  </bean>
+	<bean id="dbConnection" class="com.ericsson.raso.cac.cagw.dao.DataStaxConnection">
+		<constructor-arg name="cassandraAddress"
+			value="#{cfg.getValue('DB_PROP','cassandraAddress')}" />
+		<constructor-arg name="keySpaceName"
+			value="#{cfg.getValue('DB_PROP','keySpaceName')}" />
+	</bean>
 
-  <!-- <bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.satnar.smpp.pdu.SmppPdu" />
-  </bean> -->
-  
-  <bean id="gsonAuthAcc" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc" />
-  </bean>
-  
-    <bean id="gsonAuthAccResponse" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse" />
-  </bean>
+	<!-- <bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat"> 
+		<property name="unmarshalType" value="com.satnar.smpp.pdu.SmppPdu" /> </bean> -->
 
-  <bean id="gsonSmResultNotify" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify" />
-  </bean>
+	<bean id="gsonAuthAcc" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType"
+			value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc" />
+	</bean>
 
-  <bean id="gsonSmResultNotifyResponse" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse" />
-  </bean>
-  
-  <bean id="gsonCcr" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Ccr" />
-  </bean>
+	<bean id="gsonAuthAccResponse" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType"
+			value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse" />
+	</bean>
+
+	<bean id="gsonSmResultNotify" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType"
+			value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify" />
+	</bean>
+
+	<bean id="gsonSmResultNotifyResponse" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType"
+			value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse" />
+	</bean>
+
+	<bean id="gsonCcr" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Ccr" />
+	</bean>
 
 
-  <bean id="gsonCca" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Cca" />
-  </bean>
+	<bean id="gsonCca" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Cca" />
+	</bean>
 
-  <cxf:rsServer id="cgeServer" address="http://0.0.0.0:9090/cagw-backend/"
+	<cxf:rsServer id="cgeServer" address="http://0.0.0.0:9090/cagw-backend/"
 		serviceClass="com.ericsson.raso.cac.cagw.web.CagwBackendRestEndpoint" />
 
-  <camelContext id="com.ericsson.raso.cac.cagw" xmlns="http://camel.apache.org/schema/spring">
-    <route id="cg-engine-route">
-      <from uri="cxfrs://bean://cgeServer" />
-      <!-- <camel:bean beanType="com.ericsson.raso.cac.cagw.processor.SmsChargingProcessor" /> -->
-      <camel:doTry>
-        <camel:choice>
-          <camel:when>
-            <camel:simple>${header.fe} == 'mmsc'</camel:simple>
-            <camel:unmarshal ref="gsonCcr" />
-            <camel:log message="Entered in cagw mmsc:${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" />
-            <camel:bean
-							beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
-            <camel:marshal ref="gsonCca" />
-          </camel:when>
-          <camel:when>
-            <camel:simple>${header.fe} == 'auth_acc'</camel:simple>
-            <camel:unmarshal ref="gsonAuthAcc" />
-            <camel:log message="Entered in cagw smppfe :${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" />
-            <camel:bean
-							beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
-            <camel:marshal ref="gsonAuthAccResponse" />
-          </camel:when>
-          <camel:when>
-            <camel:simple>${header.fe} == 'sm_result'</camel:simple>
-            <camel:unmarshal ref="gsonSmResultNotify" />
-            <camel:log message="Entered in cagw smppfe :${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" />
-            <camel:bean
-							beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
-            <camel:marshal ref="gsonSmResultNotifyResponse" />
-          </camel:when>
-        </camel:choice>				
-        <camel:doCatch>
-          <camel:exception>java.lang.Exception</camel:exception>
-          <camel:log message="Exception-cagw-backend:${body}" />
-        </camel:doCatch>
-        <camel:doFinally>
-          <!-- <camel:marshal ref="gson" /> -->
-          <camel:log message="Leave-cagw-backend:${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" />
-        </camel:doFinally>
-      </camel:doTry>
-    </route>
-  </camelContext>
+	<camelContext id="com.ericsson.raso.cac.cagw" xmlns="http://camel.apache.org/schema/spring">
+		<route id="cg-engine-route">
+			<from uri="cxfrs://bean://cgeServer" />
+			<camel:doTry>
+				<camel:unmarshal ref="gsonAuthAcc" />
+				<camel:log message="From Backend :${body}" />
+				<camel:bean
+					beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+				<camel:doCatch>
+					<camel:exception>java.lang.Exception</camel:exception>
+					<camel:log message="From Backend Exception" />
+				</camel:doCatch>
+				<camel:doFinally>
+					<camel:marshal ref="AuthAccResponse" />
+					<camel:log message="Leave-Backend:${body}"/>
+				</camel:doFinally>
+			</camel:doTry>
+
+			<!-- <camel:doTry> <camel:choice> <camel:when> <camel:simple>${header.fe} 
+				== 'mmsc'</camel:simple> <camel:unmarshal ref="gsonCcr" /> <camel:log message="Entered 
+				in cagw mmsc:${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" /> <camel:bean 
+				beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" /> 
+				<camel:marshal ref="gsonCca" /> </camel:when> <camel:when> <camel:simple>${header.fe} 
+				== 'auth_acc'</camel:simple> <camel:unmarshal ref="gsonAuthAcc" /> <camel:log 
+				message="Entered in cagw smppfe :${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" 
+				/> <camel:bean beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" 
+				/> <camel:marshal ref="gsonAuthAccResponse" /> </camel:when> <camel:when> 
+				<camel:simple>${header.fe} == 'sm_result'</camel:simple> <camel:unmarshal 
+				ref="gsonSmResultNotify" /> <camel:log message="Entered in cagw smppfe :${body}" 
+				logName="com.ericsson.raso.cac.cagw.JsonPrint" /> <camel:bean beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" 
+				/> <camel:marshal ref="gsonSmResultNotifyResponse" /> </camel:when> </camel:choice> 
+				<camel:doCatch> <camel:exception>java.lang.Exception</camel:exception> <camel:log 
+				message="Exception-cagw-backend:${body}" /> </camel:doCatch> <camel:doFinally> 
+				<camel:marshal ref="gson" /> <camel:log message="Leave-cagw-backend:${body}" 
+				logName="com.ericsson.raso.cac.cagw.JsonPrint" /> </camel:doFinally> </camel:doTry> -->
+		</route>
+	</camelContext>
 </beans>
