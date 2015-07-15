@@ -88,12 +88,12 @@
 				<camel:log message="From Backend :${body}" />
 				<camel:bean
 					beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+					<camel:marshal ref="AuthAccResponse" />
 				<camel:doCatch>
 					<camel:exception>java.lang.Exception</camel:exception>
 					<camel:log message="From Backend Exception" />
 				</camel:doCatch>
-				<camel:doFinally>
-					<camel:marshal ref="AuthAccResponse" />
+				<camel:doFinally>					
 					<camel:log message="Leave-Backend:${body}"/>
 				</camel:doFinally>
 			</camel:doTry>
