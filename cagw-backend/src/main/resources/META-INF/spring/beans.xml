@@ -51,18 +51,26 @@
   <bean id="gsonAuthAcc" class="org.apache.camel.component.gson.GsonDataFormat">
     <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc" />
   </bean>
+  
+    <bean id="gsonAuthAccResponse" class="org.apache.camel.component.gson.GsonDataFormat">
+    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse" />
+  </bean>
 
   <bean id="gsonSmResultNotify" class="org.apache.camel.component.gson.GsonDataFormat">
     <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify" />
   </bean>
 
+  <bean id="gsonSmResultNotifyResponse" class="org.apache.camel.component.gson.GsonDataFormat">
+    <property name="unmarshalType" value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse" />
+  </bean>
+  
   <bean id="gsonCcr" class="org.apache.camel.component.gson.GsonDataFormat">
     <property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Ccr" />
   </bean>
 
 
   <bean id="gsonCca" class="org.apache.camel.component.gson.GsonDataFormat">
-    <property name="marshalType" value="com.ericsson.pps.diameter.dccapi.command.Cca" />
+    <property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Cca" />
   </bean>
 
   <cxf:rsServer id="cgeServer" address="http://0.0.0.0:9090/cagw-backend/"
@@ -71,7 +79,7 @@
   <camelContext id="com.ericsson.raso.cac.cagw" xmlns="http://camel.apache.org/schema/spring">
     <route id="cg-engine-route">
       <from uri="cxfrs://bean://cgeServer" />
-      <camel:unmarshal ref="gson" />
+      <camel:unmarshal ref="gson" />`
       <!-- <camel:bean beanType="com.ericsson.raso.cac.cagw.processor.SmsChargingProcessor" /> -->
       <camel:doTry>
         <camel:choice>
@@ -89,7 +97,7 @@
             <camel:log message="Entered in cagw smppfe :${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" />
             <camel:bean
 							beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
-            <camel:marshal ref="gson" />
+            <camel:marshal ref="gsonAuthAccResponse" />
           </camel:when>
           <camel:when>
             <camel:simple>${header.fe} == 'sm_result'</camel:simple>
@@ -97,7 +105,7 @@
             <camel:log message="Entered in cagw smppfe :${body}" logName="com.ericsson.raso.cac.cagw.JsonPrint" />
             <camel:bean
 							beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
-            <camel:marshal ref="gson" />
+            <camel:marshal ref="gsonSmResultNotifyResponse" />
           </camel:when>
         </camel:choice>				
         <camel:doCatch>
