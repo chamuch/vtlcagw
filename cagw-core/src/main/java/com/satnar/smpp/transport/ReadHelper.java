@@ -95,12 +95,12 @@ public class ReadHelper implements Runnable {
                                     
                                     // delgate to pdu facade now
                                     try {
-                                        LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
+                                        LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
                                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
-                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. [Pretty Print the PDU later] Reason: " + e.getMessage());
+                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + prettyPrint(pduPayload) + ", Reason: ", e);
                                     }
                                 } else {
                                     LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - allow the sliding window to handle the rest of the burst in the next incoming packet");

@@ -95,7 +95,7 @@ public class Esme {
     public void start() throws SmppServiceException {
         // first check if we have everything in order to start connecting...
         this.validateInitializeConfig();
-        LogService.appLog.debug("Config initialized for :" + this.username + "@" + this.systemType );
+        LogService.appLog.debug("Check initialization parameters: " + this.toString());
         
         try {
             if (this.canUseTrx) {
@@ -844,5 +844,39 @@ public class Esme {
     public WriteHelper getTrxWriter() {
         return trxWriter;
     }
+
+    @Override
+    public String toString() {
+        return String
+                .format("Esme [canUseTrx=%s, isEnquireLinkEnabled=%s, enquireLinkPeriod=%s, enquireLinkSchedule=%s, username=%s, password=%s, systemType=%s, interfaceVersion=%s, "
+                        + "esmeTon=%s, esmeNpi=%s, addressRange=%s, txConfig=%s, rxConfig=%s, trxConfig=%s, trxChannel=%s, txChannel=%s, rxChannel=%s, txWriter=%s, txReader=%s, "
+                        + "rxWriter=%s, rxReader=%s, trxWriter=%s, trxReader=%s, config=%s]",
+                        canUseTrx,
+                        isEnquireLinkEnabled,
+                        enquireLinkPeriod,
+                        enquireLinkSchedule,
+                        username,
+                        password,
+                        systemType,
+                        interfaceVersion,
+                        esmeTon,
+                        esmeNpi,
+                        addressRange,
+                        txConfig,
+                        rxConfig,
+                        trxConfig,
+                        trxChannel,
+                        txChannel,
+                        rxChannel,
+                        txWriter,
+                        txReader,
+                        rxWriter,
+                        rxReader,
+                        trxWriter,
+                        trxReader,
+                        config);
+    }
+    
+    
     
 }
