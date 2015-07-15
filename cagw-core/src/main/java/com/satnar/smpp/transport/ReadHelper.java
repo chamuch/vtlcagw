@@ -48,7 +48,10 @@ public class ReadHelper implements Runnable {
                 if (!networkConnectionState) {
                     LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - ReadHelper-run: Socket already seems to be broken. Proactive & Preventive measure to shutdown stack!!");
                     Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
-                    session.stop();
+                    LogService.appLog.debug("Session for " + this.smppConnection.getEsmeLabel() + " found: " + (session != null));
+                    if (session != null) session.stop();
+                    this.canRun = false;
+                    break;
                 }
                 
                 ByteBuffer readBuffer = this.smppConnection.getResponseBuffer();
@@ -58,10 +61,10 @@ public class ReadHelper implements Runnable {
                     byte[] currentWindow = null;
                     synchronized (readBuffer) {
                         windowSize =  this.smppConnection.read(readBuffer);
+                        LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Incoming Packet Size: " + windowSize);
                         
                         // check the incoming packet size...
                         if (windowSize > 0) {
-                            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Read Buffer Window Size read: " + windowSize);
                             currentWindow = new byte[windowSize];
                             readBuffer.get(currentWindow); readBuffer.clear();
                         } else { // else, lets wait 0.5 sec (this can be optimized later)
@@ -71,35 +74,42 @@ public class ReadHelper implements Runnable {
                                 // do nothing
                             } // end of catch
                         } // end of window size
-                    }
+                    } // end of sync block on read buffer
                     
                     // adjust the sliding window
-                    slidingWindow.push(currentWindow);
-                    DataInputStream parser = new DataInputStream(slidingWindow.getConsumingStream());
-                    
-                    // process the burst...
-                    do {
-                        if (parser.available() > 4) { // to ensure we have enough bytes to atleast decode PDU length...
-                            int pduLength = parser.readInt();
-                            if ( (pduLength - 4) <= parser.available() ){
-                                byte[] pduPayload = new byte[pduLength - 4];
-                                parser.read(pduPayload);
-                                
-                                
-                                // delgate to pdu facade now
-                                try {
-                                    LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
-                                    ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getMode());
-                                    this.processorPool.submit(switchingDelegator);
-                                    LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
-                                } catch (RejectedExecutionException e) {
-                                    LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. [Pretty Print the PDU later] Reason: " + e.getMessage());
+                    if (windowSize > 0) {
+                        slidingWindow.push(currentWindow);
+                        DataInputStream parser = new DataInputStream(slidingWindow.getConsumingStream());
+                        
+                        // process the burst...
+                        do {
+                            if (parser.available() > 4) { // to ensure we have enough bytes to atleast decode PDU length...
+                                int pduLength = parser.readInt();
+                                LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes");
+                                if ( (pduLength - 4) <= parser.available() ){
+                                    LogService.appLog.debug("Next PDU payload has (" + pduLength + ") bytes to read & process");
+                                    
+                                    byte[] pduPayload = new byte[pduLength - 4];
+                                    parser.read(pduPayload);
+                                    
+                                    
+                                    // delgate to pdu facade now
+                                    try {
+                                        LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
+                                        ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getMode());
+                                        this.processorPool.submit(switchingDelegator);
+                                        LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
+                                    } catch (RejectedExecutionException e) {
+                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. [Pretty Print the PDU later] Reason: " + e.getMessage());
+                                    }
+                                } else {
+                                    LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - allow the sliding window to handle the rest of the burst in the next incoming packet");
+                                    break; // allow the sliding window to handle the rest of the burst in the next incoming packet
                                 }
-                            } else {
-                                break; // allow the sliding window to handle the rest of the burst in the next incoming packet
                             }
-                        }
-                    } while (slidingWindow.canRead()); // sliding window loop
+                        } while (slidingWindow.canRead()); // sliding window loop
+                        
+                    } // end of if block - processing only if we have data to process
                     
                 } catch (IOException e) {
                     LogService.appLog.error("Broken Pipe or Buffer!! Better to shutdown this stack", e);
