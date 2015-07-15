@@ -200,6 +200,7 @@ public class TcpConnection extends Connection {
     public int read(ByteBuffer readBuffer) throws SmppTransportException {
         int packetSize = 0;
         try {
+            readBuffer.clear();
             packetSize = this.connection.read(readBuffer);
             readBuffer.flip();
             return packetSize;
