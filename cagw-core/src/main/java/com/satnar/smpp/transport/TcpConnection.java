@@ -54,6 +54,7 @@ public class TcpConnection extends Connection {
         responseBuffer.order(ByteOrder.BIG_ENDIAN);
         
         this.mode = channelMode;
+        LogService.appLog.info("TcpConnection init with: " + channelMode + ", config: " + this.config);
     }
     
     

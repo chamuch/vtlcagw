@@ -258,7 +258,7 @@ public class Esme {
             }
             
             LogService.appLog.debug(this.getEsmeLabel() + " - Command ID: " + pdu.getCommandId());
-            if (pdu.getCommandId() == CommandId.EXTENDED) {
+            if (pdu.getCommandId() == CommandId.EXTENDED || pdu.getCommandId() == CommandId.ENQUIRE_LINK_RESP ) {
                 if (mode == ChannelMode.TX) {
                     LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                     this.txWriter.writeLazy(pdu);
@@ -521,9 +521,9 @@ public class Esme {
             bindTrx = EsmeHelper.getBindTransceiver(this.username, this.password, this.systemType, this.interfaceVersion, this.esmeTon, this.esmeNpi, this.addressRange);
             LogService.stackTraceLog.trace("Encoded Write - " + bindTrx.toString());
             this.trxWriter.writeImmediate(bindTrx);
-            StackMap.addMessageIndex("" + bindTrx.getCommandSequence().getValue(), this.trxChannel.getEsmeLabel());
-            StackMap.addSession(this.trxChannel.getEsmeLabel(), this);
-            LogService.appLog.debug("Added Session to StackMap with key: " + this.trxChannel.getEsmeLabel());
+            StackMap.addMessageIndex("" + bindTrx.getCommandSequence().getValue(), this.getEsmeLabel());
+            StackMap.addSession(this.getEsmeLabel(), this);
+            LogService.appLog.debug("Added Session to StackMap with key: " + this.getEsmeLabel());
         } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-bindTransceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindTrx.getCommandSequence().getValue(),e);
@@ -551,9 +551,9 @@ public class Esme {
         try {
             bindTx = EsmeHelper.getBindTransmitter(this.username, this.password, this.systemType, this.interfaceVersion, this.esmeTon, this.esmeNpi, this.addressRange);
             this.txWriter.writeImmediate(bindTx);
-            StackMap.addMessageIndex("" + bindTx.getCommandSequence().getValue(), this.txChannel.getEsmeLabel());
-            StackMap.addSession(this.txChannel.getEsmeLabel(), this);
-            LogService.appLog.debug("Added Session to StackMap with key: " + this.txChannel.getEsmeLabel());
+            StackMap.addMessageIndex("" + bindTx.getCommandSequence().getValue(), this.getEsmeLabel());
+            StackMap.addSession(this.getEsmeLabel(), this);
+            LogService.appLog.debug("Added Session to StackMap with key: " + this.getEsmeLabel());
 
         } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
@@ -581,9 +581,9 @@ public class Esme {
         try {
             bindRx = EsmeHelper.getBindReceiver(this.username, this.password, this.systemType, this.interfaceVersion, this.esmeTon, this.esmeNpi, this.addressRange);
             this.rxWriter.writeImmediate(bindRx);
-            StackMap.addMessageIndex("" + bindRx.getCommandSequence().getValue(), this.rxChannel.getEsmeLabel());
-            StackMap.addSession(this.rxChannel.getEsmeLabel(), this);
-            LogService.appLog.debug("Added Session to StackMap with key: " + this.rxChannel.getEsmeLabel());
+            StackMap.addMessageIndex("" + bindRx.getCommandSequence().getValue(), this.getEsmeLabel());
+            StackMap.addSession(this.getEsmeLabel(), this);
+            LogService.appLog.debug("Added Session to StackMap with key: " + this.getEsmeLabel());
        } catch (SmppCodecException e) {
             // TODO Log for troubleshooting
     	   LogService.stackTraceLog.debug("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);
