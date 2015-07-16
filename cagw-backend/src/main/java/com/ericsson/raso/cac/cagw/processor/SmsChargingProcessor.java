@@ -152,15 +152,14 @@ public class SmsChargingProcessor implements Processor {
 	            throw new ServiceLogicException("Backend (SCAP Endpoint) not available for processing this request# " + smppRequest.getSmId().getString());
 	        }
 	        
-	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
-            
-	        dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), scapEndpoint.getDccStack().getDiameterStack(), route.getHostId());
+	        dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), scapEndpoint.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
 	        
 	        logMsg = new StringBuilder("");
 	        logMsg.append("Ccr::SessionId:"+dccCcr.getSessionId());
             
 	        // things that we can manage on our own...
+	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
 	        dccCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+dccCcr.getDestinationHost());
 	        dccCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+dccCcr.getDestinationRealm());
 	        dccCcr.setOriginHost(scapEndpoint.getOriginRealm()); logMsg.append(", OriginHost:"+dccCcr.getOriginHost());
