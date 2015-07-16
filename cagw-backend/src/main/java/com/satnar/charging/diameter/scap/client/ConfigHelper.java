@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
+import com.satnar.common.LogService;
 import com.satnar.common.charging.ChargingStackLifeCycleException;
 import com.satnar.common.charging.diameter.Peer;
 
@@ -100,24 +101,28 @@ public abstract class ConfigHelper {
             param = endpoint.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new ChargingStackLifeCycleException(key + " is not set or empty!");
+            LogService.appLog.debug(key + "-" + param);
             peer.setAddress(param);
             
             key = PEER_PREFIX + i + PEER_HOST_ID;
             param = endpoint.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new ChargingStackLifeCycleException(key + " is not set or empty!");
+            LogService.appLog.debug(key + "-" + param);
             peer.setHostId(param);
             
             key = PEER_PREFIX + i + PEER_REALM;
             param = endpoint.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new ChargingStackLifeCycleException(key + " is not set or empty!");
+            LogService.appLog.debug(key + "-" + param);
             peer.setRealm(param);
 
             key = PEER_PREFIX + i + PEER_SITE_ID;
             param = endpoint.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new ChargingStackLifeCycleException(key + " is not set or empty!");
+            LogService.appLog.debug(key + "-" + param);
             peer.setSiteId(param);
 
             endpoint.getPeers().add(peer);
