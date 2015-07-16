@@ -147,7 +147,8 @@ public class SmsChargingProcessor implements Processor {
 	        scapCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+scapCcr.getDestinationHost());
             scapCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+scapCcr.getDestinationRealm());
 	        scapCcr.setOriginHost(ChargingHelper.ORIGIN_HOST); logMsg.append(", OriginHost:"+scapCcr.getOriginHost());
-	        scapCcr.addAvp(new CCRequestNumberAvp(0x00));  logMsg.append(", CCRequestNumber:"+scapCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
+	        scapCcr.setOriginRealm(ChargingHelper.ORIGIN_HOST); logMsg.append(", OriginRealm:"+scapCcr.getOriginHost());
+            scapCcr.addAvp(new CCRequestNumberAvp(0x00));  logMsg.append(", CCRequestNumber:"+scapCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
             scapCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+scapCcr.getCCRequestType());
 	        scapCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+scapCcr.getRequestedAction());
 	        LogService.appLog.debug("Checkpoint#1 - SCAP CCR Build: " + logMsg.toString());
