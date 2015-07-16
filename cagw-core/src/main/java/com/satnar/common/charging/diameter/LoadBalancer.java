@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.satnar.common.LogService;
+
 public class LoadBalancer {
 	
 	private static AtomicInteger currentRoute = new AtomicInteger(-1);
@@ -16,18 +18,22 @@ public class LoadBalancer {
 	private Map<String, AtomicInteger> sitePointer = new Hashtable<String, AtomicInteger>();
 	
 	public LoadBalancer(List<Peer> routes) {
+	    LogService.appLog.debug("SCAP Peer LB init");
 		this.routes.addAll(routes);
 		
 		for (Peer peer: routes) {
 			this.hostRoutes.put(peer.getHostId(), peer);
+			LogService.appLog.debug("Adding Host Route to LB: " + peer);
 			
 			List<Peer> sitePeers = this.siteRoutes.get(peer.getSiteId());
 			if (sitePeers == null)  {
 				sitePeers = new ArrayList<Peer>();
 				this.sitePointer.put(peer.getSiteId(), new AtomicInteger(-1));
+				LogService.appLog.debug("Adding Site Peer to LB: " + peer);
 			}
 			sitePeers.add(peer);
 			this.siteRoutes.put(peer.getSiteId(), sitePeers);
+            LogService.appLog.debug("Adding Site Routes to LB: " + peer);
 		}
 	}
 	

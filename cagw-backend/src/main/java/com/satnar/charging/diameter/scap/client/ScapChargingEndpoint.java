@@ -90,9 +90,9 @@ public class ScapChargingEndpoint implements IScapCharging {
         this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_QUEUE_SIZE, this.sendQueueSize);
         this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_MESSAGE_LIMIT, this.sendMessageLimit);
         this.dccStack.getDiameterConfig().addSupportedVendor(this.supportedVendor);
-        // TODO: log for debug 
+        this.dccStack.getDiameterConfig().addSupportedVendor(10415);
         
-        LogService.stackTraceLog.debug("ScapChargingEndpoint-prepareStack:Sucess - Realm: " + this.originRealm + ", Address: " + this.ownTcpAddress);
+        LogService.appLog.debug("ScapChargingEndpoint-prepareStack:Sucess - Realm: " + this.originRealm + ", Address: " + this.ownTcpAddress);
         
     }
     
@@ -100,18 +100,18 @@ public class ScapChargingEndpoint implements IScapCharging {
         
     	for (Peer peer: this.peers) {
             try {
+                LogService.appLog.debug("Adding static route: " + peer);
                 dccStack.addStaticRoute(peer.getRealm(), -1, -1, peer.getAddress());
             } catch (UnknownServiceException e) {
-                // TODO Log to troubleshoot
-            	LogService.stackTraceLog.debug("SCAP Stack refused configuring peer. Offenders - Realm: " + peer.getRealm() + ", Address: " + peer.getAddress(),e);
+            	LogService.appLog.error("SCAP Stack refused configuring peer. Offenders - Realm: " + peer.getRealm() + ", Address: " + peer.getAddress(), e);
                 throw new ChargingStackLifeCycleException("SCAP Stack refused configuring peer. Offenders - Realm: " + peer.getRealm() + ", Address: " + peer.getAddress());
             } catch (URISyntaxException e) {
-                // TODO Log to troubleshoot
-            	LogService.stackTraceLog.debug("SCAP Stack refused configuring peer. Offenders - Realm: " + peer.getRealm() + ", Address: " + peer.getAddress(),e);
+            	LogService.appLog.error("SCAP Stack refused configuring peer. Offenders - Realm: " + peer.getRealm() + ", Address: " + peer.getAddress(), e);
                 throw new ChargingStackLifeCycleException("SCAP Stack refused configuring peer. Offenders - Realm: " + peer.getRealm() + ", Address: " + peer.getAddress());
             }
         }
-    	
+        LogService.appLog.debug("Configured DCC SCAP Stack with all peers");
+          	
     	this.scapLoadBalancer = new LoadBalancer(peers);
         
     }
