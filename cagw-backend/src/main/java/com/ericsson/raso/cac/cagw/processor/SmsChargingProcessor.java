@@ -27,6 +27,7 @@ import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdTypeAvp;
 import com.ericsson.pps.diameter.scapv2.avp.SubscriptionIdLocationAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TimeZoneAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TrafficCaseAvp;
+import com.ericsson.pps.diameter.scapv2.command.ScapCcr;
 import com.ericsson.raso.cac.cagw.SpringHelper;
 import com.ericsson.raso.cac.cagw.dao.PersistSmsChargeTransaction;
 import com.ericsson.raso.cac.cagw.dao.Transaction;
@@ -125,8 +126,8 @@ public class SmsChargingProcessor implements Processor {
         
     }
 
-    private Ccr getScapRequest(AuthAcc smppRequest) throws ServiceLogicException {
-	    Ccr scapCcr = null;
+    private ScapCcr getScapRequest(AuthAcc smppRequest) throws ServiceLogicException {
+	    ScapCcr scapCcr = null;
 	    StringBuilder logMsg = null;
 	    try {
 	        ScapChargingEndpoint scapEndpoint = (ScapChargingEndpoint) SpringHelper.getScapDiameter();
@@ -137,22 +138,23 @@ public class SmsChargingProcessor implements Processor {
 	            throw new ServiceLogicException("Backend (SCAP Endpoint) not available for processing this request# " + smppRequest.getSmId().getString());
 	        }
 	        
-	        scapCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), 
+	        Ccr dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), 
 	                scapEndpoint.getDccStack().getDiameterStack(), 
 	                ChargingHelper.SERVICE_CONTEXT_ID);
+	        scapCcr = new ScapCcr(dccCcr.getRequest());
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
 	        
 	        logMsg = new StringBuilder("");
-	        logMsg.append("Ccr::SessionId:"+scapCcr.getSessionId());
+	        logMsg.append("Ccr::SessionId:"+dccCcr.getSessionId());
             
 	        // things that we can manage on our own...
 	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
 	        scapCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+scapCcr.getDestinationHost());
-            scapCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+scapCcr.getDestinationRealm());
+	        scapCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+scapCcr.getDestinationRealm());
 	        scapCcr.setOriginHost(scapEndpoint.getOriginRealm()); logMsg.append(", OriginHost:"+scapCcr.getOriginHost());
 	        scapCcr.setOriginRealm(scapEndpoint.getOriginRealm()); logMsg.append(", OriginRealm:"+scapCcr.getOriginRealm());
-            scapCcr.addAvp(new CCRequestNumberAvp(0x00));  logMsg.append(", CCRequestNumber:"+scapCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
-            scapCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+scapCcr.getCCRequestType());
+	        scapCcr.setCCRequestNumber(0x00);  logMsg.append(", CCRequestNumber:"+scapCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
+	        scapCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+scapCcr.getCCRequestType());
 	        scapCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+scapCcr.getRequestedAction());
 	        LogService.appLog.debug("Checkpoint#1 - SCAP CCR Build: " + logMsg.toString());
 	        
@@ -162,24 +164,27 @@ public class SmsChargingProcessor implements Processor {
 	        CCServiceSpecificUnitsAvp ssuAvp = new CCServiceSpecificUnitsAvp();
 	        ssuAvp.setData(1); // 1 SMS unit to charge
 	        rsuAvp.addSubAvp(ssuAvp);
-	        scapCcr.addAvp(rsuAvp);
-	        logMsg.append(", RequestedServicesUnit->ServiceSpecificUnits(1)");
+	        scapCcr.setRequestedServiceUnit(rsuAvp);
+            logMsg.append(", RequestedServicesUnit->ServiceSpecificUnits(1)");
 	        LogService.appLog.debug("Checkpoint#2 - RSU added to CCR: " + logMsg.toString());
             
 	    	if (smppRequest.getMoMtFlag() == WinMoMtFlag.MO) {
-	            scapCcr.addAvp(new TrafficCaseAvp(21)); //MO Charging
+	            scapCcr.setTrafficCase(21); //MO Charging
 	            logMsg.append(", TrafficCase(21)");
 	            LogService.appLog.debug("Checkpoint#2 - TrafficCase added to CCR: " + logMsg.toString());
 	                
-	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
-	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
-	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getSourceAddress().getString());
-	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
-	            opiAvp.addSubAvp(opitAvp);
-	            opiAvp.addSubAvp(opidAvp);
-	            opiAvp.addSubAvp(opinAvp);
-	            scapCcr.addAvp(opiAvp);
+	            
+	            scapCcr.setOtherPartyId(smppRequest.getSourceAddress().getString(), OtherPartyIdTypeAvp.END_USER_E164);
+//	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
+//	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
+//	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getSourceAddress().getString());
+//	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
+//	            opiAvp.addSubAvp(opitAvp);
+//	            opiAvp.addSubAvp(opidAvp);
+//	            opiAvp.addSubAvp(opinAvp);
+//	            dccCcr.addAvp(opiAvp);
                 
+	            
 	            SubscriptionIdAvp siAvp = new SubscriptionIdAvp();
                 SubscriptionIdTypeAvp sitAvp = new SubscriptionIdTypeAvp(SubscriptionIdTypeAvp.END_USER_E164);
                 SubscriptionIdDataAvp sidAvp = new SubscriptionIdDataAvp(smppRequest.getSourceAddress().getString());
@@ -197,15 +202,16 @@ public class SmsChargingProcessor implements Processor {
 	            scapCcr.addAvp(new TrafficCaseAvp(20)); //MT Charging
 	            logMsg.append(", TrafficCase(20)");
                 LogService.appLog.debug("Checkpoint#2 - TrafficCase added to CCR: " + logMsg.toString());
-                
-	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
-	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
-	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getDestinationAddress().getString());
-	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
-	            opiAvp.addSubAvp(opitAvp);
-	            opiAvp.addSubAvp(opidAvp);
-	            opiAvp.addSubAvp(opinAvp);
-	            scapCcr.addAvp(opiAvp);
+
+                scapCcr.setOtherPartyId(smppRequest.getDestinationAddress().getString(), OtherPartyIdTypeAvp.END_USER_E164);
+//	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
+//	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
+//	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getDestinationAddress().getString());
+//	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
+//	            opiAvp.addSubAvp(opitAvp);
+//	            opiAvp.addSubAvp(opidAvp);
+//	            opiAvp.addSubAvp(opinAvp);
+//	            dccCcr.addAvp(opiAvp);
 	            
 	            SubscriptionIdAvp siAvp = new SubscriptionIdAvp();
 	            SubscriptionIdTypeAvp sitAvp = new SubscriptionIdTypeAvp(SubscriptionIdTypeAvp.END_USER_E164);
@@ -221,19 +227,22 @@ public class SmsChargingProcessor implements Processor {
                 
 	        }
 	        
+	    	
 	        // service identifier
-	        scapCcr.addAvp(new ServiceIdentifierAvp(SCAP_SERVICE_IDENTIFIER));
+	    	scapCcr.setServiceIdentifier(SCAP_SERVICE_IDENTIFIER);
+	        //dccCcr.addAvp(new ServiceIdentifierAvp(SCAP_SERVICE_IDENTIFIER));
 	        logMsg.append(", ServiceIdentifier(" + SCAP_SERVICE_IDENTIFIER + ")");
             LogService.appLog.debug("Checkpoint#4 - ServiceIdentifier added to CCR: " + logMsg.toString());
             
 	        // Roaming indicator (subscribe-id-location)
-	        scapCcr.addAvp(new SubscriptionIdLocationAvp(smppRequest.getMoMscAddress().getString()));
+            scapCcr.setSubscriptionIdLocation(smppRequest.getMoMscAddress().getString());
+            //dccCcr.addAvp(new SubscriptionIdLocationAvp(smppRequest.getMoMscAddress().getString()));
 	        logMsg.append(", SubscriptionIdLocation(" + smppRequest.getMoMscAddress().getString() + ")");
             LogService.appLog.debug("Checkpoint#5 - SubscriptionIdLocation added to CCR: " + logMsg.toString());
             
 	        // service paramter info set
-	        ServiceParameterInfoAvp spiAvp =  ChargingHelper.createSPI(100, SCAP_SERVICE_IDENTIFIER); // service enabler type
-	        scapCcr.addAvp(spiAvp);
+            ServiceParameterInfoAvp spiAvp =  ChargingHelper.createSPI(100, SCAP_SERVICE_IDENTIFIER); // service enabler type
+            scapCcr.addAvp(spiAvp);
 	        logMsg.append(", SPI(100=" + SCAP_SERVICE_IDENTIFIER + ")");
             LogService.appLog.debug("Checkpoint#6 - SPI(100=ServiceIdentifier) added to CCR: " + logMsg.toString());
             
@@ -263,7 +272,7 @@ public class SmsChargingProcessor implements Processor {
             LogService.appLog.debug("Checkpoint#11 - SPI(303=B Party Number) added to CCR: " + logMsg.toString());
             
 	        spiAvp = ChargingHelper.createSPI(304, smppRequest.getSmscAddress().getString()); // smsc addr
-            scapCcr.addAvp(spiAvp);
+	        scapCcr.addAvp(spiAvp);
             logMsg.append(", SPI(304=" + smppRequest.getSmscAddress().getString() + ")");
             LogService.appLog.debug("Checkpoint#12 - SPI(301=SMSC Number) added to CCR: " + logMsg.toString());
             
@@ -274,16 +283,18 @@ public class SmsChargingProcessor implements Processor {
             
             // Event-Timestamp
             Date timestamp = new Date(System.currentTimeMillis());
-	        scapCcr.addAvp(new EventTimestampAvp(new Time(timestamp)));
+            scapCcr.setEventTimestamp(new Time(timestamp));
+            //dccCcr.addAvp(new EventTimestampAvp(new Time(timestamp)));
 	        logMsg.append(", EventTimestamp(" + timestamp + ")");
             LogService.appLog.debug("Checkpoint#14 - EventTimestamp added to CCR: " + logMsg.toString());
             
 	        // Timezone
-	        scapCcr.addAvp(new TimeZoneAvp((byte)11, (byte)0, (byte)0));
+            scapCcr.setTimeZone((byte)11, (byte)0, (byte)0);
+	        //dccCcr.addAvp(new TimeZoneAvp((byte)11, (byte)0, (byte)0));
 	        logMsg.append(", TimeZone(11hours 0mins 0dst)");
             LogService.appLog.debug("Checkpoint#15 - TimeZone added to CCR: " + logMsg.toString());
             
-	        LogService.stackTraceLog.debug("SmsChargingProcessor-getScapRequest: Final Construction:"+logMsg.toString());
+	        LogService.stackTraceLog.debug("SmsChargingProcessor-getScapRequest: Final Construction:" + logMsg.toString());
             logMsg = null;
             
 	        return scapCcr;
