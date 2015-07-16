@@ -64,28 +64,31 @@ public class ChargeAmountProcessor implements Processor {
 	        		+":ResultCode"+scapResponse.getResultCode());
 		} catch (NoRouteException e) {
 		    //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("ChargeAmountProcessor-process:No Diamter Peer available based on the Stack Config & Request Parameters!!",e);
+			LogService.appLog.debug("ChargeAmountProcessor-process:No Diamter Peer available based on the Stack Config & Request Parameters!!",e);
 		    throw new ServiceLogicException("No Diamter Peer available based on the Stack Config & Request Parameters!!", e);
 		} catch (BadMessageException e) {
             //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("ChargeAmountProcessor-process:Request rejected by OCC/CCN!!",e);
+			LogService.appLog.debug("ChargeAmountProcessor-process:Request rejected by OCC/CCN!!",e);
             throw new ServiceLogicException("Request rejected by OCC/CCN!!", e);
 		} catch (URISyntaxException e) {
             //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("ChargeAmountProcessor-process:Bad Peer configuration for the route!!",e);
+			LogService.appLog.debug("ChargeAmountProcessor-process:Bad Peer configuration for the route!!",e);
             throw new ServiceLogicException("Bad Peer configuration for the route!!", e);
 		} catch (UnknownServiceException e) {
             //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("ChargeAmountProcessor-process:Bad Stack Configuration - Service!!",e);
+			LogService.appLog.debug("ChargeAmountProcessor-process:Bad Stack Configuration - Service!!",e);
 			throw new ServiceLogicException("Bad Stack Configuration - Service!!", e);
 		} catch (AvpDataException e) {
             //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("ChargeAmountProcessor-process:Presentation Tier Failure for Raquest Parameter!!",e);
+			LogService.appLog.debug("ChargeAmountProcessor-process:Presentation Tier Failure for Raquest Parameter!!",e);
 			throw new ServiceLogicException("Presentation Tier Failure for Raquest Parameter!!", e);
 		} catch (IOException e) {
             //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",e);
+			LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",e);
             throw new ServiceLogicException("Transport Tier Failure for Raquest!!", e);
+		} catch (Exception genE){//Added for debugging
+			LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",genE);
+            throw genE;
 		}
 				
 		LogService.appLog.info("Exiting from DIRECT_DEBIT ChargeAmountProcessor");

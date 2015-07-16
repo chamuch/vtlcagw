@@ -26,8 +26,8 @@ public class SmsRefundProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		//System.out.println("We have entered into SmsRefundProcessor");
-		LogService.appLog.info("Entered into SmsRefundProcessor");
+		try{
+			LogService.appLog.info("Entered into SmsRefundProcessor");
 		    SmResultNotify smppRequest = (SmResultNotify) exchange.getIn().getBody();
 		    
 		    StringBuilder logMsg = new StringBuilder("");
@@ -114,6 +114,9 @@ public class SmsRefundProcessor implements Processor {
 		    LogService.appLog.debug("SmsRefundProcessor-process:Refund Done."+logMsg.toString());
 		    
 		    logMsg = null;		
+		}catch(Exception genE){//Added for debugging
+			LogService.appLog.debug("SmsRefundProcessor-process:Encountered exception",genE);
+		}
 	}
 
     private void moveToArchive(Transaction txn, int deliveryResult, boolean refundResult, long sysTime) {

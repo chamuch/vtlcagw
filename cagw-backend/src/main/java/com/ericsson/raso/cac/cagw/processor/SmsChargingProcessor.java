@@ -44,30 +44,33 @@ public class SmsChargingProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		//System.out.println("We have entered into SmsChargingProcessor");
+		try{
 		
-		AuthAcc smppRequest = (AuthAcc) exchange.getIn().getBody();
-        Ccr scapRequest = this.getScapRequest(smppRequest);
-        
-        StringBuilder logMsg = new StringBuilder("");
-	    logMsg.append(":CommandSequence:");logMsg.append(smppRequest.getCommandSequence().getValue());
-	    logMsg.append(":SmId:");logMsg.append(smppRequest.getCommandSequence().getValue());
-	    logMsg.append(":SourceAddres:");logMsg.append(smppRequest.getCommandSequence().getValue());
-	    logMsg.append(":DestinationAddress:");logMsg.append(smppRequest.getCommandSequence().getValue());
-	    LogService.appLog.debug("SmsChargingProcessor-process:Sending.."+logMsg.toString());
-	    
-        Cca scapResponse = scapRequest.send();
-        AuthAccResponse smppResponse = this.getSmppResponse(scapResponse, smppRequest);
-        smppResponse.setCommandSequence(smppRequest.getCommandSequence());
-        
-        Transaction smsChargingStatus = this.getSmsChargingStatus(smppRequest, scapRequest, smppResponse);
-        new Thread(new PersistSmsChargeTransaction(smsChargingStatus)).start();
-        
-        exchange.getOut().setBody(smppResponse);
-                
-	    logMsg.append(":ScapResultCode:");logMsg.append(scapResponse.getResultCode());	    
-        LogService.appLog.debug("SmsChargingProcessor-process:Done."+logMsg.toString());
-        logMsg = null;
+			AuthAcc smppRequest = (AuthAcc) exchange.getIn().getBody();
+	        Ccr scapRequest = this.getScapRequest(smppRequest);
+	        
+	        StringBuilder logMsg = new StringBuilder("");
+		    logMsg.append(":CommandSequence:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    logMsg.append(":SmId:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    logMsg.append(":SourceAddres:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    logMsg.append(":DestinationAddress:");logMsg.append(smppRequest.getCommandSequence().getValue());
+		    LogService.appLog.debug("SmsChargingProcessor-process:Sending.."+logMsg.toString());
+		    
+	        Cca scapResponse = scapRequest.send();
+	        AuthAccResponse smppResponse = this.getSmppResponse(scapResponse, smppRequest);
+	        smppResponse.setCommandSequence(smppRequest.getCommandSequence());
+	        
+	        Transaction smsChargingStatus = this.getSmsChargingStatus(smppRequest, scapRequest, smppResponse);
+	        new Thread(new PersistSmsChargeTransaction(smsChargingStatus)).start();
+	        
+	        exchange.getOut().setBody(smppResponse);
+	                
+		    logMsg.append(":ScapResultCode:");logMsg.append(scapResponse.getResultCode());	    
+	        LogService.appLog.debug("SmsChargingProcessor-process:Done."+logMsg.toString());
+	        logMsg = null;
+		}catch (Exception genE){//Added for debugging
+			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE);
+		}
 	}
 	
 	private Transaction getSmsChargingStatus(AuthAcc smppRequest, Ccr scapRequest, AuthAccResponse smppResponse) {

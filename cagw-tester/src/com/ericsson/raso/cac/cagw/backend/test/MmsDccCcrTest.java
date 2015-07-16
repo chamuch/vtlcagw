@@ -142,6 +142,9 @@ public class MmsDccCcrTest {
             // now post the rest api
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(cagwUrl);
+            post.setHeader("Content-Type", "application/json");
+            post.setHeader("Accept", "application/json");
+            post.setHeader("fe", "mmsc");
             StringEntity body = new StringEntity(new Gson().toJson(mmsDccCer));
             
             post.setEntity(body);

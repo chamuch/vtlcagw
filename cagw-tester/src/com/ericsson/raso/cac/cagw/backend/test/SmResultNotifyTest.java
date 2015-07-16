@@ -83,6 +83,9 @@ public class SmResultNotifyTest {
         try {
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(cagwUrl);
+            post.setHeader("Content-Type", "application/json");
+            post.setHeader("Accept", "application/json");
+            post.setHeader("fe", "sm_result");
             StringEntity body = new StringEntity(new Gson().toJson(smResultPdu));
             
             post.setEntity(body);
