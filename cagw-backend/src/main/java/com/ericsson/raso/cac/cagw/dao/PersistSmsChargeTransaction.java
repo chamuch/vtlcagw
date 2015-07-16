@@ -16,10 +16,10 @@ public class PersistSmsChargeTransaction implements Runnable {
             TransactionDao txnPersistenceHelper = new TransactionDao();
             txnPersistenceHelper.persistSmsCharging(this.transactionData);
             //TODO: Log success
-            LogService.appLog.info("PersistSmsChargeTransaction: Success!!");
+            LogService.appLog.info("PersistSmsChargeTransaction(" + this.transactionData + "): Success!!");
         } catch (PersistenceException e) {
             // TODO Just log this... nothing can be done in a zombie thread ;)
-        	LogService.appLog.debug("PersistSmsChargeTransaction: Encountered exception.",e);
+        	LogService.appLog.error("PersistSmsChargeTransaction(" + this.transactionData + "): Persistence Failure!!",e);
         }
     }
     

@@ -113,6 +113,17 @@ public class AuthAccResponse extends SmppPdu {
 		this.notifyMode = notifyMode;
 	}
 
-	
+    @Override
+    public String toString() {
+        return String.format("AuthAccResponse [getCommandId()=%s, getCommandLength()=%s, getCommandStatus()=%s, getCommandSequence()=%s, operationResult=%s, notifyMode=%s]",
+                getCommandId(),
+                getCommandLength(),
+                getCommandStatus(),
+                getCommandSequence(),
+                operationResult,
+                notifyMode);
+    }
+
+
 	
 }
