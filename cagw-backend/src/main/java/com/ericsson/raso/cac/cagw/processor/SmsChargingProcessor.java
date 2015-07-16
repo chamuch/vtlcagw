@@ -73,6 +73,7 @@ public class SmsChargingProcessor implements Processor {
 	
 	private Transaction getSmsChargingStatus(AuthAcc smppRequest, Ccr scapRequest, AuthAccResponse smppResponse) {
         Transaction status = new Transaction();
+        LogService.appLog.debug("Preparing persistence pojo for transaction state - Req# " + smppRequest.getSmId().getString());
         
         status.setSourceAddress(smppRequest.getSourceAddress().getString());
         status.setDestinationAddress(smppRequest.getDestinationAddress().getString());
@@ -97,8 +98,7 @@ public class SmsChargingProcessor implements Processor {
             status.setChargeStatus(true);
         else
             status.setChargeStatus(false);
-        
-        LogService.stackTraceLog.debug("SmsChargingProcessor-getSmsChargingStatus:Done.SmppCommandSequence:"+smppRequest.getCommandSequence().getValue());
+        LogService.appLog.debug("Verify Transaction state pojo: " + status);
         
         return status;
     }
