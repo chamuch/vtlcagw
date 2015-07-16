@@ -48,11 +48,11 @@ public class SmsChargingProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		try{
-			AuthAcc smppRequest = (AuthAcc) exchange.getIn().getBody();
-	        LogService.stackTraceLog.info("Request>> " + smppRequest.toString());
-	        
-	        LogService.appLog.debug("Preparing SCAP Request for Auth ACC Request# " + smppRequest.getSmId().getString());
+	    AuthAcc smppRequest = (AuthAcc) exchange.getIn().getBody();
+        LogService.stackTraceLog.info("Request>> " + smppRequest.toString());
+        
+        try{
+			LogService.appLog.debug("Preparing SCAP Request for Auth ACC Request# " + smppRequest.getSmId().getString());
 	        Ccr scapRequest = this.getScapRequest(smppRequest);
 	        
 	        LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC: " + scapRequest.toString());
@@ -72,10 +72,24 @@ public class SmsChargingProcessor implements Processor {
 	        exchange.getOut().setBody(smppResponse);
 		}catch (Exception genE){//Added for troubleshooting
 			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE);
+			AuthAccResponse smppResponse = this.getUnknownFailureSmppResponse(smppRequest);
+            LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
+            exchange.getOut().setBody(smppResponse);
 		}
 	}
 	
-	private Transaction getSmsChargingStatus(AuthAcc smppRequest, Ccr scapRequest, AuthAccResponse smppResponse) {
+	private AuthAccResponse getUnknownFailureSmppResponse(AuthAcc smppRequest) {
+	    AuthAccResponse smppResponse = new AuthAccResponse();
+	    smppResponse.setCommandStatus(CommandStatus.ESME_ROK);
+        smppResponse.setOperationResult(WinOperationResult.OTHER_ERRORS);
+        smppResponse.setNotifyMode(WinNotifyMode.NOTIFY_FAILURE);   
+        smppResponse.setCommandSequence(smppRequest.getCommandSequence());
+        smppResponse.getCommandLength();
+        LogService.appLog.debug("Constructed Failure AuthAccResponse: " + smppResponse.toString());
+        return smppResponse;
+    }
+
+    private Transaction getSmsChargingStatus(AuthAcc smppRequest, Ccr scapRequest, AuthAccResponse smppResponse) {
         Transaction status = new Transaction();
         LogService.appLog.debug("Preparing persistence pojo for transaction state - Req# " + smppRequest.getSmId().getString());
         
@@ -114,8 +128,10 @@ public class SmsChargingProcessor implements Processor {
             smppResponse.setCommandStatus(CommandStatus.ESME_ROK);
             long scapResult = scapResponse.getResultCode();
             smppResponse.setOperationResult(ChargingHelper.getWinOperationResult(scapResult, smppRequest.getMoMtFlag()));
-            smppResponse.setNotifyMode(WinNotifyMode.NOTIFY_FAILURE);   
-            LogService.appLog.debug("Constructed AuthAccResponse: " + smppResponse.toString());
+            smppResponse.setNotifyMode(WinNotifyMode.NOTIFY_FAILURE);  
+            smppResponse.setCommandSequence(smppRequest.getCommandSequence());
+            smppResponse.getCommandLength();
+            LogService.appLog.debug("Constructed Functional AuthAccResponse: " + smppResponse.toString());
 
             return smppResponse;
         } catch (AvpDataException e) {
