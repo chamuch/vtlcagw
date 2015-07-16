@@ -81,7 +81,7 @@ public class SmsChargingProcessor implements Processor {
 	    smppResponse.setCommandStatus(CommandStatus.ESME_ROK);
         smppResponse.setOperationResult(WinOperationResult.OTHER_ERRORS);
         smppResponse.setNotifyMode(WinNotifyMode.NOTIFY_FAILURE);   
-        smppResponse.setCommandSequence(smppRequest.getCommandSequence());
+        smppResponse.setCommandSequence(smppRequest.getCommandSequence()); 
         smppResponse.getCommandLength();
         LogService.appLog.debug("Constructed Failure AuthAccResponse: " + smppResponse.toString());
         return smppResponse;
