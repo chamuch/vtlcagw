@@ -1,5 +1,6 @@
 package com.ericsson.raso.cac.cagw.processor;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.camel.Exchange;
@@ -16,8 +17,13 @@ import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdDataAvp;
 import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdTypeAvp;
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
+import com.ericsson.pps.diameter.rfcapi.base.DiameterStack;
+import com.ericsson.pps.diameter.rfcapi.base.RouteInformation;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
 import com.ericsson.pps.diameter.rfcapi.base.avp.avpdatatypes.Time;
+import com.ericsson.pps.diameter.rfcapi.base.impl.OwnPeerInfo;
+import com.ericsson.pps.diameter.rfcapi.base.impl.realmhandling.RealmHandler;
+import com.ericsson.pps.diameter.rfcapi.base.impl.realmhandling.RealmRoutes;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdDataAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdNatureAvp;
@@ -139,6 +145,61 @@ public class SmsChargingProcessor implements Processor {
         }
         
     }
+    
+    private void checkDiameterStack(DiameterStack stack, Ccr request) throws ServiceLogicException {
+        if (stack.peerManager == null) {
+            LogService.appLog.error("SCAP Endpoint instance has no peerManager!! Potential null pointer!!");
+            throw new ServiceLogicException("SCAP Endpoint instance has no peerManager!! Potential null pointer!!");
+        }
+        
+        OwnPeerInfo sopi = stack.ownPeerInfo;
+        if (sopi == null) {
+            LogService.appLog.error("SCAP Diameter Stack has no ownPeerInfo!! Potential null pointer!!");
+ //           throw new ServiceLogicException("SCAP Diameter Stack has no ownPeerInfo!! Potential null pointer!!");
+        }
+        LogService.appLog.debug("Check stack's own peer info: " + String.format("OwnPeerInfo [getDiameterUri()=%s, isUsingDiameterUri()=%s, getSctpPort()=%s, getTcpPort()=%s, "
+                + "getDiameterIdentity()=%s, getDiameterIdentityAsByteArray()=%s, getRealm()=%s, getRealmAsByteArray()=%s, getIpAddress()=%s, getIpAddresses()=%s, getVendorId()=%s,"
+                + " getProductName()=%s, getFirmwareRevision()=%s, getApplications()=%s, getSupportedVendors()=%s, isRelayActive()=%s, getSctpNumOutStreams()=%s, "
+                + "getSctpMaxInStreams()=%s, getSctpMaxInitAttempts()=%s, getSctpMaxInitTimeout()=%s, getSctpAsocMaxRxt()=%s, getSctpHbInterval()=%s, getSctpPathMaxRxt()=%s, "
+                + "getSctpRtoInitial()=%s, getSctpRtoMax()=%s, getSctpRtoMin()=%s, getSctpValidCookieLife()=%s, getNumberOfThreadsThatHandlesReceivedRequests()=%s]",
+                        sopi.getDiameterUri(), sopi.isUsingDiameterUri(), sopi.getSctpPort(), sopi.getTcpPort(), sopi.getDiameterIdentity(), 
+                        Arrays.toString(sopi.getDiameterIdentityAsByteArray()), sopi.getRealm(), Arrays.toString(sopi.getRealmAsByteArray()), sopi.getIpAddress(), 
+                        sopi.getIpAddresses(), sopi.getVendorId(), sopi.getProductName(), sopi.getFirmwareRevision(), sopi.getApplications(), 
+                        Arrays.toString(sopi.getSupportedVendors()), sopi.isRelayActive(), sopi.getSctpNumOutStreams(), sopi.getSctpMaxInStreams(), sopi.getSctpMaxInitAttempts(),
+                        sopi.getSctpMaxInitTimeout(), sopi.getSctpAsocMaxRxt(), sopi.getSctpHbInterval(), sopi.getSctpPathMaxRxt(), sopi.getSctpRtoInitial(), sopi.getSctpRtoMax(),
+                        sopi.getSctpRtoMin(), sopi.getSctpValidCookieLife(), sopi.getNumberOfThreadsThatHandlesReceivedRequests()));
+        
+        RealmRoutes rr = stack.peerManager.getRealmRoutes();
+        if (sopi == null || rr.getAllRoutes().length == 0) {
+            LogService.appLog.error("SCAP Diameter Stack has no RealmRoutes!! Potential null pointer!!");
+ //           throw new ServiceLogicException("SCAP Diameter Stack has no RealmRoutes!! Potential null pointer!!");
+        }
+        for (RouteInformation ri: rr.getAllRoutes()) {
+            LogService.appLog.debug(String.format("RouteInformation [getRealm()=%s, getApplicationId()=%s, getVendorId()=%s, getIncludedPeers()=%s]",
+                    ri.getRealm(), ri.getApplicationId(), ri.getVendorId(), Arrays.toString(ri.getIncludedPeers())));
+        }
+        
+        RealmHandler rh = null;
+        try {
+            rh = rr.getRealmHandler(request.getDestinationRealm(), 4, 193);
+            if (rh == null) {
+                LogService.appLog.error("Could not resolve destinationRealm from message. Potential null pointer!!");
+                throw new ServiceLogicException("Could not resolve destinationRealm from message!! Potential null pointer!!");
+            }
+            
+            if (rh.getPeers() == null || rh.getPeers().size() == 0 ){
+                LogService.appLog.error("Stack has no selectable Peer to destinationRealm. Potential null pointer!!");
+                throw new ServiceLogicException("Stack has no selectable Peer to destinationRealm!! Potential null pointer!!");
+            }
+        } catch (AvpDataException e) {
+            LogService.appLog.debug("Unable to resolve destinationRealm from message, AvpDataException!!");
+            throw new ServiceLogicException("Unable to resolve destinationRealm from message, AvpDataException!!");
+        }
+        
+        
+        
+       
+    }
 
     private Ccr getScapRequest(AuthAcc smppRequest) throws ServiceLogicException {
         Ccr dccCcr = null;
@@ -152,10 +213,7 @@ public class SmsChargingProcessor implements Processor {
 	            throw new ServiceLogicException("Backend (SCAP Endpoint) not available for processing this request# " + smppRequest.getSmId().getString());
 	        }
 	        
-	        if (scapEndpoint.getDccStack().getDiameterStack().peerManager == null) {
-                LogService.appLog.error("SCAP Endpoint instance has no peerManager!! Potential null pointer!!");
-                throw new ServiceLogicException("SCAP Endpoint instance has no peerManager!! Potential null pointer!!");
-	        }
+	        this.checkDiameterStack(scapEndpoint.getDccStack().getDiameterStack(), dccCcr);
 	        
 	        dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), scapEndpoint.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
