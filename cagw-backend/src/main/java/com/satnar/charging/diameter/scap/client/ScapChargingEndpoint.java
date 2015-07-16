@@ -13,7 +13,7 @@ import com.ericsson.pps.diameter.rfcapi.base.DiameterConfigException;
 import com.ericsson.pps.diameter.scapv2.SCAPStack;
 import com.satnar.common.LogService;
 import com.satnar.common.charging.ChargingStackLifeCycleException;
-import com.satnar.common.charging.diameter.LoadBalancer;
+import com.satnar.common.charging.diameter.LoadBalancerCagw;
 import com.satnar.common.charging.diameter.Peer;
 
 public class ScapChargingEndpoint implements IScapCharging {
@@ -27,7 +27,7 @@ public class ScapChargingEndpoint implements IScapCharging {
     private DCCStack            dccStack            = null;
     private Properties          config              = null;
     private List<Peer>          peers               = new ArrayList<Peer>();
-    private LoadBalancer scapLoadBalancer = null;
+    private DccLoadBalancerPool scapLoadBalancer = null;
     
     
     // config members
@@ -50,7 +50,7 @@ public class ScapChargingEndpoint implements IScapCharging {
     }
     
     @Override
-    public void start() throws ChargingStackLifeCycleException {
+    public void start() throws ChargingStackLifeCycleException { 
        
         ConfigHelper.validateAndInitializeConfig(this, this.config);
         this.prepareStack();
@@ -58,6 +58,8 @@ public class ScapChargingEndpoint implements IScapCharging {
         try {
         	LogService.appLog.debug("ScapChargingEndpoint:Start:Initiated..");
             this.dccStack.start();
+            this.dccStack.getDiameterStack().addPeerConnectionListener(this.scapLoadBalancer);
+            
             LogService.appLog.debug("ScapChargingEndpoint:Start:Completed..");
         } catch (IOException e) {
             // TODO log for troubleshooting
@@ -112,7 +114,7 @@ public class ScapChargingEndpoint implements IScapCharging {
         }
         LogService.appLog.debug("Configured DCC SCAP Stack with all peers");
           	
-    	this.scapLoadBalancer = new LoadBalancer(peers);
+    	this.scapLoadBalancer = new DccLoadBalancerPool(peers);
         
     }
     
@@ -143,15 +145,16 @@ public class ScapChargingEndpoint implements IScapCharging {
         this.peers = peers;
     }
 
-    public LoadBalancer getScapLoadBalancer() {
-		return scapLoadBalancer;
-	}
+    
+	public DccLoadBalancerPool getScapLoadBalancer() {
+        return scapLoadBalancer;
+    }
 
-	public void setScapLoadBalancer(LoadBalancer scapLoadBalancer) {
-		this.scapLoadBalancer = scapLoadBalancer;
-	}
+    public void setScapLoadBalancer(DccLoadBalancerPool scapLoadBalancer) {
+        this.scapLoadBalancer = scapLoadBalancer;
+    }
 
-	public String getOwnProductId() {
+    public String getOwnProductId() {
         return ownProductId;
     }
 
