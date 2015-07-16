@@ -152,6 +152,11 @@ public class SmsChargingProcessor implements Processor {
 	            throw new ServiceLogicException("Backend (SCAP Endpoint) not available for processing this request# " + smppRequest.getSmId().getString());
 	        }
 	        
+	        if (scapEndpoint.getDccStack().getDiameterStack().peerManager == null) {
+                LogService.appLog.error("SCAP Endpoint instance has no peerManager!! Potential null pointer!!");
+                throw new ServiceLogicException("SCAP Endpoint instance has no peerManager!! Potential null pointer!!");
+	        }
+	        
 	        dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), scapEndpoint.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
 	        
@@ -162,8 +167,8 @@ public class SmsChargingProcessor implements Processor {
 	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
 	        //dccCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+dccCcr.getDestinationHost());
 	        dccCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+dccCcr.getDestinationRealm());
-	        dccCcr.setOriginHost(scapEndpoint.getOriginRealm()); logMsg.append(", OriginHost:"+dccCcr.getOriginHost());
-	        dccCcr.setOriginRealm(scapEndpoint.getOriginRealm()); logMsg.append(", OriginRealm:"+dccCcr.getOriginRealm());
+//	        dccCcr.setOriginHost(scapEndpoint.getOriginRealm()); logMsg.append(", OriginHost:"+dccCcr.getOriginHost());
+//	        dccCcr.setOriginRealm(scapEndpoint.getOriginRealm()); logMsg.append(", OriginRealm:"+dccCcr.getOriginRealm());
 	        dccCcr.setCCRequestNumber(0x00);  logMsg.append(", CCRequestNumber:"+dccCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
 	        dccCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+dccCcr.getCCRequestType());
 	        dccCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+dccCcr.getRequestedAction());
@@ -296,9 +301,9 @@ public class SmsChargingProcessor implements Processor {
             //LogService.appLog.debug("Checkpoint#15 - TimeZone added to CCR: " + logMsg.toString());
             
             // sanity
-            dccCcr.setAuthApplicationId(0x04); // DCC PROTOCOL
+//            dccCcr.setAuthApplicationId(0x04); // DCC PROTOCOL
 //            dccCcr.setCCCorrelationId(dccCcr.getSessionId().getBytes());
-            dccCcr.setServiceContextId(SCAP_SERVICE_CONTEXT_ID);
+//            dccCcr.setServiceContextId(SCAP_SERVICE_CONTEXT_ID);
             
 	        LogService.stackTraceLog.debug("SmsChargingProcessor-getScapRequest: Final Construction:" + logMsg.toString());
             logMsg = null;
