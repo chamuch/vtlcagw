@@ -1,226 +1,558 @@
 <!DOCTYPE config SYSTEM "config.dtd">
 <config>
-	<section id="Cagw_EndPoint" description="cagw backend url">
-		<property key="Mmsc_Cagw_BackendUrl"
-			value="http://0.0.0.0:9090/cagw-backend/CgWeb/process/mmsc" />
-		<property key="Smpp_Cagw_BackendUrl"
-		value="http://0.0.0.0:9090/cagw-backend/CgWeb/process/smpp" />
+	<section id="CAGW_BE" description="cagw backend url">
+		<property key="cagwBackendUrl"
+			value="http4://192.168.0.44:9090/cagw-backend/CgWeb/process" />
 	</section>
 	
-	<section id="DB_PROP" description="cagw backend url">
-		<property key="cassandraAddress" value="192.168.1065" />
-		<property key="keySpaceName" value="CAGW_SPACE" />
+	<section id="Cagw_EndPoint" description="cagw backend url">
+		<property key="Mmsc_Cagw_BackendUrl"
+			value="http4://192.168.0.44:9090/cagw-backend/CgWeb/process/mmsc" />
+		<property key="Smpp_Cagw_BackendUrl"
+		value="http4://192.168.0.44:9090/cagw-backend/CgWeb/process/smpp" />
 	</section>
+
+	<section id="DB_PROP" description="cagw backend url">
+		<property key="cassandraAddress" value="192.168.0.40,192.168.0.47" />
+		<property key="keySpaceName" value="cagw_keyspace" />
+	</section>
+         <section id="Smpp_Secion" description="SMPP sections">
+            <property key="smppSectionsList" value="Esme_Props_Smsc1,Esme_Props_Smsc2,Esme_Props_Smsc3,Esme_Props_Smsc4,Esme_Props_Smsc5,Esme_Props_Smsc6,Esme_Props_Smsc7,Esme_Props_Smsc8" />
+         </section>
 
 	<!-- ESME Properties : Considering 4 SMSC servers -->
 	<section id="Esme_Props_Smsc1" description="esmeSmsc1">
-		<property key="username" value="username" />
-		<property key="password" value="password" />
-		<property key="systemType" value="" />
-		<property key="interfaceVersion" value="" />
-		<property key="esmeTon" value="" />
-		<property key="esmeNpi" value="" />
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
 		<property key="addressRange" value="" />
 		<property key="isEnquireLinkEnabled" value="true" />
-		<property key="enquireLinkPeriod" value="" />
-		<property key="canUseTrx" value="" />
-		<property key="tx.tcpAddress" value="" />
-		<property key="tx.tcpPort" value="" />
-		<property key="tx.esmeLabel" value="" />
-		<property key="tx.lazyWriteWait" value="" />
-		<property key="rx.tcpAddress" value="" />
-		<property key="rx.tcpPort" value="" />
-		<property key="rx.esmeLabel" value="" />
-		<property key="rx.lazyWriteWait" value="" />
-		<property key="trx.tcpAddress" value="" />
-		<property key="trx.tcpPort" value="" />
-		<property key="trx.esmeLabel" value="" />
-		<property key="trx.lazyWriteWait" value="" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="threadPoolSize" value="40" />
+		<property key="canUseTrx" value="false" />
+		<property key="tx.tcpAddress" value="10.50.5.1" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC1-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />		
+		<property key="rx.tcpAddress" value="10.50.5.1" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC1-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.1" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC1-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
 	</section>
+	<!-- ESME Properties : Considering 4 SMSC servers -->
 	<section id="Esme_Props_Smsc2" description="esmeSmsc2">
-		<property key="username" value="username" />
-		<property key="password" value="password" />
-		<property key="systemType" value="" />
-		<property key="interfaceVersion" value="" />
-		<property key="esmeTon" value="" />
-		<property key="esmeNpi" value="" />
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
 		<property key="addressRange" value="" />
 		<property key="isEnquireLinkEnabled" value="true" />
-		<property key="enquireLinkPeriod" value="" />
-		<property key="canUseTrx" value="" />
-		<property key="tx.tcpAddress" value="" />
-		<property key="tx.tcpPort" value="" />
-		<property key="tx.esmeLabel" value="" />
-		<property key="tx.lazyWriteWait" value="" />
-		<property key="rx.tcpAddress" value="" />
-		<property key="rx.tcpPort" value="" />
-		<property key="rx.esmeLabel" value="" />
-		<property key="rx.lazyWriteWait" value="" />
-		<property key="trx.tcpAddress" value="" />
-		<property key="trx.tcpPort" value="" />
-		<property key="trx.esmeLabel" value="" />
-		<property key="trx.lazyWriteWait" value="" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.2" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC2-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.2" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC2-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.2" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC2-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
 	</section>
+	<!-- ESME Properties : Considering 4 SMSC servers -->
 	<section id="Esme_Props_Smsc3" description="esmeSmsc3">
-		<property key="username" value="username" />
-		<property key="password" value="password" />
-		<property key="systemType" value="" />
-		<property key="interfaceVersion" value="" />
-		<property key="esmeTon" value="" />
-		<property key="esmeNpi" value="" />
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
 		<property key="addressRange" value="" />
 		<property key="isEnquireLinkEnabled" value="true" />
-		<property key="enquireLinkPeriod" value="" />
-		<property key="canUseTrx" value="" />
-		<property key="tx.tcpAddress" value="" />
-		<property key="tx.tcpPort" value="" />
-		<property key="tx.esmeLabel" value="" />
-		<property key="tx.lazyWriteWait" value="" />
-		<property key="rx.tcpAddress" value="" />
-		<property key="rx.tcpPort" value="" />
-		<property key="rx.esmeLabel" value="" />
-		<property key="rx.lazyWriteWait" value="" />
-		<property key="trx.tcpAddress" value="" />
-		<property key="trx.tcpPort" value="" />
-		<property key="trx.esmeLabel" value="" />
-		<property key="trx.lazyWriteWait" value="" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.3" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC3-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.3" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC3-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.3" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC3-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
 	</section>
+	
 	<section id="Esme_Props_Smsc4" description="esmeSmsc4">
-		<property key="username" value="username" />
-		<property key="password" value="password" />
-		<property key="systemType" value="" />
-		<property key="interfaceVersion" value="" />
-		<property key="esmeTon" value="" />
-		<property key="esmeNpi" value="" />
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
 		<property key="addressRange" value="" />
 		<property key="isEnquireLinkEnabled" value="true" />
-		<property key="enquireLinkPeriod" value="" />
-		<property key="canUseTrx" value="" />
-		<property key="tx.tcpAddress" value="" />
-		<property key="tx.tcpPort" value="" />
-		<property key="tx.esmeLabel" value="" />
-		<property key="tx.lazyWriteWait" value="" />
-		<property key="rx.tcpAddress" value="" />
-		<property key="rx.tcpPort" value="" />
-		<property key="rx.esmeLabel" value="" />
-		<property key="rx.lazyWriteWait" value="" />
-		<property key="trx.tcpAddress" value="" />
-		<property key="trx.tcpPort" value="" />
-		<property key="trx.esmeLabel" value="" />
-		<property key="trx.lazyWriteWait" value="" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.4" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC4-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.4" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC4-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.4" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC4-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
 	</section>
+	<section id="Esme_Props_Smsc5" description="esmeSmsc5">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.5" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC5-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.5" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC5-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.5" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC5-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc6" description="esmeSmsc6">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.6" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC6-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.6" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC6-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.6" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC6-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc7" description="esmeSmsc7">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.7" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC7-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.7" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC7-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.7" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC7-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc8" description="esmeSmsc8">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="systemId" value="SCPV01" />
+		<property key="interfaceVersion" value="v3_3" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.50.5.8" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC8-SCPV01" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.50.5.8" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC8-SCPV01" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.50.5.8" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC8-SCPV01" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc9" description="esmeSmsc9">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.51.151.5" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC9-SCPD02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.51.151.5" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC9-SCPD02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.51.151.5" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC9-SCPD02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc10" description="esmeSmsc10">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.51.151.6" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC10-SCPD02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.51.151.6" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC10-SCPD02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.51.151.6" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC10-SCPD02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc11" description="esmeSmsc11">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.51.151.7" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC11-SCPD02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.51.151.7" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC11-SCPD02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.51.151.7" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC11-SCPD02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc12" description="esmeSmsc12">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.51.151.8" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC12-SCPD02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.51.151.8" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC12-SCPD02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.51.151.8" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC12-SCPD02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc13" description="esmeSmsc13">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.32.151.6" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC13-SCNH02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.32.151.6" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC13-SCNH02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.32.151.6" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC13-SCNH02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc14" description="esmeSmsc14">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.32.151.7" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC14-SCNH02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.32.151.7" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC14-SCNH02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.32.151.7" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC14-SCNH02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc15" description="esmeSmsc15">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.32.151.8" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC15-SCNH02" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.32.151.8" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC15-SCNH02" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.32.151.8" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC15-SCNH02" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc16" description="esmeSmsc16">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.66.151.6" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC16-SCHT03" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.66.151.6" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC16-SCHT03" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.66.151.6" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC16-SCHT03" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+	<section id="Esme_Props_Smsc17" description="esmeSmsc17">
+		<property key="username" value="ocse1" />
+		<property key="password" value="ocse1" />
+		<property key="systemType" value="SCP" />
+		<property key="interfaceVersion" value="v3_4" />
+		<property key="esmeTon" value="INTERNATIONAL" />
+		<property key="esmeNpi" value="ISDN_E164" />
+		<property key="addressRange" value="" />
+		<property key="isEnquireLinkEnabled" value="true" />
+		<property key="enquireLinkPeriod" value="30000" />
+		<property key="canUseTrx" value="false" />
+		<property key="threadPoolSize" value="40" />
+		<property key="tx.tcpAddress" value="10.66.151.7" />
+		<property key="tx.tcpPort" value="2775" />
+		<property key="tx.esmeLabel" value="SMSC17-SCHT03" />
+		<property key="tx.lazyWriteWait" value="2000" />
+		<property key="rx.tcpAddress" value="10.66.151.7" />
+		<property key="rx.tcpPort" value="2775" />
+		<property key="rx.esmeLabel" value="SMSC17-SCHT03" />
+		<property key="rx.lazyWriteWait" value="2000" />
+		<property key="trx.tcpAddress" value="10.66.151.7" />
+		<property key="trx.tcpPort" value="2775" />
+		<property key="trx.esmeLabel" value="SMSC17-SCHT03" />
+		<property key="trx.lazyWriteWait" value="2000" />
+	</section>
+
 
 	<!-- DCC : Considering 2 MMSC servers -->
 	<section id="Dcc_Props1" description="Dcc_Props1">
-		<property key="originRealm" value="" />
-		<property key="acceptUnknownPeers" value="" />
-		<property key="accountId" value="0" />
-		<property key="authId" value="0" />
-		<property key="ownProductId" value="" />
-		<property key="ownFqdn" value="" />
-		<property key="ownTcpPort" value="0" />
-		<property key="ownTcpAddress" value="" />
-		<property key="threadPoolSize" value="0" />
-		<property key="eventQueueSize" value="0" />
-		<property key="sendQueueSize" value="0" />
-		<property key="sendMessageLimit" value="0" />
+		<property key="originRealm" value="viettel.com.vn" />
+		<property key="acceptUnknownPeers" value="true" />
+		<property key="accountId" value="10" />
+		<property key="authId" value="4" />
+		<property key="ownProductId" value="emmsgw01" />
+		<property key="ownFqdn" value="emmsgw01.viettel.com.vn" />
+		<property key="ownTcpPort" value="3868" />
+		<property key="ownTcpAddress" value="10.49.5.157" />
+		<property key="threadPoolSize" value="40" />
+		<property key="eventQueueSize" value="3000" />
+		<property key="sendQueueSize" value="3000" />
+		<property key="sendMessageLimit" value="1200" />
 		<property key="vendorId" value="0" />
-		<property key="messageTimeout" value="0" />
+		<property key="messageTimeout" value="30000" />
 	</section>
 	<section id="Dcc_Props2" description="Dcc_Props2">
-		<property key="originRealm" value="" />
-		<property key="acceptUnknownPeers" value="" />
-		<property key="accountId" value="0" />
-		<property key="authId" value="0" />
-		<property key="ownProductId" value="" />
-		<property key="ownFqdn" value="" />
-		<property key="ownTcpPort" value="0" />
-		<property key="ownTcpAddress" value="" />
-		<property key="threadPoolSize" value="0" />
-		<property key="eventQueueSize" value="0" />
-		<property key="sendQueueSize" value="0" />
-		<property key="sendMessageLimit" value="0" />
+		<property key="originRealm" value="viettel.com.vn" />
+		<property key="acceptUnknownPeers" value="true" />
+		<property key="accountId" value="10" />
+		<property key="authId" value="4" />
+		<property key="ownProductId" value="emmsgw01" />
+		<property key="ownFqdn" value="emmsgw02.viettel.com.vn" />
+		<property key="ownTcpPort" value="3868" />
+		<property key="ownTcpAddress" value="10.49.5.163" />
+		<property key="threadPoolSize" value="40" />
+		<property key="eventQueueSize" value="3000" />
+		<property key="sendQueueSize" value="3000" />
+		<property key="sendMessageLimit" value="1200" />
 		<property key="vendorId" value="0" />
-		<property key="messageTimeout" value="0" />
+		<property key="messageTimeout" value="30000" />
 	</section>
 
 	<!-- SCAPv2 : Considering 4 peers for commercial test -->
 	<section id="Scap_Props_Occ" description="Scap_Props_Occ">
-		<property key="ownProductId" value="" />
-		<property key="originRealm" value="" />
-		<property key="ownFqdn" value="0" />
-		<property key="ownTcpPort" value="0" />
-		<property key="ownTcpAddress" value="" />
-		<property key="peerCount" value="4" />
-		<property key="threadPoolSize" value="0" />
-		<property key="eventQueueSize" value="" />
-		<property key="sendQueueSize" value="0" />
-		<property key="sendMessageLimit" value="0" />
-		<property key="supportedVendor" value="0" />
-		<property key="peer.1.address" value="0" />
-		<property key="peer.1.hostId" value="0" />
-		<property key="peer.1.realm" value="0" />
-		<property key="peer.1.siteId" value="0" />
-		<property key="peer.2.address" value="0" />
-		<property key="peer.2.hostId" value="0" />
-		<property key="peer.2.realm" value="0" />
-		<property key="peer.2.siteId" value="0" />
-		<property key="peer.3.address" value="0" />
-		<property key="peer.3.hostId" value="0" />
-		<property key="peer.3.realm" value="0" />
-		<property key="peer.3.siteId" value="0" />
-		<property key="peer.4.address" value="0" />
-		<property key="peer.4.hostId" value="0" />
-		<property key="peer.4.realm" value="0" />
-		<property key="peer.4.siteId" value="0" />
+		<property key="ownProductId" value="Online Charging Control" />
+		<property key="originRealm" value="viettel.com.vn" />
+		<property key="ownFqdn" value="emmsgw01.viettel.com.vn" />
+		<property key="ownTcpPort" value="3868" />
+		<property key="ownTcpAddress" value="10.49.5.159" />
+		<property key="peerCount" value="2" />
+		<property key="threadPoolSize" value="30" />
+		<property key="eventQueueSize" value="3500" />
+		<property key="sendQueueSize" value="3500" />
+		<property key="sendMessageLimit" value="150" />
+		<property key="supportedVendor" value="193" />
+		<property key="peer.1.address" value="aaa://10.49.5.134:3868;transport=tcp" />
+		<property key="peer.1.hostId" value="eocc02.viettel.com.vn" />
+		<property key="peer.1.realm" value="viettel.com.vn"/>
+		<property key="peer.1.siteId" value="1" />
+		<property key="peer.2.address" value="aaa://10.49.5.135:3868;transport=tcp" />
+		<property key="peer.2.hostId" value="eocc03.viettel.com.vn" />
+		<property key="peer.2.realm" value="viettel.com.vn" />
+		<property key="peer.2.siteId" value="1" />
 	</section>
 	<section id="cs-air1" description="">
-		<property key="originNodeType" value="ADM" />
-		<property key="originHostName" value="IL" />
-		<property key="csair protocol" value="air" />
-		<property key="type" value="client" />
-		<property key="username" value="fdsuser" />
-		<property key="password" value="fdsuser" />
-		<property key="userAgent" value="UGw Server/5.0/1.0" />
-		<property key="connectionTimeout" value="30000" />
-		<property key="idleConnctionTimeout" value="360000" />
-		<property key="idleConnectionTimeoutInterval" value="60000" />
-		<property key="maxConnections" value="32" />
-		<property key="maxConnectionsPerHost" value="32" />
-		<property key="staleCheckingEnabled" value="true" />
-		<property key="retryCount" value="3" />
-		<property key="useApacheHttpClient" value="true" />
-		<property key="soTimeout" value="120000" />
-		<property key="endpointId" value="air" />
-		<property key="staticRoute realm" value="smart.com.ph" />
-		<!-- <property key="address" value="http://10.245.144.65:10010/Air"/> -->
-		<property key="address" value="http://172.20.0.126:10010/Air" />
-		<property key="hostId" value="air-lb1.smart.com.ph" />
-		<property key="siteId" value="Vietnem" />
-	</section>
-	<section id="Cs-Air1" description="">
-		<property key="originNodeType" value="ADM" />
-		<property key="originHostName" value="IL" />
-		<property key="csair protocol" value="air" />
-		<property key="type" value="client" />
-		<property key="username" value="fdsuser" />
-		<property key="password" value="fdsuser" />
-		<property key="userAgent" value="UGw Server/5.0/1.0" />
-		<property key="connectionTimeout" value="30000" />
-		<property key="idleConnctionTimeout" value="360000" />
-		<property key="idleConnectionTimeoutInterval" value="60000" />
-		<property key="maxConnections" value="32" />
-		<property key="maxConnectionsPerHost" value="32" />
-		<property key="staleCheckingEnabled" value="true" />
-		<property key="retryCount" value="3" />
-		<property key="useApacheHttpClient" value="true" />
-		<property key="soTimeout" value="120000" />
-		<property key="endpointId" value="air" />
-		<property key="staticRoute realm" value="smart.com.ph" />
-		<property key="address" value="http://172.20.0.126:10010/Air" />
-		<property key="hostId" value="air-lb1.smart.com.ph" />
-		<property key="siteId" value="Vietnem" />
-	</section>
+		<property key="ucipEndpointCount" value="2" />
+		<property key="ownHostName" value="emmsgw01.viettel.com.vn" />
+		<property key="ownNodeType" value="1" />
+		<property key="negotiatedCapabilities" value="805646916" />
+		<property key="ucip.1.connectionTimeout" value="10" />
+		<property key="ucip.1.replyTimeout" value="500" />
+		<property key="ucip.1.idleTimeout" value="10" />
+		<property key="ucip.1.idleConnectionTimeoutInterval" value="10" />
+		<property key="ucip.1.maxConnections" value="60" />
+		<property key="ucip.1.maxTotalConnections" value="60" />
+		<property key="ucip.1.password" value="user" />
+		<property key="ucip.1.retryCount" value="1" />
+		<property key="ucip.1.staleCheckingEnabled" value="true" />
+		<property key="ucip.1.useApacheHttpClient" value="true" />
+		<property key="ucip.1.userAgent" value="UGw Server /5.0/1.0" />
+		<property key="ucip.1.username" value="user" />
+		<property key="ucip.1.soTimeout" value="10" />
+		<property key="ucip.1.urlAddress" value="http://10.57.249.76:10011/Air" />
+		<property key="ucip.1.site" value="1" />
+		<property key="ucip.1.defaultNai" value="1" />		
+		<property key="ucip.2.connectionTimeout" value="10" />
+		<property key="ucip.2.replyTimeout" value="500" />
+		<property key="ucip.2.idleTimeout" value="10" />
+		<property key="ucip.2.idleConnectionTimeoutInterval" value="10" />
+		<property key="ucip.2.maxConnections" value="60" />
+		<property key="ucip.2.maxTotalConnections" value="60" />
+		<property key="ucip.2.password" value="user" />
+		<property key="ucip.2.retryCount" value="1" />
+		<property key="ucip.2.staleCheckingEnabled" value="true" />
+		<property key="ucip.2.useApacheHttpClient" value="true" />
+		<property key="ucip.2.userAgent" value="UGw Server /5.0/1.0" />
+		<property key="ucip.2.username" value="user" />
+		<property key="ucip.2.soTimeout" value="10" />
+		<property key="ucip.2.urlAddress" value="http://10.57.249.76:10011/Air" />
+		<property key="ucip.2.site" value="1" />
+		<property key="ucip.2.defaultNai" value="1" />		
+	</section>	
 	<section id="Water_Gate" description="">
 		<property key="frontend" value="500" />
 		<property key="nodeThreshold" value="1000" />
