@@ -34,6 +34,7 @@ public class DiameterLoadBalancerPool implements LoadBalancerPool {
                 LogService.appLog.debug("Adding Site Peer to LB: " + peer);
 			}
 			list.add(peer);
+			this.addToPool(peer.getHostId());
             LogService.appLog.debug("Adding Site Routes to LB: " + peer);
 		}
 	}
