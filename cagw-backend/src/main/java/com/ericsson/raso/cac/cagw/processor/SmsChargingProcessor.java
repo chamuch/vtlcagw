@@ -71,7 +71,7 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
 	        exchange.getOut().setBody(smppResponse);
 		}catch (Exception genE){//Added for troubleshooting
-			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE);
+			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE); 
 			AuthAccResponse smppResponse = this.getUnknownFailureSmppResponse(smppRequest);
             LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
             exchange.getOut().setBody(smppResponse);
