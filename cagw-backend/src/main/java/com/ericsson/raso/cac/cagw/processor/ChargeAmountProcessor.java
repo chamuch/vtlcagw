@@ -101,7 +101,7 @@ public class ChargeAmountProcessor implements Processor {
 	    StringBuilder logMsg = null;
 	    try {
 	    	scapCcr = new Ccr(dccRequest.getSessionId(), scapStack.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);	    	
-	    	Peer route = scapStack.getScapLoadBalancer().getRoute();
+	    	Peer route = scapStack.getScapLoadBalancer().getPeerBySite("1");
 	    	scapCcr.setDestinationHost(route.getHostId());	    	
 	    	scapCcr.setDestinationRealm(route.getRealm());	    	
 	    	

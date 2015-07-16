@@ -143,7 +143,7 @@ public class SmsChargingProcessor implements Processor {
 	        logMsg.append("Ccr::SessionId:"+scapCcr.getSessionId());
             
 	        // things that we can manage on our own...
-	        Peer route = scapEndpoint.getScapLoadBalancer().getRoute(); 
+	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
 	        scapCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+scapCcr.getDestinationHost());
             scapCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+scapCcr.getDestinationRealm());
 	        scapCcr.setOriginHost(ChargingHelper.ORIGIN_HOST); logMsg.append(", OriginHost:"+scapCcr.getOriginHost());
