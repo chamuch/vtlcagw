@@ -12,6 +12,9 @@ import com.ericsson.pps.diameter.dccapi.avp.RequestedActionAvp;
 import com.ericsson.pps.diameter.dccapi.avp.RequestedServiceUnitAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceIdentifierAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceParameterInfoAvp;
+import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdAvp;
+import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdDataAvp;
+import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdTypeAvp;
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
@@ -153,6 +156,7 @@ public class SmsChargingProcessor implements Processor {
 	        scapCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+scapCcr.getRequestedAction());
 	        LogService.appLog.debug("Checkpoint#1 - SCAP CCR Build: " + logMsg.toString());
 	        
+	        
 	        // things we expect shit from Viettel...
 	        RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
 	        CCServiceSpecificUnitsAvp ssuAvp = new CCServiceSpecificUnitsAvp();
@@ -175,13 +179,20 @@ public class SmsChargingProcessor implements Processor {
 	            opiAvp.addSubAvp(opidAvp);
 	            opiAvp.addSubAvp(opinAvp);
 	            scapCcr.addAvp(opiAvp);
+                
+	            SubscriptionIdAvp siAvp = new SubscriptionIdAvp();
+                SubscriptionIdTypeAvp sitAvp = new SubscriptionIdTypeAvp(SubscriptionIdTypeAvp.END_USER_E164);
+                SubscriptionIdDataAvp sidAvp = new SubscriptionIdDataAvp(smppRequest.getSourceAddress().getString());
+                siAvp.addSubAvp(sitAvp);
+                siAvp.addSubAvp(sidAvp);
+                scapCcr.addAvp(siAvp);
+                
+	            
 	            logMsg.append(", OtherPartyId[OtherPartyType("+ OtherPartyIdTypeAvp.END_USER_E164 + ")), OtherPartyIdNature(" + OtherPartyIdNatureAvp.UNKNOWN 
 	                    + "), OtherPartyIdData(" + smppRequest.getSourceAddress().getString() + ")");
 	            LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
 	            
 	            
-	            logMsg.append(":SubscriptionIdType:"+opitAvp.getAsUTF8String());
-	    		logMsg.append(":SubscriptionIdData:"+opidAvp.getAsUTF8String());
 	        } else {
 	            scapCcr.addAvp(new TrafficCaseAvp(20)); //MT Charging
 	            logMsg.append(", TrafficCase(20)");
@@ -195,6 +206,15 @@ public class SmsChargingProcessor implements Processor {
 	            opiAvp.addSubAvp(opidAvp);
 	            opiAvp.addSubAvp(opinAvp);
 	            scapCcr.addAvp(opiAvp);
+	            
+	            SubscriptionIdAvp siAvp = new SubscriptionIdAvp();
+	            SubscriptionIdTypeAvp sitAvp = new SubscriptionIdTypeAvp(SubscriptionIdTypeAvp.END_USER_E164);
+	            SubscriptionIdDataAvp sidAvp = new SubscriptionIdDataAvp(smppRequest.getDestinationAddress().getString());
+	            siAvp.addSubAvp(sitAvp);
+	            siAvp.addSubAvp(sidAvp);
+	            scapCcr.addAvp(siAvp);
+
+	            
 	            logMsg.append(", OtherPartyId[OtherPartyType("+ OtherPartyIdTypeAvp.END_USER_E164 + ")), OtherPartyIdNature(" + OtherPartyIdNatureAvp.UNKNOWN 
                         + "), OtherPartyIdData(" + smppRequest.getSourceAddress().getString() + ")");
                 LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
