@@ -32,6 +32,12 @@ public class Peer {
     public void setSiteId(String siteId) {
         this.siteId = siteId;
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Peer [address=%s, hostId=%s, realm=%s, siteId=%s]", address, hostId, realm, siteId);
+    }
 
+    
     
 }

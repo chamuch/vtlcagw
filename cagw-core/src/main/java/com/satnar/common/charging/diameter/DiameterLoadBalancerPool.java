@@ -84,7 +84,7 @@ public class DiameterLoadBalancerPool implements LoadBalancerPool {
 
 	@Override
 	public Peer getPeerBySite(String site) {
-	    LogService.appLog.debug("loadBalancerMap size: " + loadBalancerMap.size());
+	    LogService.appLog.debug("loadBalancerMap for site: " + site + " is size: " + loadBalancerMap.size());
 		LoadBalancer balancer = loadBalancerMap.get(site);
 		if (balancer == null) {
 		    LogService.appLog.error("Load Balancer for [{}] cannot be found.", site);
@@ -95,6 +95,7 @@ public class DiameterLoadBalancerPool implements LoadBalancerPool {
 			}
 			throw new IllegalStateException("Load Balancer for [" + site + "] is not found.");
 		}
+		LogService.appLog.debug("Site based route will be selected now!");
 		return balancer.chooseRoute();
 	}
 }

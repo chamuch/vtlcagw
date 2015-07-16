@@ -7,13 +7,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.satnar.common.LogService;
+
 public class RoundRobinLoadBalancer implements LoadBalancer {
 
 	private String name;
 	private AtomicInteger counter = new AtomicInteger(0);
 	private final List<Peer> pool = new CopyOnWriteArrayList<Peer>();
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-
+	
 	public RoundRobinLoadBalancer(String name) {
 		this.name = name;
 	}
@@ -40,7 +41,7 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 	@Override
 	public Peer getRoute() {
 		int size = pool.size();
-		logger.debug("Pool Size: {}", size);
+		LogService.appLog.debug("Pool Size: {}", size);
 		if (size <= 0) {
 			throw new IllegalStateException("[RoundRobinLoadBalancer] Pool is empty!.");
 		}
@@ -51,14 +52,15 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 			target = counter.getAndIncrement();
 		}
 
+		LogService.appLog.debug("Route selected: " + pool.get(target));
 		return pool.get(target);
 	}
 
 	@Override
 	public Peer chooseRoute() {
 		int size = pool.size();
-		logger.debug("Pool Size: {}", size);
-		if (size <= 0) {
+		LogService.appLog.debug("Pool Size: {}", size);
+        if (size <= 0) {
 			throw new IllegalStateException("[RoundRobinLoadBalancer] Pool is empty!.");
 		}
 
@@ -68,6 +70,7 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 			target = counter.getAndIncrement();
 		}
 
+        LogService.appLog.debug("Route selected: " + pool.get(target));
 		return pool.get(target);
 	}
 

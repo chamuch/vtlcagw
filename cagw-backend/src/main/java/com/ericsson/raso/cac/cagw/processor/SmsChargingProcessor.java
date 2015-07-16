@@ -156,7 +156,7 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
 	        
 	        logMsg = new StringBuilder("");
-	        logMsg.append("Ccr::SessionId:"+dccCcr.getSessionId());
+	        logMsg.append("Ccr::SessionId:" + dccCcr.getSessionId());
             
 	        // things that we can manage on our own...
 	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
