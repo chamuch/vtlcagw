@@ -160,14 +160,14 @@ public class SmsChargingProcessor implements Processor {
             
 	        // things that we can manage on our own...
 	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
-	        dccCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+dccCcr.getDestinationHost());
+	        //dccCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+dccCcr.getDestinationHost());
 	        dccCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+dccCcr.getDestinationRealm());
 	        dccCcr.setOriginHost(scapEndpoint.getOriginRealm()); logMsg.append(", OriginHost:"+dccCcr.getOriginHost());
 	        dccCcr.setOriginRealm(scapEndpoint.getOriginRealm()); logMsg.append(", OriginRealm:"+dccCcr.getOriginRealm());
 	        dccCcr.setCCRequestNumber(0x00);  logMsg.append(", CCRequestNumber:"+dccCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
 	        dccCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+dccCcr.getCCRequestType());
 	        dccCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+dccCcr.getRequestedAction());
-	        LogService.appLog.debug("Checkpoint#1 - SCAP CCR Build: " + logMsg.toString());
+	        //LogService.appLog.debug("Checkpoint#1 - SCAP CCR Build: " + logMsg.toString());
 	        
 	        
 	        // things we expect shit from Viettel...
@@ -177,7 +177,7 @@ public class SmsChargingProcessor implements Processor {
 	        rsuAvp.addSubAvp(ssuAvp);
 	        dccCcr.setRequestedServiceUnit(rsuAvp);
             logMsg.append(", RequestedServicesUnit->ServiceSpecificUnits(1)");
-	        LogService.appLog.debug("Checkpoint#2 - RSU added to CCR: " + logMsg.toString());
+	        //LogService.appLog.debug("Checkpoint#2 - RSU added to CCR: " + logMsg.toString());
             
 	    	if (smppRequest.getMoMtFlag() == WinMoMtFlag.MO) {
 //	            dccCcr.addAvp(new TrafficCaseAvp(21)); //MO Charging
@@ -202,7 +202,7 @@ public class SmsChargingProcessor implements Processor {
                 siAvp.addSubAvp(sidAvp);
                 dccCcr.addAvp(siAvp);
 	            
-	            LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
+	            //LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
 	            
 	            
 	        } else {
@@ -225,11 +225,10 @@ public class SmsChargingProcessor implements Processor {
 	            siAvp.addSubAvp(sitAvp);
 	            siAvp.addSubAvp(sidAvp);
 	            dccCcr.addAvp(siAvp);
-
 	            
 	            logMsg.append(", OtherPartyId[OtherPartyType("+ OtherPartyIdTypeAvp.END_USER_E164 + ")), OtherPartyIdNature(" + OtherPartyIdNatureAvp.UNKNOWN 
                         + "), OtherPartyIdData(" + smppRequest.getSourceAddress().getString() + ")");
-                LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
+                //LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
                 
 	        }
 	        
@@ -237,7 +236,7 @@ public class SmsChargingProcessor implements Processor {
 	        // service identifier
 	    	dccCcr.setServiceIdentifier(SCAP_SERVICE_IDENTIFIER);
 	        logMsg.append(", ServiceIdentifier(" + SCAP_SERVICE_IDENTIFIER + ")");
-            LogService.appLog.debug("Checkpoint#4 - ServiceIdentifier added to CCR: " + logMsg.toString());
+            //LogService.appLog.debug("Checkpoint#4 - ServiceIdentifier added to CCR: " + logMsg.toString());
             
 	        // Roaming indicator (subscribe-id-location)
 //            dccCcr.addAvp(new SubscriptionIdLocationAvp(smppRequest.getMoMscAddress().getString()));
@@ -289,12 +288,12 @@ public class SmsChargingProcessor implements Processor {
             Date timestamp = new Date(System.currentTimeMillis());
             dccCcr.setEventTimestamp(new Time(timestamp));
             logMsg.append(", EventTimestamp(" + timestamp + ")");
-            LogService.appLog.debug("Checkpoint#14 - EventTimestamp added to CCR: " + logMsg.toString());
+            //LogService.appLog.debug("Checkpoint#14 - EventTimestamp added to CCR: " + logMsg.toString());
             
 	        // Timezone
             dccCcr.addAvp(new TimeZoneAvp((byte)11, (byte)0, (byte)0));
 	        logMsg.append(", TimeZone(11hours 0mins 0dst)");
-            LogService.appLog.debug("Checkpoint#15 - TimeZone added to CCR: " + logMsg.toString());
+            //LogService.appLog.debug("Checkpoint#15 - TimeZone added to CCR: " + logMsg.toString());
             
             // sanity
             dccCcr.setAuthApplicationId(0x04); // DCC PROTOCOL
