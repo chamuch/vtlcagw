@@ -86,6 +86,7 @@ public class ScapChargingEndpoint implements IScapCharging {
         this.dccStack.setOwnFqdn(this.ownFqdn);
         this.dccStack.setOwnTcpPort(this.ownTcpPort);
         this.dccStack.getDiameterConfig().setValue(SERVICE_TCP_ADDRESS, this.ownTcpAddress);
+        this.dccStack.setOwnDiameterUri("aaa://" + this.ownTcpAddress + ":" + this.ownTcpPort + ";transport=tcp");
         this.loadStaticRoutes(this.dccStack, peers);
         this.dccStack.getDiameterConfig().setValue(DiameterConfig.NUMBER_OF_THREADS_THAT_HANDLES_RECEIVED_REQUESTS, this.threadPoolSize);
         this.dccStack.getDiameterConfig().setValue(DiameterConfig.EVENT_QUEUE_SIZE, this.eventQueueSize);
