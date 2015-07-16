@@ -42,7 +42,7 @@ import com.satnar.smpp.CommandStatus;
 public class SmsChargingProcessor implements Processor {
     
     private static int SCAP_SERVICE_IDENTIFIER = 4; //as per Mikael's inputs; no mail or written requirements though!!!
-    
+    private static String SCAP_SERVICE_CONTEXT_ID = "SCAP_V.2.0@ericsson.com";
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -182,19 +182,19 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.appLog.debug("Checkpoint#2 - RSU added to CCR: " + logMsg.toString());
             
 	    	if (smppRequest.getMoMtFlag() == WinMoMtFlag.MO) {
-	            dccCcr.addAvp(new TrafficCaseAvp(21)); //MO Charging
-	            logMsg.append(", TrafficCase(21)");
-	            LogService.appLog.debug("Checkpoint#2 - TrafficCase added to CCR: " + logMsg.toString());
+//	            dccCcr.addAvp(new TrafficCaseAvp(21)); //MO Charging
+//	            logMsg.append(", TrafficCase(21)");
+//	            LogService.appLog.debug("Checkpoint#2 - TrafficCase added to CCR: " + logMsg.toString());
 	                
 	            
-	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
-	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
-	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getSourceAddress().getString());
-	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
-	            opiAvp.addSubAvp(opitAvp);
-	            opiAvp.addSubAvp(opidAvp);
-	            opiAvp.addSubAvp(opinAvp);
-	            dccCcr.addAvp(opiAvp);
+//	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
+//	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
+//	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getDestinationAddress().getString());
+//	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
+//	            opiAvp.addSubAvp(opitAvp);
+//	            opiAvp.addSubAvp(opidAvp);
+//	            opiAvp.addSubAvp(opinAvp);
+//	            dccCcr.addAvp(opiAvp);
                 
 	            
 	            SubscriptionIdAvp siAvp = new SubscriptionIdAvp();
@@ -203,26 +203,23 @@ public class SmsChargingProcessor implements Processor {
                 siAvp.addSubAvp(sitAvp);
                 siAvp.addSubAvp(sidAvp);
                 dccCcr.addAvp(siAvp);
-                
 	            
-	            logMsg.append(", OtherPartyId[OtherPartyType("+ OtherPartyIdTypeAvp.END_USER_E164 + ")), OtherPartyIdNature(" + OtherPartyIdNatureAvp.UNKNOWN 
-	                    + "), OtherPartyIdData(" + smppRequest.getSourceAddress().getString() + ")");
 	            LogService.appLog.debug("Checkpoint#3 - OPI added to CCR: " + logMsg.toString());
 	            
 	            
 	        } else {
-	            dccCcr.addAvp(new TrafficCaseAvp(20)); //MT Charging
-	            logMsg.append(", TrafficCase(20)");
-                LogService.appLog.debug("Checkpoint#2 - TrafficCase added to CCR: " + logMsg.toString());
+//	            dccCcr.addAvp(new TrafficCaseAvp(20)); //MT Charging
+//	            logMsg.append(", TrafficCase(20)");
+//                LogService.appLog.debug("Checkpoint#2 - TrafficCase added to CCR: " + logMsg.toString());
 
-	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
-	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
-	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getDestinationAddress().getString());
-	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
-	            opiAvp.addSubAvp(opitAvp);
-	            opiAvp.addSubAvp(opidAvp);
-	            opiAvp.addSubAvp(opinAvp);
-	            dccCcr.addAvp(opiAvp);
+//	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
+//	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
+//	            OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp(smppRequest.getSourceAddress().getString());
+//	            OtherPartyIdNatureAvp opinAvp = new OtherPartyIdNatureAvp(OtherPartyIdNatureAvp.UNKNOWN);
+//	            opiAvp.addSubAvp(opitAvp);
+//	            opiAvp.addSubAvp(opidAvp);
+//	            opiAvp.addSubAvp(opinAvp);
+//	            dccCcr.addAvp(opiAvp);
 	            
 	            SubscriptionIdAvp siAvp = new SubscriptionIdAvp();
 	            SubscriptionIdTypeAvp sitAvp = new SubscriptionIdTypeAvp(SubscriptionIdTypeAvp.END_USER_E164);
@@ -245,50 +242,50 @@ public class SmsChargingProcessor implements Processor {
             LogService.appLog.debug("Checkpoint#4 - ServiceIdentifier added to CCR: " + logMsg.toString());
             
 	        // Roaming indicator (subscribe-id-location)
-            dccCcr.addAvp(new SubscriptionIdLocationAvp(smppRequest.getMoMscAddress().getString()));
-	        logMsg.append(", SubscriptionIdLocation(" + smppRequest.getMoMscAddress().getString() + ")");
-            LogService.appLog.debug("Checkpoint#5 - SubscriptionIdLocation added to CCR: " + logMsg.toString());
+//            dccCcr.addAvp(new SubscriptionIdLocationAvp(smppRequest.getMoMscAddress().getString()));
+//	        logMsg.append(", SubscriptionIdLocation(" + smppRequest.getMoMscAddress().getString() + ")");
+//            LogService.appLog.debug("Checkpoint#5 - SubscriptionIdLocation added to CCR: " + logMsg.toString());
             
 	        // service paramter info set
-            ServiceParameterInfoAvp spiAvp =  ChargingHelper.createSPI(100, SCAP_SERVICE_IDENTIFIER); // service enabler type
-            dccCcr.addAvp(spiAvp);
-	        logMsg.append(", SPI(100=" + SCAP_SERVICE_IDENTIFIER + ")");
-            LogService.appLog.debug("Checkpoint#6 - SPI(100=ServiceIdentifier) added to CCR: " + logMsg.toString());
-            
-	        spiAvp = ChargingHelper.createSPI(500, smppRequest.getSmId().getString()); // message id
-	        dccCcr.addAvp(spiAvp);
-	        logMsg.append(", SPI(500=" + smppRequest.getSmId().getString() + ")");
-            LogService.appLog.debug("Checkpoint#7 - SPI(500=SMS Message ID) added to CCR: " + logMsg.toString());
-            
-	        spiAvp = ChargingHelper.createSPI(300, OtherPartyIdTypeAvp.END_USER_E164); // source addr type
-	        dccCcr.addAvp(spiAvp);
-	        logMsg.append(", SPI(300=" + OtherPartyIdTypeAvp.END_USER_E164 + ")");
-            LogService.appLog.debug("Checkpoint#8 - SPI(300=A Party Type) added to CCR: " + logMsg.toString());
-            
-	        spiAvp = ChargingHelper.createSPI(301, smppRequest.getSourceAddress().getString()); // source addr
-	        dccCcr.addAvp(spiAvp);
-	        logMsg.append(", SPI(301=" + smppRequest.getSourceAddress().getString() + ")");
-            LogService.appLog.debug("Checkpoint#9 - SPI(301=A Party Number) added to CCR: " + logMsg.toString());
-            
-	        spiAvp = ChargingHelper.createSPI(302, OtherPartyIdTypeAvp.END_USER_E164); // destn addr type
-	        dccCcr.addAvp(spiAvp);
-	        logMsg.append(", SPI(302=" + OtherPartyIdTypeAvp.END_USER_E164 + ")");
-            LogService.appLog.debug("Checkpoint#10 - SPI(302=B Party Type) added to CCR: " + logMsg.toString());
-            
-	        spiAvp = ChargingHelper.createSPI(303, smppRequest.getDestinationAddress().getString()); // destn addr
-	        dccCcr.addAvp(spiAvp);
-	        logMsg.append(", SPI(303=" + smppRequest.getDestinationAddress().getString() + ")");
-            LogService.appLog.debug("Checkpoint#11 - SPI(303=B Party Number) added to CCR: " + logMsg.toString());
-            
-	        spiAvp = ChargingHelper.createSPI(304, smppRequest.getSmscAddress().getString()); // smsc addr
-	        dccCcr.addAvp(spiAvp);
-            logMsg.append(", SPI(304=" + smppRequest.getSmscAddress().getString() + ")");
-            LogService.appLog.debug("Checkpoint#12 - SPI(301=SMSC Number) added to CCR: " + logMsg.toString());
-            
-            spiAvp = ChargingHelper.createSPI(305, smppRequest.getMoMscAddress().getString()); // mo msc addr
-            dccCcr.addAvp(spiAvp);
-            logMsg.append(", SPI(305=" + smppRequest.getSmscAddress().getString() + ")");
-            LogService.appLog.debug("Checkpoint#13 - SPI(305=MSC Number) added to CCR: " + logMsg.toString());
+//            ServiceParameterInfoAvp spiAvp =  ChargingHelper.createSPI(100, SCAP_SERVICE_IDENTIFIER); // service enabler type
+//            dccCcr.addAvp(spiAvp);
+//	        logMsg.append(", SPI(100=" + SCAP_SERVICE_IDENTIFIER + ")");
+//            LogService.appLog.debug("Checkpoint#6 - SPI(100=ServiceIdentifier) added to CCR: " + logMsg.toString());
+//            
+//	        spiAvp = ChargingHelper.createSPI(500, smppRequest.getSmId().getString()); // message id
+//	        dccCcr.addAvp(spiAvp);
+//	        logMsg.append(", SPI(500=" + smppRequest.getSmId().getString() + ")");
+//            LogService.appLog.debug("Checkpoint#7 - SPI(500=SMS Message ID) added to CCR: " + logMsg.toString());
+//            
+//	        spiAvp = ChargingHelper.createSPI(300, OtherPartyIdTypeAvp.END_USER_E164); // source addr type
+//	        dccCcr.addAvp(spiAvp);
+//	        logMsg.append(", SPI(300=" + OtherPartyIdTypeAvp.END_USER_E164 + ")");
+//            LogService.appLog.debug("Checkpoint#8 - SPI(300=A Party Type) added to CCR: " + logMsg.toString());
+//            
+//	        spiAvp = ChargingHelper.createSPI(301, smppRequest.getSourceAddress().getString()); // source addr
+//	        dccCcr.addAvp(spiAvp);
+//	        logMsg.append(", SPI(301=" + smppRequest.getSourceAddress().getString() + ")");
+//            LogService.appLog.debug("Checkpoint#9 - SPI(301=A Party Number) added to CCR: " + logMsg.toString());
+//            
+//	        spiAvp = ChargingHelper.createSPI(302, OtherPartyIdTypeAvp.END_USER_E164); // destn addr type
+//	        dccCcr.addAvp(spiAvp);
+//	        logMsg.append(", SPI(302=" + OtherPartyIdTypeAvp.END_USER_E164 + ")");
+//            LogService.appLog.debug("Checkpoint#10 - SPI(302=B Party Type) added to CCR: " + logMsg.toString());
+//            
+//	        spiAvp = ChargingHelper.createSPI(303, smppRequest.getDestinationAddress().getString()); // destn addr
+//	        dccCcr.addAvp(spiAvp);
+//	        logMsg.append(", SPI(303=" + smppRequest.getDestinationAddress().getString() + ")");
+//            LogService.appLog.debug("Checkpoint#11 - SPI(303=B Party Number) added to CCR: " + logMsg.toString());
+//            
+//	        spiAvp = ChargingHelper.createSPI(304, smppRequest.getSmscAddress().getString()); // smsc addr
+//	        dccCcr.addAvp(spiAvp);
+//            logMsg.append(", SPI(304=" + smppRequest.getSmscAddress().getString() + ")");
+//            LogService.appLog.debug("Checkpoint#12 - SPI(301=SMSC Number) added to CCR: " + logMsg.toString());
+//            
+//            spiAvp = ChargingHelper.createSPI(305, smppRequest.getMoMscAddress().getString()); // mo msc addr
+//            dccCcr.addAvp(spiAvp);
+//            logMsg.append(", SPI(305=" + smppRequest.getSmscAddress().getString() + ")");
+//            LogService.appLog.debug("Checkpoint#13 - SPI(305=MSC Number) added to CCR: " + logMsg.toString());
             
             // Event-Timestamp
             Date timestamp = new Date(System.currentTimeMillis());
@@ -302,8 +299,9 @@ public class SmsChargingProcessor implements Processor {
             LogService.appLog.debug("Checkpoint#15 - TimeZone added to CCR: " + logMsg.toString());
             
             // sanity
-            dccCcr.setAuthApplicationId(0x04);
-            dccCcr.setCCCorrelationId(dccCcr.getSessionId().getBytes());
+            dccCcr.setAuthApplicationId(0x04); // DCC PROTOCOL
+//            dccCcr.setCCCorrelationId(dccCcr.getSessionId().getBytes());
+            dccCcr.setServiceContextId(SCAP_SERVICE_CONTEXT_ID);
             
 	        LogService.stackTraceLog.debug("SmsChargingProcessor-getScapRequest: Final Construction:" + logMsg.toString());
             logMsg = null;
