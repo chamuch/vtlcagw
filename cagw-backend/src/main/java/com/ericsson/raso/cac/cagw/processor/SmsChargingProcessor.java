@@ -146,8 +146,8 @@ public class SmsChargingProcessor implements Processor {
 	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
 	        scapCcr.setDestinationHost(route.getHostId()); logMsg.append(", DestinationHost:"+scapCcr.getDestinationHost());
             scapCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+scapCcr.getDestinationRealm());
-	        scapCcr.setOriginHost(ChargingHelper.ORIGIN_HOST); logMsg.append(", OriginHost:"+scapCcr.getOriginHost());
-	        scapCcr.setOriginRealm(ChargingHelper.ORIGIN_HOST); logMsg.append(", OriginRealm:"+scapCcr.getOriginHost());
+	        scapCcr.setOriginHost(scapEndpoint.getOriginRealm()); logMsg.append(", OriginHost:"+scapCcr.getOriginHost());
+	        scapCcr.setOriginRealm(scapEndpoint.getOriginRealm()); logMsg.append(", OriginRealm:"+scapCcr.getOriginRealm());
             scapCcr.addAvp(new CCRequestNumberAvp(0x00));  logMsg.append(", CCRequestNumber:"+scapCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
             scapCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+scapCcr.getCCRequestType());
 	        scapCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+scapCcr.getRequestedAction());
