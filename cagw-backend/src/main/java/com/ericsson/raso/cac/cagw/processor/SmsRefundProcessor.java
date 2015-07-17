@@ -65,10 +65,6 @@ public class SmsRefundProcessor implements Processor {
 		    LogService.appLog.info("Transaction from DB: " + txn.toString());
 		    
 		    // lets refund
-		    String[] accounts = txn.getAccountId().split("|");
-		    String[] amounts = txn.getAmount().split("|");
-		    String[] accountTypes = txn.getAccountType().split("|");
-		    
 		    UpdateBalanceAndDateRequest ubdRequest = new UpdateBalanceAndDateRequest();
 		    ubdRequest.setSubscriberNumber(txn.getChargedParty());
 		    ubdRequest.setSubscriberNumberNAI(1);
@@ -79,7 +75,13 @@ public class SmsRefundProcessor implements Processor {
 		    StringBuilder sbLog = new StringBuilder("");
 		    sbLog.append("SubscriberNumber:");sbLog.append(ubdRequest.getSubscriberNumber());
 		    
-		    List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
+		    String[] accounts = txn.getAccountId().split("|");
+            String[] amounts = txn.getAmount().split("|");
+            String[] accountTypes = txn.getAccountType().split("|");
+            LogService.appLog.debug("Lets test the splits. accounts size: %d, accounts(0): %s, amounts size: %d, amounts(0): %s, accountTypes size: %d, accountTypes(0): %s",
+                    accounts.length, accounts[0], amounts.length, amounts[0], accountTypes.length, accountTypes[0]);
+            
+            List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
 		    for (int i = 0; i < accounts.length; i++) {
 		        LogService.appLog.debug(String.format("Preparing DA with %d account: %s, amount: %s, type: %s", i, accounts[i], amounts[i], accountTypes[i]));
 		        DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
