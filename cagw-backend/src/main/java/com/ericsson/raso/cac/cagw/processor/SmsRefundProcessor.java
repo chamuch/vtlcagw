@@ -27,20 +27,17 @@ public class SmsRefundProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		try{
-			LogService.appLog.info("Entered into SmsRefundProcessor");
-		    SmResultNotify smppRequest = (SmResultNotify) exchange.getIn().getBody();
-		    
-		    StringBuilder logMsg = new StringBuilder("");
-		    logMsg.append("CommandSequence:");logMsg.append(smppRequest.getCommandSequence().getValue());
-		    logMsg.append(":SmId:");logMsg.append(smppRequest.getCommandSequence().getValue());
-		    logMsg.append(":SourceAddres:");logMsg.append(smppRequest.getCommandSequence().getValue());
-		    logMsg.append(":DestinationAddress:");logMsg.append(smppRequest.getCommandSequence().getValue());
-		    
+	    SmResultNotify smppRequest = null;
+		SmResultNotifyResponse smppResponse = null;
+	    try{
+			smppRequest = (SmResultNotify) exchange.getIn().getBody();		    
+			LogService.stackTraceLog.info("Request >> " + smppRequest.toString());
+            
 		    // successful delivery... nothing to do
 		    if (smppRequest.getFinalState().getValue() == 0) {
-		    	LogService.appLog.debug("SmsRefundProcessor-process:No need to refund.."+logMsg.toString());
-		        SmResultNotifyResponse smppResponse = this.getSuccessSmppResponse(smppRequest);
+		    	LogService.appLog.debug("SmsRefundProcessor-process:Message devliery Success. No need to refund!");
+		        smppResponse = this.getSuccessSmppResponse(smppRequest);
+		        LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
 		        exchange.getOut().setBody(smppResponse);
 		        this.moveToArchive(smppRequest);
 		        return;
@@ -58,9 +55,10 @@ public class SmsRefundProcessor implements Processor {
 		    
 		    // no data, potentially nothing to refund (for e.g., free sms or wrong transactionid
 		    if (txn == null || txn.getAccountId() == null || txn.getAccountId().equalsIgnoreCase("")) {
-		    	LogService.appLog.debug("SmsRefundProcessor-process:No need to refund, as ther is no data."+logMsg.toString());
-		    	
-		        SmResultNotifyResponse smppResponse = this.getSuccessSmppResponse(smppRequest);
+		    	LogService.appLog.debug("SmsRefundProcessor-process:Transaction not found. Will not need to refund");
+		        smppResponse = this.getSuccessSmppResponse(smppRequest);
+		        LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
+                exchange.getOut().setBody(smppResponse);
                 return;
 		    }
 		    
@@ -77,7 +75,7 @@ public class SmsRefundProcessor implements Processor {
 		    ubdRequest.setTransactionCode(smppRequest.getDestinationAddress().getString());
 		    
 		    StringBuilder sbLog = new StringBuilder("");
-		    sbLog.append(":SubscriberNumber:");sbLog.append(ubdRequest.getSubscriberNumber());
+		    sbLog.append("SubscriberNumber:");sbLog.append(ubdRequest.getSubscriberNumber());
 		    
 		    List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
 		    for (int i = 0; i < accounts.length; i++) {
@@ -91,8 +89,7 @@ public class SmsRefundProcessor implements Processor {
                 sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AccountUnitType:");sbLog.append(dauInfo.getDedicatedAccountUnitType());
                 sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AdjustmentAmountRelative:");sbLog.append(dauInfo.getAdjustmentAmountRelative());
 		    }		    
-		    //TODO: logger... packed all account info
-		    LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR request:"+logMsg.toString()+sbLog.toString());
+		    LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR request:" + sbLog.toString());
 		    sbLog = null;
 		    
 		    boolean refundResult = false;
@@ -100,23 +97,25 @@ public class SmsRefundProcessor implements Processor {
 		        UpdateBalanceAndDateCommand command = new UpdateBalanceAndDateCommand(ubdRequest);
 		        UpdateBalanceAndDateResponse ubdResponse = command.execute();
 		        
-		        LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR response:"+logMsg.toString()+":AirResponseCode:"+ubdResponse.getResponseCode());
+		        LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR ResponseCode:"+ubdResponse.getResponseCode());
 		        refundResult = true;
+		        smppResponse = this.getSuccessSmppResponse(smppRequest);
+		        LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
+		        exchange.getOut().setBody(smppResponse);
 		    } catch (UcipException e) {
 		    	LogService.stackTraceLog.debug("SmsRefundProcessor-process:Failed to refund !!",e);
-		        SmResultNotifyResponse smppResponse = this.getRefundFailedSmppResponse(smppRequest);
-                exchange.getOut().setBody(smppResponse);
-                return;
-	        }  
+		        smppResponse = this.getRefundFailedSmppResponse(smppRequest);
+                LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
+		        exchange.getOut().setBody(smppResponse);
+ 	        }  
 		    
 		    //now delete txn and move to archive now
 		    this.moveToArchive(txn, smppRequest.getFinalState().getValue(), refundResult, System.currentTimeMillis());
-		    
-		    LogService.appLog.debug("SmsRefundProcessor-process:Refund Done."+logMsg.toString());
-		    
-		    logMsg = null;		
+		    LogService.appLog.info("Transaction archived for : " + smppRequest.getSmId().getString());
 		}catch(Exception genE){//Added for debugging
 			LogService.appLog.debug("SmsRefundProcessor-process:Encountered exception",genE);
+            smppResponse = this.getRefundFailedSmppResponse(smppRequest);
+            exchange.getOut().setBody(smppResponse);
 		}
 	}
 
@@ -132,12 +131,12 @@ public class SmsRefundProcessor implements Processor {
     private void moveToArchive(SmResultNotify smppRequest) {
         Transaction transaction = null;
         try {
-                // check for data to refund         
+            // check for data to refund         
             transaction = new TransactionDao().fetchSmsCharging(smppRequest.getSmId().getString(), 
-                smppRequest.getSourceAddress().getString(), 
-                smppRequest.getDestinationAddress().getString());
+                    smppRequest.getSourceAddress().getString(), 
+                    smppRequest.getDestinationAddress().getString());
         } catch (PersistenceException e) {                    	
-		    LogService.stackTraceLog.debug("SmsRefundProcessor-moveToArchive: Failed:SmId:"+smppRequest.getSmId().getValue(),e);
+            LogService.stackTraceLog.debug("SmsRefundProcessor-moveToArchive: Failed:SmId:"+smppRequest.getSmId().getValue(),e);
         }
         
         if (transaction != null) {

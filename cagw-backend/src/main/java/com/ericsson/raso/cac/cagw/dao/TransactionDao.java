@@ -104,6 +104,7 @@ public class TransactionDao {
                                                 select.where((eq("messageId", messageId)))
                                                 .and(eq("sourceAddress", sourceAddress))
                                                 .and(eq("destinationAddress", destinationAddress));
+                                                select.allowFiltering();
                 List<Row> results = session.execute(select).all();
                 if (results.size() == 0)
                     return null;
