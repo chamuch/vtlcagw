@@ -38,6 +38,7 @@ public class AirClientImpl implements AirClient {
 
 	public void init() throws UcipException {
 		ConfigHelper.initializeConfig(this);
+		LogService.appLog.debug("Verifying init config: " + this.toString());
 	}
 
 	@Override
