@@ -109,7 +109,7 @@ public class ConfigHelper {
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(DEFAULT_NAI + " is not set or empty!");
             client.setDefaultNai(param);
-            LogService.appLog.debug(String.format("Default NAI '%d' set in air client", client.getDefaultNai()));
+            LogService.appLog.debug(String.format("Default NAI '%s' set in air client", client.getDefaultNai()));
             
             // connection timeout
             String key = UCIP_PREFIX + i + CONN_TIMEOUT;
