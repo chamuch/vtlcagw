@@ -105,7 +105,9 @@ public class TransactionDao {
                                                 .and(eq("sourceAddress", sourceAddress))
                                                 .and(eq("destinationAddress", destinationAddress));
                                                 select.allowFiltering();
+
                 List<Row> results = session.execute(select).all();
+                LogService.stackTraceLog.info("TransactionDao-deleteSmsCharging:Success !! Query Returned: " + results.size());
                 if (results.size() == 0)
                     return null;
                 
@@ -125,7 +127,6 @@ public class TransactionDao {
                 tx.setAccountType(firstMatch.getString("accountType"));
                 tx.setChargeStatus(firstMatch.getBool("chargeStatus"));
                 
-                LogService.stackTraceLog.info("TransactionDao-deleteSmsCharging:Success !! Query Returned: " + results.size());
                 return tx;
             }else{                
                 LogService.stackTraceLog.info("TransactionDao-fetchSmsCharging:Unable to get connection to insert txn");

@@ -81,6 +81,7 @@ public class SmsRefundProcessor implements Processor {
 		    
 		    List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
 		    for (int i = 0; i < accounts.length; i++) {
+		        LogService.appLog.debug(String.format("Preparing DA with %d account: %s, amount: %s, type: %s", i, accounts[i], amounts[i], accountTypes[i]));
 		        DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
 		        dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
 		        dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
@@ -91,7 +92,7 @@ public class SmsRefundProcessor implements Processor {
                 sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AccountUnitType:");sbLog.append(dauInfo.getDedicatedAccountUnitType());
                 sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AdjustmentAmountRelative:");sbLog.append(dauInfo.getAdjustmentAmountRelative());
 		    }		    
-		    LogService.stackTraceLog.debug("SmsRefundProcessor-process:AIR request:" + sbLog.toString());
+		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + sbLog.toString());
 		    sbLog = null;
 		    
 		    boolean refundResult = false;
