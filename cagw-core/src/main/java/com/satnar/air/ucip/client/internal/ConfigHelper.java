@@ -54,11 +54,6 @@ public class ConfigHelper {
             throw new UcipException(OWN_HOST_NAME + " is not set or empty!");
         client.setOriginHostName(param);
         
-        // default nai
-        param = client.getConfig().getProperty(DEFAULT_NAI);
-        if (param == null || param.equalsIgnoreCase(""))
-            throw new UcipException(DEFAULT_NAI + " is not set or empty!");
-        client.setDefaultNai(param);
         
         // negotiated capabilities
         int negCap = 0;
@@ -89,11 +84,31 @@ public class ConfigHelper {
             throw new UcipException("'ucipEndpointCount' is not numeric! Found: " + param);
         }
         
-
+        // negotiated capabilities
+        param = client.getConfig().getProperty(NEGOTIATED_CAPABILITIES);
+        if (param == null || param.equalsIgnoreCase(""))
+            throw new UcipException(DEFAULT_NAI + " is not set or empty!");
+        try {
+            client.setNegotiatedCapabilities(Integer.parseInt(param));
+        } catch (NumberFormatException e) {
+            client.setNegotiatedCapabilities(805646916);
+        }
+        
+        client.setDefaultSite("1"); //veittel specific hard code
+        
+        
+        
         XmlRpcClientFactory factory = new DefaultXmlRpcClientFactory();
         for (int i =1; i <= ucipCount; i++) {
             ConfigParams configParams = new ConfigParams();
             
+            // default nai
+            param = client.getConfig().getProperty(UCIP_PREFIX + i + DEFAULT_NAI);
+            if (param == null || param.equalsIgnoreCase(""))
+                throw new UcipException(DEFAULT_NAI + " is not set or empty!");
+            client.setDefaultNai(param);
+            
+            // connection timeout
             String key = UCIP_PREFIX + i + CONN_TIMEOUT;
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))

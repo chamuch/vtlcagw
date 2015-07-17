@@ -61,7 +61,6 @@ public class AirClientImpl implements AirClient {
 			
 			LogService.appLog.info(request.getClass().getName()+"-"+request.getMethodName()+":Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 		} catch (XmlRpcException e) {
-			//TODO: AirEdrLogger.responseError(request.getMethodName(), e);
 			LogService.appLog.debug(request.getClass().getName()+"-"+request.getMethodName()+":Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 			if(e.code == 0) {
 				throw new XmlRpcException(e.getMessage(), e.linkedException);
