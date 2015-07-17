@@ -1,8 +1,10 @@
 package com.ericsson.raso.cac.cagw.dao;
 
+import java.util.concurrent.Callable;
+
 import com.satnar.common.LogService;
 
-public class PersistSmsChargeTransaction implements Runnable {
+public class PersistSmsChargeTransaction implements Callable<Void> {
     
     private Transaction transactionData = null;
 
@@ -11,7 +13,7 @@ public class PersistSmsChargeTransaction implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Void call() {
         try {
             TransactionDao txnPersistenceHelper = new TransactionDao();
             txnPersistenceHelper.persistSmsCharging(this.transactionData);
@@ -21,6 +23,7 @@ public class PersistSmsChargeTransaction implements Runnable {
             // TODO Just log this... nothing can be done in a zombie thread ;)
         	LogService.appLog.error("PersistSmsChargeTransaction(" + this.transactionData + "): Persistence Failure!!",e);
         }
+        return null;
     }
     
 }

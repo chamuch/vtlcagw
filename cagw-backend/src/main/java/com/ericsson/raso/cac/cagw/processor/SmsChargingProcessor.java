@@ -33,6 +33,7 @@ import com.ericsson.pps.diameter.scapv2.avp.TimeZoneAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TrafficCaseAvp;
 import com.ericsson.pps.diameter.scapv2.command.ScapCcr;
 import com.ericsson.raso.cac.cagw.SpringHelper;
+import com.ericsson.raso.cac.cagw.dao.ConcurrencyControl;
 import com.ericsson.raso.cac.cagw.dao.PersistSmsChargeTransaction;
 import com.ericsson.raso.cac.cagw.dao.Transaction;
 import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc;
@@ -70,7 +71,7 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.appLog.debug("Spawning persistence thread for Request# " + smppRequest.getSmId().getString());
 	        Transaction smsChargingStatus = this.getSmsChargingStatus(smppRequest, scapRequest, smppResponse);
 	        LogService.appLog.debug("Verify Transaction pojo(" + smsChargingStatus + ") for Request# " + smppRequest.getSmId().getString());
-	        new Thread(new PersistSmsChargeTransaction(smsChargingStatus)).start();
+	        ConcurrencyControl.enqueueExecution(new PersistSmsChargeTransaction(smsChargingStatus));
 	        
 	        LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
 	        exchange.getOut().setBody(smppResponse);

@@ -1,8 +1,10 @@
 package com.ericsson.raso.cac.cagw.dao;
 
+import java.util.concurrent.Callable;
+
 import com.satnar.common.LogService;
 
-public class MoveTransactionToArchive implements Runnable {
+public class MoveTransactionToArchive implements Callable<Void> {
     
     private Transaction transactionData = null;
     private Archive archiveData = null;
@@ -12,7 +14,7 @@ public class MoveTransactionToArchive implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Void call() {
         try {
             ArchiveDao archivePersistenceHelper = new ArchiveDao();
             archivePersistenceHelper.pushToArchive(archiveData);
@@ -25,6 +27,7 @@ public class MoveTransactionToArchive implements Runnable {
             // TODO Just log this... nothing can be done in a zombie thread ;)
         	LogService.appLog.debug("MoveTransactionToArchive: Encountered exception.",e);
         }
+        return null;
     }
     
 }

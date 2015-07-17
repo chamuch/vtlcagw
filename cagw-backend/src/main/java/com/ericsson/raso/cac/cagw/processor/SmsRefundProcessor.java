@@ -7,6 +7,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
 import com.ericsson.raso.cac.cagw.dao.Archive;
+import com.ericsson.raso.cac.cagw.dao.ConcurrencyControl;
 import com.ericsson.raso.cac.cagw.dao.MoveTransactionToArchive;
 import com.ericsson.raso.cac.cagw.dao.PersistenceException;
 import com.ericsson.raso.cac.cagw.dao.Transaction;
@@ -124,7 +125,7 @@ public class SmsRefundProcessor implements Processor {
         archive.setDeliveryStatus(deliveryResult == 0);
         archive.setRefundStatus(refundResult);
         archive.setRefundTime(sysTime);
-        new Thread(new MoveTransactionToArchive(txn, archive)).start();
+        ConcurrencyControl.enqueueExecution(new MoveTransactionToArchive(txn, archive));
         
     }
 
@@ -144,7 +145,7 @@ public class SmsRefundProcessor implements Processor {
             archive.setDeliveryStatus(smppRequest.getFinalState().getValue() == 0);
             archive.setRefundStatus(false);
             archive.setRefundTime(System.currentTimeMillis());
-            new Thread(new MoveTransactionToArchive(transaction, archive)).start();
+            ConcurrencyControl.enqueueExecution(new MoveTransactionToArchive(transaction, archive));
         }
     }
 
