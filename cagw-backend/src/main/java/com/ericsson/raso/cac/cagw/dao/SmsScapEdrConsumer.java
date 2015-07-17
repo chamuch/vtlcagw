@@ -13,14 +13,18 @@ public class SmsScapEdrConsumer {
     private static final String ACCT_DELIM = "/";
     
     public static void main(String[] args) {
-        if (args.length < 1) {
-           System.out.println("Usage: java SmsScapEdrConsumer <fully_qualified_path_to_input_file>");        	
+        if (args.length < 3) {
+           System.out.println("Usage: java SmsScapEdrConsumer <fully_qualified_path_to_input_file> <cassandra_ip_address_csv_list> <keyspace_name>");        	
         }
         
-        processInputFile(args[0]);
+        processInputFile(args[0], args[1], args[2]);
     }
 
-    private static void processInputFile(String csvPath) {
+    private static void processInputFile(String csvPath, String cassandraIp, String keyspace) {
+        
+        DataStaxConnection.getInstance(cassandraIp, keyspace);
+        System.out.println("Cassandra Connected with: " + cassandraIp);
+        
         String recordEntry = null;
         try {
             FileReader fileInput = new FileReader(csvPath);
