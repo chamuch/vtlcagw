@@ -47,6 +47,7 @@ public class AirClientImpl implements AirClient {
 			request.setOriginTransactionId(String.valueOf(createTransactionId()));
 		}
 		
+		LogService.appLog.debug("Verifying stack config: " + this.toString());
 		request.setSubscriberNumberNAI(Integer.valueOf(this.defaultNai));
 		request.setOriginTimeStamp(new Date());
 		request.setOriginHostName(originHostName);
@@ -138,6 +139,18 @@ public class AirClientImpl implements AirClient {
 
     public void setNegotiatedCapabilities(int negotiatedCapabilities) {
         this.negotiatedCapabilities = negotiatedCapabilities;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("AirClientImpl [originNodeType=%s, originHostName=%s, defaultSite=%s, defaultNai=%s, negotiatedCapabilities=%s, loadBalancer=%s, config=%s]",
+                originNodeType,
+                originHostName,
+                defaultSite,
+                defaultNai,
+                negotiatedCapabilities,
+                loadBalancer,
+                config);
     }
 
 
