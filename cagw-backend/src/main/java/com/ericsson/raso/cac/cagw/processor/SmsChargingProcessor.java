@@ -314,7 +314,7 @@ public class SmsChargingProcessor implements Processor {
             logMsg.append(", EventTimestamp(" + timestamp + ")");
             
 	        // Timezone
-            dccCcr.addAvp(new TimeZoneAvp((byte)11, (byte)0, (byte)0));
+            dccCcr.addAvp(new TimeZoneAvp((byte)10, (byte)0, (byte)0));
 	        logMsg.append(", TimeZone(11hours 0mins 0dst)");
             
             
