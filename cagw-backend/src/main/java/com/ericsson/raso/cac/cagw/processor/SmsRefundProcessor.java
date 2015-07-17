@@ -78,8 +78,8 @@ public class SmsRefundProcessor implements Processor {
 		    String[] accounts = txn.getAccountId().split("|");
             String[] amounts = txn.getAmount().split("|");
             String[] accountTypes = txn.getAccountType().split("|");
-            LogService.appLog.debug("Lets test the splits. accounts size: %d, accounts(0): %s, amounts size: %d, amounts(0): %s, accountTypes size: %d, accountTypes(0): %s",
-                    accounts.length, accounts[0], amounts.length, amounts[0], accountTypes.length, accountTypes[0]);
+            LogService.appLog.debug(String.format("Lets test the splits. accounts size: %d, accounts(0): %s, amounts size: %d, amounts(0): %s, accountTypes size: %d, accountTypes(0): %s",
+                    accounts.length, accounts[0], amounts.length, amounts[0], accountTypes.length, accountTypes[0]));
             
             List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
 		    for (int i = 0; i < accounts.length; i++) {
