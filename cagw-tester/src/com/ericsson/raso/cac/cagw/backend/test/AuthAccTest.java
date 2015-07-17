@@ -53,7 +53,7 @@ public class AuthAccTest {
             postSmsCharge(args[0]);
         }
         
-        //msisdn:84980200604
+        //msisdn:841669005768
         
     }
 
@@ -61,16 +61,16 @@ public class AuthAccTest {
         // Pack the pdu first....
         AuthAcc authAccPdu = new AuthAcc();
         authAccPdu.setCommandSequence(CommandSequence.getInstance());
-        authAccPdu.setDestinationAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "84980200605"));
-        authAccPdu.setSourceAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "84980200604"));
-        authAccPdu.setMoMscAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "84981234567"));
+        authAccPdu.setDestinationAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "841669005769"));
+        authAccPdu.setSourceAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "841669005768"));
+        authAccPdu.setMoMscAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "849812345678"));
         authAccPdu.setMoMscNoa((Byte) SmppParameter.getInstance(Type.BYTE, (byte)1));
         authAccPdu.setMoMscNpi((Byte) SmppParameter.getInstance(Type.BYTE, (byte)1));
         authAccPdu.setMoMtFlag(WinMoMtFlag.MO);
         authAccPdu.setServiceId((com.satnar.smpp.codec.Integer) SmppParameter.getInstance(Type.INTEGER, 1));
         authAccPdu.setSmId((CHexString) SmppParameter.getInstance(Type.C_HEX_STRING, Integer.toHexString(smId.incrementAndGet())));
         authAccPdu.setSmLength((com.satnar.smpp.codec.Integer) SmppParameter.getInstance(Type.INTEGER, 140));
-        authAccPdu.setSmscAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "84981234567"));
+        authAccPdu.setSmscAddress((CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING, "849812345678"));
         authAccPdu.setVersion(WinVersion.V_3);
         authAccPdu.getCommandLength();
         
