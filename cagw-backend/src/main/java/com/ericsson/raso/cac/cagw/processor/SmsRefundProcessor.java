@@ -75,9 +75,9 @@ public class SmsRefundProcessor implements Processor {
 		    StringBuilder sbLog = new StringBuilder("");
 		    sbLog.append("SubscriberNumber:");sbLog.append(ubdRequest.getSubscriberNumber());
 		    
-		    String[] accounts = txn.getAccountId().split("|");
-            String[] amounts = txn.getAmount().split("|");
-            String[] accountTypes = txn.getAccountType().split("|");
+		    String[] accounts = txn.getAccountId().split("\\|");
+            String[] amounts = txn.getAmount().split("\\|");
+            String[] accountTypes = txn.getAccountType().split("\\|");
             LogService.appLog.debug(String.format("Lets test the splits. accounts size: %d, accounts(0): %s, amounts size: %d, amounts(0): %s, accountTypes size: %d, accountTypes(0): %s",
                     accounts.length, accounts[0], amounts.length, amounts[0], accountTypes.length, accountTypes[0]));
             
