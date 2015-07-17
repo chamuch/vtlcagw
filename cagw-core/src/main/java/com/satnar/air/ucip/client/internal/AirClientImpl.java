@@ -32,7 +32,6 @@ public class AirClientImpl implements AirClient {
 	
 	public AirClientImpl(Properties ucipConfig)  {		
 		LogService.appLog.info("AirClientImpl:AIR Endpoint initialization starts!!!");
-		//logger.debug("AIR Endpoint initialization starts!!!");	
 		this.config = ucipConfig;
 	}
 
@@ -143,7 +142,7 @@ public class AirClientImpl implements AirClient {
 
     @Override
     public String toString() {
-        return String.format("AirClientImpl [originNodeType=%s, originHostName=%s, defaultSite=%s, defaultNai=%s, negotiatedCapabilities=%s, loadBalancer=%s, config=%s]",
+        return String.format("AirClientImpl [originNodeType=%s, originHostName=%s, defaultSite=%s, defaultNai=%s, negotiatedCapabilities=%s]\n\nloadBalancer=%s \n\nconfig=%s]",
                 originNodeType,
                 originHostName,
                 defaultSite,

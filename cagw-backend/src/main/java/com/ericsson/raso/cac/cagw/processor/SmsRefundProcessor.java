@@ -108,7 +108,7 @@ public class SmsRefundProcessor implements Processor {
 		        LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
 		        exchange.getOut().setBody(smppResponse);
 		    } catch (UcipException e) {
-		    	LogService.stackTraceLog.debug("SmsRefundProcessor-process:Failed to refund !!",e);
+		    	LogService.appLog.debug("SmsRefundProcessor-process:Failed to refund !!",e);
 		        smppResponse = this.getRefundFailedSmppResponse(smppRequest);
                 LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
 		        exchange.getOut().setBody(smppResponse);

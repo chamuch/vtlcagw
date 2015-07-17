@@ -44,34 +44,22 @@ public class ConfigHelper {
         String param = null;
         
         // own host name
+        LogService.appLog.debug("Configuring ownHostName...");
         param = client.getConfig().getProperty(OWN_HOST_NAME);
         if (param == null || param.equalsIgnoreCase(""))
             throw new UcipException(OWN_HOST_NAME + " is not set or empty!");
         client.setOriginHostName(param);
         
         // own node type
+        LogService.appLog.debug("Configuring ownHostType...");
         param = client.getConfig().getProperty(OWN_NODE_TYPE);
         if (param == null || param.equalsIgnoreCase(""))
             throw new UcipException(OWN_HOST_NAME + " is not set or empty!");
         client.setOriginHostName(param);
         
         
-        // negotiated capabilities
-        int negCap = 0;
-        param = client.getConfig().getProperty(NEGOTIATED_CAPABILITIES);
-        if (param == null || param.equalsIgnoreCase(""))
-            throw new UcipException("'negotiatedCapabilities' is not set!");
-        
-        try {
-            negCap = Integer.parseInt(param);
-            if (negCap == 0) 
-                throw new UcipException("'negotiatedCapabilities' is set to Zero (0)");
-        } catch (NumberFormatException e) {
-            throw new UcipException("'negotiatedCapabilities' is not numeric! Found: " + param);
-        }
-        client.setNegotiatedCapabilities(negCap);
-        
         // UCIP Endpoint Count...
+        LogService.appLog.debug("Configuring ucipEndpointCount...");
         int ucipCount = 0;
         param = client.getConfig().getProperty(UCIP_EP_COUNT);
         if (param == null || param.equalsIgnoreCase(""))
@@ -86,9 +74,10 @@ public class ConfigHelper {
         }
         
         // negotiated capabilities
+        LogService.appLog.debug("Configuring negotiatedCapabilities...");
         param = client.getConfig().getProperty(NEGOTIATED_CAPABILITIES);
         if (param == null || param.equalsIgnoreCase(""))
-            throw new UcipException(DEFAULT_NAI + " is not set or empty!");
+            throw new UcipException(NEGOTIATED_CAPABILITIES + " is not set or empty!");
         try {
             client.setNegotiatedCapabilities(Integer.parseInt(param));
         } catch (NumberFormatException e) {
@@ -105,14 +94,17 @@ public class ConfigHelper {
             ConfigParams configParams = new ConfigParams();
             
             // default nai
-            param = client.getConfig().getProperty(UCIP_PREFIX + i + DEFAULT_NAI);
+            String key = UCIP_PREFIX + i + DEFAULT_NAI;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
+            param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
-                throw new UcipException(DEFAULT_NAI + " is not set or empty!");
+                throw new UcipException(key + " is not set or empty!");
             client.setDefaultNai(param);
             LogService.appLog.debug(String.format("Default NAI '%s' set in air client", client.getDefaultNai()));
             
             // connection timeout
-            String key = UCIP_PREFIX + i + CONN_TIMEOUT;
+            key = UCIP_PREFIX + i + CONN_TIMEOUT;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -125,6 +117,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + REPLY_TIMEOUT;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -137,6 +130,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + IDLE_TIMEOUT;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -149,6 +143,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + IDLE_CONN_TIMEOUT_INTERVAL;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -161,6 +156,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + MAX_CONNECTIONS;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -172,6 +168,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + MAX_TOTAL_CONNECTIONS;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -183,12 +180,14 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + PASSWORD;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
             configParams.setPassword(param);
             
             key = UCIP_PREFIX + i + RETRY_COUNT;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -200,30 +199,35 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + STALE_CHECK;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
             configParams.setStaleCheckingEnabled(Boolean.parseBoolean(param));
             
             key = UCIP_PREFIX + i + USE_APACHE;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
             configParams.setUseApacheHttpClient(Boolean.parseBoolean(param));
             
             key = UCIP_PREFIX + i + USER_AGENT;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
             configParams.setUserAgent(param);
             
             key = UCIP_PREFIX + i + USERNAME;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
             configParams.setUsername(param);
             
             key = UCIP_PREFIX + i + SO_TIMEOUT;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -235,6 +239,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + URL_ADDRESS;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -247,6 +252,7 @@ public class ConfigHelper {
             }
             
             key = UCIP_PREFIX + i + SITE;
+            LogService.appLog.debug(String.format("Configuring %s...", key));
             param = client.getConfig().getProperty(key);
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(key + " is not set or empty!");
@@ -255,16 +261,12 @@ public class ConfigHelper {
             
             try {
                 XmlRpcClient rpcClient = factory.create(configParams);
-                //client.getClientMap().put(param, rpcClient);
                 client.addSitePeer(param, rpcClient);
+                LogService.appLog.debug(String.format("Added client connection#" + i));
             } catch (XmlRpcException e) {
                 throw new UcipException(e.code, e.getMessage(), e);
             }
-            
-            
         }
-        
+        LogService.appLog.info("Air Client is now configured and ready for use!!");
     }
-    
-
 }
