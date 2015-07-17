@@ -229,10 +229,9 @@ public class SmsChargingProcessor implements Processor {
 	        
 	        // things we expect shit from Viettel...
 	        RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
-	        CCServiceSpecificUnitsAvp ssuAvp = new CCServiceSpecificUnitsAvp();
-	        ssuAvp.setData(1); // 1 SMS unit to charge
-	        rsuAvp.addSubAvp(ssuAvp);
-	        dccCcr.setRequestedServiceUnit(rsuAvp);
+	        CCServiceSpecificUnitsAvp ssuAvp = new CCServiceSpecificUnitsAvp(1); // 1 SMS unit to charge
+	        //rsuAvp.addSubAvp(ssuAvp);
+	        dccCcr.setRequestedServiceUnit(ssuAvp);
             logMsg.append(", RequestedServicesUnit->ServiceSpecificUnits(1)");
             
 	    	if (smppRequest.getMoMtFlag() == WinMoMtFlag.MO) {
