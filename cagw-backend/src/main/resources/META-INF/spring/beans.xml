@@ -33,7 +33,8 @@
 	
 	<bean id="airContect" class="com.satnar.air.ucip.client.internal.CsAirContext" />
 	
-	<bean id="airClient" class="com.satnar.air.ucip.client.internal.AirClientImpl">
+	<bean id="airClient" class="com.satnar.air.ucip.client.internal.AirClientImpl"
+	init-method="init">
 		<constructor-arg name="ucipConfig"
 			value="#{cfg.getProperties('cs-air1')}" />
 	</bean>
