@@ -34,6 +34,9 @@ public class DataStaxConnection {
 	 */
 	private DataStaxConnection(String cassandraAddress, String keySpaceName) {
 		try {
+		    if (instance != null)
+		        return;
+		    
 		    this.address = cassandraAddress;
 		    this.keyspace = keySpaceName;
 		    
@@ -48,6 +51,7 @@ public class DataStaxConnection {
 			LogService.appLog.debug("DataStaxConnection: Cluster build is successful");
 			this.session = cluster.connect(keySpaceName);
 			LogService.appLog.debug("DataStaxConnection: Session established successfully");
+			instance = this;
 		} catch (Exception e) {
 			LogService.appLog.debug("DataStaxConnection: Encoutnered exception:",e);
 			throw new RuntimeException(e);
