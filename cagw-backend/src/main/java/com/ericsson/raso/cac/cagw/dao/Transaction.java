@@ -80,4 +80,22 @@ public class Transaction {
 	public void setTransactionTime(long transactionTime) {
 		this.transactionTime = transactionTime;
 	}
+    @Override
+    public String toString() {
+        return String
+                .format("Transaction [transactionTime=%s, transactionId=%s, messageId=%s, chargingSessionId=%s, sourceAddress=%s, destinationAddress=%s, chargedParty=%s, accountId=%s, amount=%s, accountType=%s, chargeStatus=%s]",
+                        transactionTime,
+                        transactionId,
+                        messageId,
+                        chargingSessionId,
+                        sourceAddress,
+                        destinationAddress,
+                        chargedParty,
+                        accountId,
+                        amount,
+                        accountType,
+                        chargeStatus);
+    }
+	
+	
 }

@@ -62,6 +62,8 @@ public class SmsRefundProcessor implements Processor {
                 return;
 		    }
 		    
+		    LogService.appLog.info("Transaction from DB: " + txn.toString());
+		    
 		    // lets refund
 		    String[] accounts = txn.getAccountId().split("|");
 		    String[] amounts = txn.getAmount().split("|");

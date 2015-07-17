@@ -87,9 +87,9 @@ public class TransactionDao {
                 
                 session.execute(delete);
                 
-                LogService.stackTraceLog.info("TransactionDao-deleteSmsCharging:Success !!");
+                LogService.appLog.info("TransactionDao-deleteSmsCharging:Success !!");
             }else{                
-                LogService.stackTraceLog.info("TransactionDao-deleteSmsCharging:Unable to get connection to insert txn");	
+                LogService.appLog.info("TransactionDao-deleteSmsCharging:Unable to get connection to insert txn");	
             }           
         } catch (Exception e) {
         	LogService.stackTraceLog.debug("TransactionDao-deleteSmsCharging:Encountered exception.",e);
