@@ -43,7 +43,7 @@ public class ChargingHelper {
     }
 
     public static WinOperationResult getWinOperationResult(long scapResult, WinMoMtFlag moMtFlag) {
-        if (scapResult == ResultCode.DIAMETER_SUCCESS.getCode()) 
+        if (scapResult == ResultCode.DIAMETER_SUCCESS.getCode() || scapResult == ResultCode.DIAMETER_CREDIT_CONTROL_NOT_APPLICABLE.getCode()) 
             return WinOperationResult.SUCCESS;
         
         if (scapResult == ResultCode.SUBSCRIBER_NOT_FOUND.getCode())
