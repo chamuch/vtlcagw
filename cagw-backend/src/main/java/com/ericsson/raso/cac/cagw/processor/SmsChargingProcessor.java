@@ -170,7 +170,7 @@ public class SmsChargingProcessor implements Processor {
                         sopi.getSctpRtoMin(), sopi.getSctpValidCookieLife(), sopi.getNumberOfThreadsThatHandlesReceivedRequests()));
         
         RealmRoutes rr = stack.peerManager.getRealmRoutes();
-        if (sopi == null || rr.getAllRoutes().length == 0) {
+        if (rr == null || rr.getAllRoutes().length == 0) {
             LogService.appLog.error("SCAP Diameter Stack has no RealmRoutes!! Potential null pointer!!");
  //           throw new ServiceLogicException("SCAP Diameter Stack has no RealmRoutes!! Potential null pointer!!");
         }
@@ -213,7 +213,6 @@ public class SmsChargingProcessor implements Processor {
 	            throw new ServiceLogicException("Backend (SCAP Endpoint) not available for processing this request# " + smppRequest.getSmId().getString());
 	        }
 	        
-	        this.checkDiameterStack(scapEndpoint.getDccStack().getDiameterStack(), dccCcr);
 	        
 	        dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), scapEndpoint.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
@@ -232,6 +231,8 @@ public class SmsChargingProcessor implements Processor {
 	        dccCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+dccCcr.getRequestedAction());
 	        //LogService.appLog.debug("Checkpoint#1 - SCAP CCR Build: " + logMsg.toString());
 	        
+	        this.checkDiameterStack(scapEndpoint.getDccStack().getDiameterStack(), dccCcr);
+            
 	        
 	        // things we expect shit from Viettel...
 	        RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
