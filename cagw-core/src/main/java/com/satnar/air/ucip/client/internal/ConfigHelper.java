@@ -9,6 +9,7 @@ import com.satnar.air.ucip.client.xmlrpc.XmlRpcClient;
 import com.satnar.air.ucip.client.xmlrpc.XmlRpcClientFactory;
 import com.satnar.air.ucip.client.xmlrpc.XmlRpcException;
 import com.satnar.air.ucip.client.xmlrpc.internal.DefaultXmlRpcClientFactory;
+import com.satnar.common.LogService;
 
 
 public class ConfigHelper {
@@ -93,9 +94,10 @@ public class ConfigHelper {
         } catch (NumberFormatException e) {
             client.setNegotiatedCapabilities(805646916);
         }
+        LogService.appLog.debug(String.format("Negotiated Capabilities '%d' set in air client", client.getNegotiatedCapabilities()));
         
         client.setDefaultSite("1"); //veittel specific hard code
-        
+        LogService.appLog.debug("Default Site '1' set in air client");
         
         
         XmlRpcClientFactory factory = new DefaultXmlRpcClientFactory();
@@ -107,6 +109,7 @@ public class ConfigHelper {
             if (param == null || param.equalsIgnoreCase(""))
                 throw new UcipException(DEFAULT_NAI + " is not set or empty!");
             client.setDefaultNai(param);
+            LogService.appLog.debug(String.format("Default NAI '%d' set in air client", client.getDefaultNai()));
             
             // connection timeout
             String key = UCIP_PREFIX + i + CONN_TIMEOUT;
