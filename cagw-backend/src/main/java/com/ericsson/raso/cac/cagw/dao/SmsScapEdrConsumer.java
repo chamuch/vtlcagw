@@ -33,8 +33,10 @@ public class SmsScapEdrConsumer {
             TransactionDao txnHelper = new TransactionDao();
             while(true) {
                 recordEntry = textReader.readLine();
-                if (recordEntry == null)
+                if (recordEntry == null) {
+                    System.out.println("No more entries... exiting..");
                     break;
+                }
                 
                 // Handle record
                 Transaction txn = new Transaction();
@@ -97,6 +99,7 @@ public class SmsScapEdrConsumer {
             }
         } catch (PersistenceException e) {
             System.out.println("Processing stopped at entry: " + recordEntry);
+            e.printStackTrace();
         }
         
     }
