@@ -110,4 +110,31 @@ public class UpdateBalanceAndDateRequest extends AbstractAirRequest {
         this.negotiatedCapabilities = negotiatedCapabilities;
         addParam("negotiatedCapabilites", negotiatedCapabilities);
     }
+
+    @Override
+    public String toString() {
+        return String
+                .format("UpdateBalanceAndDateRequest [getOriginNodeType()=%s, getOriginHostName()=%s, getOriginTransactionId()=%s, getOriginTimeStamp()=%s, getSubscriberNumber()=%s, getOriginOperatorId()=%s, getSubscriberNumberNAI()=%s, getSiteId()=%s, transactionCurrency=%s, serviceFeeExpiryDate=%s, supervisionExpiryDate=%s, transactionType=%s, transactionCode=%s, externalData1=%s, externalData2=%s, dedicatedAccountUpdateInformation=%s, negotiatedCapabilities=%s]",
+                        getOriginNodeType(),
+                        getOriginHostName(),
+                        getOriginTransactionId(),
+                        getOriginTimeStamp(),
+                        getSubscriberNumber(),
+                        getOriginOperatorId(),
+                        getSubscriberNumberNAI(),
+                        getSiteId(),
+                        transactionCurrency,
+                        serviceFeeExpiryDate,
+                        supervisionExpiryDate,
+                        transactionType,
+                        transactionCode,
+                        externalData1,
+                        externalData2,
+                        dedicatedAccountUpdateInformation,
+                        negotiatedCapabilities);
+    }
+    
+    
+    
+    
 }

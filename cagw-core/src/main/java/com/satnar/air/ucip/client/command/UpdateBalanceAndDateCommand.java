@@ -23,9 +23,9 @@ public class UpdateBalanceAndDateCommand extends AbstractAirCommand<UpdateBalanc
 		try {
 			CsAirContext.getAirClient().execute(request, response);
 			
-			LogService.appLog.info("UpdateBalanceAndDateResponse-execute:Success:Msisdn:"+request.getSubscriberNumber());
+			LogService.appLog.info("UpdateBalanceAndDateResponse-execute() Success:Msisdn:"+request.getSubscriberNumber());
 		} catch (XmlRpcException e) {
-			LogService.appLog.debug("UpdateBalanceAndDateResponse-execute:failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+			LogService.appLog.debug("UpdateBalanceAndDateResponse-execute() failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 			throw new UcipException(e.code, e.getMessage(), e.linkedException);
 		}
 		return response;

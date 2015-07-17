@@ -27,9 +27,9 @@ public class DefaultXmlRpcClient implements XmlRpcClient {
 			Object result = nativeClient.execute(request.getMethodName(), request.getParams());
 			response.setResult(result);
 		} catch (org.apache.xmlrpc.XmlRpcException e) {
-			logger.error(e.getMessage(), e);
+			LogService.appLog.error(e.getMessage(), e);
 			if(e.linkedException != null) {
-				logger.error(e.linkedException.getMessage(), e.linkedException);
+			    LogService.appLog.error(e.linkedException.getMessage(), e.linkedException);
 			}
 			throw new XmlRpcException(e.code, e.getMessage(), e.linkedException);
 		}

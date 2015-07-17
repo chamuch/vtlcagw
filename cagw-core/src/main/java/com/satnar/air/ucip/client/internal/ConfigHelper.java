@@ -55,7 +55,7 @@ public class ConfigHelper {
         param = client.getConfig().getProperty(OWN_NODE_TYPE);
         if (param == null || param.equalsIgnoreCase(""))
             throw new UcipException(OWN_HOST_NAME + " is not set or empty!");
-        client.setOriginHostName(param);
+        client.setOriginNodeType(param);
         
         
         // UCIP Endpoint Count...

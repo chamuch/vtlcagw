@@ -48,20 +48,28 @@ public class AirClientImpl implements AirClient {
 		}
 		
 		LogService.appLog.debug("Verifying stack config: " + this.toString());
-		request.setSubscriberNumberNAI(Integer.valueOf(this.defaultNai));
+		if (request.getSubscriberNumberNAI() == null)
+		    request.setSubscriberNumberNAI(Integer.valueOf(this.defaultNai));
 		request.setOriginTimeStamp(new Date());
 		request.setOriginHostName(originHostName);
 		request.setOriginNodeType(originNodeType);
 
 		
 		try {
-			LogService.appLog.info(request.getClass().getName()+"-"+request.getMethodName()+"Fetching client for siteId:"+request.getSiteId());
+			LogService.appLog.info(request.getClass().getName()+"."+request.getMethodName() +"() - Fetching client for siteId:"+request.getSiteId());
 			XmlRpcClient xmlRpcClient = getXmlRpcClient(request.getSubscriberNumber(), request.getSiteId());
-			xmlRpcClient.execute(request, response);
+			LogService.appLog.debug("Selected Routed to UCIP EP available: " + (xmlRpcClient != null));
+			if (xmlRpcClient != null) {
+			    LogService.stackTraceLog.info("UCIP.REQ >> " + request.toString());
+			    xmlRpcClient.execute(request, response);
+			    LogService.stackTraceLog.info("UCIP.RES >> " + response.toString());
+			} else {
+			    throw new XmlRpcException(999, "UCIP Stack had no available routes to send request!!");
+			}
 			
-			LogService.appLog.info(request.getClass().getName()+"-"+request.getMethodName()+":Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+			LogService.appLog.info(request.getClass().getName()+"."+request.getMethodName() +"() Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 		} catch (XmlRpcException e) {
-			LogService.appLog.debug(request.getClass().getName()+"-"+request.getMethodName()+":Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+			LogService.appLog.debug(request.getClass().getName()+"."+request.getMethodName() +"() Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 			if(e.code == 0) {
 				throw new XmlRpcException(e.getMessage(), e.linkedException);
 			} else {

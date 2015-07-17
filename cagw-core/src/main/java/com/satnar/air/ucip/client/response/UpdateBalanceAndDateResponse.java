@@ -25,4 +25,15 @@ public class UpdateBalanceAndDateResponse extends AbstractAirResponse {
 		return dedicatedAccountInformation;
 	}
 
+    @Override
+    public String toString() {
+        return String.format("UpdateBalanceAndDateResponse [getResponseCode()=%s, isResponseAvailable()=%s, getResult()=%s, dedicatedAccountInformation=%s]",
+                getResponseCode(),
+                isResponseAvailable(),
+                getResult(),
+                dedicatedAccountInformation);
+    }
+	
+	
+
 }
