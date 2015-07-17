@@ -30,7 +30,9 @@
 		<constructor-arg name="scapConfig"
 			value="#{cfg.getProperties('Scap_Props_Occ')}" />
 	</bean>
-
+	
+	<bean id="airContect" class="com.satnar.air.ucip.client.internal.CsAirContext" />
+	
 	<bean id="airClient" class="com.satnar.air.ucip.client.internal.AirClientImpl">
 		<constructor-arg name="ucipConfig"
 			value="#{cfg.getProperties('cs-air1')}" />
