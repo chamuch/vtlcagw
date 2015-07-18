@@ -11,6 +11,7 @@ public class MoveTransactionToArchive implements Callable<Void> {
 
     public MoveTransactionToArchive(Transaction transaction, Archive archive) {
         this.transactionData  = transaction;
+        this.archiveData = archive;
     }
 
     @Override
