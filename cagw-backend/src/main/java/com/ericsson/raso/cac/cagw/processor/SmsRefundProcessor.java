@@ -50,7 +50,10 @@ public class SmsRefundProcessor implements Processor {
 		            smppRequest.getSourceAddress().getString(), 
 		            smppRequest.getDestinationAddress().getString());
 		    } catch (PersistenceException e) {
-	            throw new ServiceLogicException("Unable to query Transaction!!", e);
+                smppResponse = this.getRefundFailedSmppResponse(smppRequest);
+                LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
+                exchange.getOut().setBody(smppResponse);
+                return;
 	        }
 		    
 		    // no data, potentially nothing to refund (for e.g., free sms or wrong transactionid
@@ -120,6 +123,7 @@ public class SmsRefundProcessor implements Processor {
 		}catch(Exception genE){//Added for debugging
 			LogService.appLog.debug("SmsRefundProcessor-process:Encountered exception",genE);
             smppResponse = this.getRefundFailedSmppResponse(smppRequest);
+            LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
             exchange.getOut().setBody(smppResponse);
 		}
 	}
