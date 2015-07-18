@@ -48,8 +48,13 @@ public class AirClientImpl implements AirClient {
 		}
 		
 		LogService.appLog.debug("Verifying stack config: " + this.toString());
+		
 		if (request.getSubscriberNumberNAI() == null)
 		    request.setSubscriberNumberNAI(Integer.valueOf(this.defaultNai));
+		
+		if (request.getOriginOperatorId() == null)
+		    request.setOriginOperatorId("");
+		
 		request.setOriginTimeStamp(new Date());
 		request.setOriginHostName(originHostName);
 		request.setOriginNodeType(originNodeType);
