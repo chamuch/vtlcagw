@@ -7,6 +7,10 @@ import java.util.concurrent.Callable;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 
+import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc;
+import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse;
+import com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify;
+import com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse;
 import com.satnar.common.LogService;
 import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandSequence;
@@ -97,20 +101,21 @@ public class ParsingDelegate implements Callable<Void> {
                     LogService.appLog.debug("ParsingDeligate-call:Sending request to cagw-backend!!:CommandId:"+request.getCommandId().name()+"CommandSequence:"+request.getCommandSequence().getValue());
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
+                        LogService.stackTraceLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         if (pdu.getCommandId() == CommandId.AUTH_ACC) {
                             //TODO: place some code here for camel exception handling
-                            response = producerTemplate.requestBodyAndHeader(processingEndpoint, pdu, "fe", "auth_acc", SmppPdu.class);
+                            response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
                         }
                         if (pdu.getCommandId() == CommandId.SM_RESULT_NOTIFY) {
                             //TODO: place some code here for camel exception handling
-                             response = producerTemplate.requestBodyAndHeader(processingEndpoint, pdu, "fe", "sm_result", SmppPdu.class);
+                            response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
                         }
                     	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+request.getCommandId().name()+":CommandSequence:"+request.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
+                    } else {
+                        LogService.stackTraceLog.info(String.format("Throttling ingress for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
+                        EsmeHelper.sendThrottledResponse(pdu, this.channelMode);
                     }
-                    else {
-                        response = EsmeHelper.getThrottledResponse(pdu);
-                    	LogService.appLog.debug("ParsingDeligate-call:Throttling this request:CommandId:"+request.getCommandId().name()+"CommandSequence:"+request.getCommandSequence().getValue());
-                    }
+                    
                     if ((commandId & EsmeHelper.REQUEST_MASK) == EsmeHelper.REQUEST_MASK) {                         
                         String sessionId = StackMap.getEsmeLabel("" + request.getCommandSequence().getValue());
                         Esme session = StackMap.getStack(sessionId);

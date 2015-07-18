@@ -390,21 +390,32 @@ public abstract class EsmeHelper {
             
 
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
         	LogService.stackTraceLog.debug("EsmeHelper-sendDeliverSmThrottled:Encountered exception",e);
         }
          
     }
 
 
-    public static SmppPdu getThrottledResponse(SmppPdu pdu) {
-        CommandId commandId = pdu.getCommandId();
-        commandId.setId(commandId.getId() | RESPONSE_MASK);
-        pdu.setCommandId(commandId);
-        pdu.setCommandStatus(CommandStatus.ESME_RTHROTTLED);
-        return pdu;
+    public static void sendThrottledResponse(SmppPdu pdu, ChannelMode mode) {
+        try {
+            CommandId commandId = pdu.getCommandId();
+            commandId.setId(commandId.getId() | RESPONSE_MASK);
+            pdu.setCommandId(commandId);
+            pdu.setCommandStatus(CommandStatus.ESME_RTHROTTLED);
+            
+            String sessionId = StackMap.getEsmeLabel("" + pdu.getCommandSequence().getValue());
+            Esme session = StackMap.getStack(sessionId);
+            StackMap.removeMessageIndex("" + pdu.getCommandSequence().getValue());
+            
+            session.sendPdu(pdu, mode);
+        } catch (SmppCodecException e) {
+            LogService.stackTraceLog.debug("EsmeHelper-sendThrottledResponse:Encountered exception",e);
+        }
+        return;
     }
-    
+
+
+   
     
     
 }
