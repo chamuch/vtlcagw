@@ -72,7 +72,7 @@ public class SmsRefundProcessor implements Processor {
 		    ubdRequest.setSubscriberNumber(txn.getChargedParty());
 		    ubdRequest.setSubscriberNumberNAI(1);
 		    ubdRequest.setSiteId("1");
-		    ubdRequest.setNegotiatedCapabilities(805646916);
+//		    ubdRequest.setNegotiatedCapabilities(805646916);
 		    ubdRequest.setTransactionCode(smppRequest.getDestinationAddress().getString());
 		    
 		    StringBuilder sbLog = new StringBuilder("");
