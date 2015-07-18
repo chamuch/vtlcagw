@@ -31,7 +31,7 @@ public class UpdateBalanceAndDateResponse extends AbstractAirResponse {
                 getResponseCode(),
                 isResponseAvailable(),
                 getResult(),
-                dedicatedAccountInformation);
+                ((dedicatedAccountInformation!=null)?dedicatedAccountInformation.toString():"<empty>"));
     }
 	
 	
