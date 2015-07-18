@@ -118,6 +118,8 @@ public class UpdateBalanceAndDateRequest extends AbstractAirRequest {
 
     public void setAdjustmentAmountRelative(String adjustmentAmountRelative) {
         this.adjustmentAmountRelative = adjustmentAmountRelative;
+        addParam("adjustmentAmountRelative", adjustmentAmountRelative);
+        
     }
 
     @Override
