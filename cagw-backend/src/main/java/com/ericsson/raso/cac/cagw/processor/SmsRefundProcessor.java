@@ -115,6 +115,7 @@ public class SmsRefundProcessor implements Processor {
 		        smppResponse = this.getRefundFailedSmppResponse(smppRequest);
                 LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
 		        exchange.getOut().setBody(smppResponse);
+		        return;
  	        }  
 		    
 		    //now delete txn and move to archive now
@@ -125,6 +126,7 @@ public class SmsRefundProcessor implements Processor {
             smppResponse = this.getRefundFailedSmppResponse(smppRequest);
             LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
             exchange.getOut().setBody(smppResponse);
+            return;
 		}
 	}
 

@@ -97,7 +97,14 @@ public class ParsingDelegate implements Callable<Void> {
                     LogService.appLog.debug("ParsingDeligate-call:Sending request to cagw-backend!!:CommandId:"+request.getCommandId().name()+"CommandSequence:"+request.getCommandSequence().getValue());
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
-                        response = producerTemplate.requestBody(processingEndpoint, pdu, SmppPdu.class);
+                        if (pdu.getCommandId() == CommandId.AUTH_ACC) {
+                            //TODO: place some code here for camel exception handling
+                            response = producerTemplate.requestBodyAndHeader(processingEndpoint, pdu, "fe", "auth_acc", SmppPdu.class);
+                        }
+                        if (pdu.getCommandId() == CommandId.SM_RESULT_NOTIFY) {
+                            //TODO: place some code here for camel exception handling
+                             response = producerTemplate.requestBodyAndHeader(processingEndpoint, pdu, "fe", "sm_result", SmppPdu.class);
+                        }
                     	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+request.getCommandId().name()+":CommandSequence:"+request.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                     }
                     else {
