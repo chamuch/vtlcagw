@@ -70,7 +70,8 @@ public class AirClientImpl implements AirClient {
 			
 			LogService.appLog.info(request.getClass().getName()+"."+request.getMethodName() +"() Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 		} catch (XmlRpcException e) {
-			LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+			LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()
+			        +":ResponseCode:"+((response!=null)?response.getResponseCode():"No Response Available!!"));
 			if(e.code == 0) {
 				throw new XmlRpcException(e.getMessage(), e.linkedException);
 			} else {
