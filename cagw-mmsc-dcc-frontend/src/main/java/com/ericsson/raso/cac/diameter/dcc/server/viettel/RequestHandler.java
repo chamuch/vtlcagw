@@ -43,8 +43,7 @@ public class RequestHandler implements ApplicationRequestListener {
             //TODO: if any AVPs must be expliclitly copied, perform the same here...
             
             if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()) {
-                //TODO: any logging for trace and debugging
-            	logMsg = new StringBuilder("");
+                logMsg = new StringBuilder("");
             	logMsg.append(":SessionId:");logMsg.append(dccRequest.getSessionId());
             	logMsg.append(":OriginHost:");logMsg.append(dccRequest.getOriginHost());
             	logMsg.append(":OriginRealm:");logMsg.append(dccRequest.getOriginRealm());
@@ -52,8 +51,7 @@ public class RequestHandler implements ApplicationRequestListener {
             	logMsg.append(":DestinationRealm:");logMsg.append(dccRequest.getDestinationHost());
             	LogService.appLog.debug("RequestHandler-ProcessRequest:Sending Request.."+logMsg.toString());
             	
-                Cca dccResponse = this.producer.requestBody(BACKEND_ENDPOINT, dccRequest, Cca.class);
-                //TODO: any logging for trace and debugging
+                Cca dccResponse = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, dccRequest, "fe", "mmsc", Cca.class);
                 logMsg.append(":ResultCode:");logMsg.append(dccResponse.getResultCode());
                 LogService.stackTraceLog.debug("RequestHandler-ProcessRequest:Received Response.."+logMsg.toString());
                 
