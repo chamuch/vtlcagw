@@ -16,6 +16,10 @@ public abstract class AbstractAirResponse extends XmlRpcResponse implements Seri
 		if (responseCode != null) {
 			return responseCode;
 		}
+		
+		if(result == null)
+		    return 1111;
+		
 		responseCode = (Integer) (((Map<?, ?>) result).get("responseCode"));
 		return responseCode;
 	}
