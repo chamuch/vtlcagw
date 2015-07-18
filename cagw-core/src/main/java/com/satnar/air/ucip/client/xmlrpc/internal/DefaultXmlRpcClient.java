@@ -24,7 +24,9 @@ public class DefaultXmlRpcClient implements XmlRpcClient {
 	@Override
 	public <R extends XmlRpcRequest, S extends XmlRpcResponse> void execute(R request, S response) throws XmlRpcException {
 		try {
-			Object result = nativeClient.execute(request.getMethodName(), request.getParams());
+		    logger.debug(String.format("Attempting to execute thru Default (our ucip) Client for request %s with %s", request.getMethodName(), request.getParams())); 
+		    Object result = nativeClient.execute(request.getMethodName(), request.getParams());
+		    logger.debug("native response post execution: " + response);
 			response.setResult(result);
 		} catch (org.apache.xmlrpc.XmlRpcException e) {
 			LogService.appLog.error(e.getMessage(), e);
