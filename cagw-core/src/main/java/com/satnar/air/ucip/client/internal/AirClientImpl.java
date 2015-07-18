@@ -53,7 +53,7 @@ public class AirClientImpl implements AirClient {
 		    request.setSubscriberNumberNAI(Integer.valueOf(this.defaultNai));
 		
 		if (request.getOriginOperatorId() == null)
-		    request.setOriginOperatorId("");
+		    request.setOriginOperatorId("UcipClient");
 		
 		request.setOriginTimeStamp(new Date());
 		request.setOriginHostName(originHostName);
