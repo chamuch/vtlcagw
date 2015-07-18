@@ -89,6 +89,7 @@ public class SmsRefundProcessor implements Processor {
 		        LogService.appLog.debug(String.format("Preparing DA with %d account: %s, amount: %s, type: %s", i, accounts[i], amounts[i], accountTypes[i]));
 		        if (accounts[i].equals("0")) {
 		            ubdRequest.setAdjustmentAmountRelative("-" + amounts[i]);
+		            ubdRequest.setTransactionCurrency("VND");
 		            LogService.appLog.debug("Updating Main Account with " + amounts[i]);
 		        } else {
 		            DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
