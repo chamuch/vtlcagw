@@ -81,7 +81,8 @@ public class TransactionDao {
         try {
             if(cluster != null && session != null) {
                 Delete delete = QueryBuilder.delete().from(connection.getKeyspace(), TRANSACTION_TABLE);
-                                             delete.where((eq("messageId", txnInfo.getMessageId())))
+                                             delete.where(eq("transactionTime", txnInfo.getTransactionTime()))
+                                                    .and((eq("messageId", txnInfo.getMessageId())))
                                                     .and(eq("chargingSessionId", txnInfo.getChargingSessionId()))
                                                     .and(eq("chargedParty", txnInfo.getChargedParty()));
                 
