@@ -157,7 +157,7 @@ public class SmResultNotify extends SmppPdu {
 	
 	public String toString() {
         return "PDU:: Command Length: " + this.getCommandLength().getValue() + ", " 
-                + CommandId.AUTH_ACC + "(" + java.lang.Integer.toHexString(CommandId.AUTH_ACC.getId())
+                + CommandId.SM_RESULT_NOTIFY + "(" + java.lang.Integer.toHexString(CommandId.SM_RESULT_NOTIFY.getId())
                 + "), Command Status: " + this.getCommandStatus()
                 + ", Command Sequence: " + this.getCommandSequence().getValue()
                 + ", Version: " + this.version.getValue().getValue()
