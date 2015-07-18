@@ -21,6 +21,7 @@ public class UpdateBalanceAndDateRequest extends AbstractAirRequest {
 	private String externalData2;
 	private List<DedicatedAccountUpdateInformation> dedicatedAccountUpdateInformation;
 	private int negotiatedCapabilities;
+	private String adjustmentAmountRelative;
 
 	public String getTransactionCurrency() {
 		return transactionCurrency;
@@ -111,10 +112,21 @@ public class UpdateBalanceAndDateRequest extends AbstractAirRequest {
         addParam("negotiatedCapabilites", negotiatedCapabilities);
     }
 
+    public String getAdjustmentAmountRelative() {
+        return adjustmentAmountRelative;
+    }
+
+    public void setAdjustmentAmountRelative(String adjustmentAmountRelative) {
+        this.adjustmentAmountRelative = adjustmentAmountRelative;
+    }
+
     @Override
     public String toString() {
         return String
-                .format("UpdateBalanceAndDateRequest [getOriginNodeType()=%s, getOriginHostName()=%s, getOriginTransactionId()=%s, getOriginTimeStamp()=%s, getSubscriberNumber()=%s, getOriginOperatorId()=%s, getSubscriberNumberNAI()=%s, getSiteId()=%s, transactionCurrency=%s, serviceFeeExpiryDate=%s, supervisionExpiryDate=%s, transactionType=%s, transactionCode=%s, externalData1=%s, externalData2=%s, dedicatedAccountUpdateInformation=%s, negotiatedCapabilities=%s]",
+                .format("UpdateBalanceAndDateRequest [getOriginNodeType()=%s, getOriginHostName()=%s, getOriginTransactionId()=%s, getOriginTimeStamp()=%s, "
+                        + "getSubscriberNumber()=%s, getOriginOperatorId()=%s, getSubscriberNumberNAI()=%s, getSiteId()=%s, transactionCurrency=%s, serviceFeeExpiryDate=%s, "
+                        + "supervisionExpiryDate=%s, transactionType=%s, transactionCode=%s, externalData1=%s, externalData2=%s, dedicatedAccountUpdateInformation=%s, "
+                        + "adjustmentAmountRelative=%s, negotiatedCapabilities=%s]",
                         getOriginNodeType(),
                         getOriginHostName(),
                         getOriginTransactionId(),
@@ -131,6 +143,7 @@ public class UpdateBalanceAndDateRequest extends AbstractAirRequest {
                         externalData1,
                         externalData2,
                         dedicatedAccountUpdateInformation,
+                        adjustmentAmountRelative,
                         negotiatedCapabilities);
     }
     

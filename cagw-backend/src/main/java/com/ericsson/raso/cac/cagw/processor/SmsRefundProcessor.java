@@ -87,15 +87,17 @@ public class SmsRefundProcessor implements Processor {
             List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
 		    for (int i = 0; i < accounts.length; i++) {
 		        LogService.appLog.debug(String.format("Preparing DA with %d account: %s, amount: %s, type: %s", i, accounts[i], amounts[i], accountTypes[i]));
-		        DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
-		        dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
-		        dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
-                dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
-                dasToUpdate.add(dauInfo); 
-                
-                sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:Id:");sbLog.append(dauInfo.getDedicatedAccountID());
-                sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AccountUnitType:");sbLog.append(dauInfo.getDedicatedAccountUnitType());
-                sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AdjustmentAmountRelative:");sbLog.append(dauInfo.getAdjustmentAmountRelative());
+		        if (accounts[i].equals("0")) {
+		            ubdRequest.setAdjustmentAmountRelative("-" + amounts[i]);
+		            LogService.appLog.debug("Updating Main Account with " + amounts[i]);
+		        } else {
+		            DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
+		            dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
+		            dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
+		            dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
+		            dasToUpdate.add(dauInfo); 
+                    LogService.appLog.debug("Updating request with " + dauInfo.toString());
+		        }
 		    }		 
 		    ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
 		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + ubdRequest.toString());
