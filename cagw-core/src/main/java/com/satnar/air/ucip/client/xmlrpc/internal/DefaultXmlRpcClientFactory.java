@@ -86,9 +86,9 @@ public class DefaultXmlRpcClientFactory implements XmlRpcClientFactory {
 	}
 
 	private XmlRpcClientConfig createConfig(ConfigParams params) throws MalformedURLException {
-		URL acipEndpointUrl = new URL(params.getUrl());
+		URL xmlRpcUrl = new URL(params.getUrl());
 		XmlRpcClientConfigImpl xmlRpcConfig = new XmlRpcClientConfigImpl();
-		xmlRpcConfig.setServerURL(acipEndpointUrl);
+		xmlRpcConfig.setServerURL(xmlRpcUrl);
 
 		xmlRpcConfig.setBasicUserName(params.getUsername());
 		xmlRpcConfig.setBasicPassword(params.getPassword());
