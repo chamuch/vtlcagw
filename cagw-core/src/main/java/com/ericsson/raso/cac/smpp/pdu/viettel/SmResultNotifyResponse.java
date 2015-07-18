@@ -103,5 +103,18 @@ public class SmResultNotifyResponse extends SmppPdu {
         this.operationResult = operationResult;
     }
 
+
+    @Override
+    public String toString() {
+        return String.format("SmResultNotifyResponse [getCommandId()=%s, getCommandStatus()=%s, getCommandSequence()=%s, operationResult=%s, myCommandLength=%s]",
+                getCommandId(),
+                getCommandStatus(),
+                getCommandSequence(),
+                operationResult,
+                myCommandLength);
+    }
+    
+    
+
 	
 }

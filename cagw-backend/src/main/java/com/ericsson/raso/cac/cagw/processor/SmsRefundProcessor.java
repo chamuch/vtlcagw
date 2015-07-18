@@ -98,7 +98,7 @@ public class SmsRefundProcessor implements Processor {
                 sbLog.append(":DA:[");sbLog.append(i);sbLog.append("]:AdjustmentAmountRelative:");sbLog.append(dauInfo.getAdjustmentAmountRelative());
 		    }		 
 		    ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
-		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + sbLog.toString());
+		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + ubdRequest.toString());
 		    sbLog = null;
 		    
 		    boolean refundResult = false;
