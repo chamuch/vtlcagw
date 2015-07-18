@@ -98,8 +98,11 @@ public class SmsRefundProcessor implements Processor {
 		            dasToUpdate.add(dauInfo); 
                     LogService.appLog.debug("Updating request with " + dauInfo.toString());
 		        }
-		    }		 
-		    ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
+		    }		
+		    if (dasToUpdate.size()>0) {
+		        ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
+		        LogService.appLog.debug("Hav atleast 1 DA to add to the request.");
+		    }
 		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + ubdRequest.toString());
 		    sbLog = null;
 		    
