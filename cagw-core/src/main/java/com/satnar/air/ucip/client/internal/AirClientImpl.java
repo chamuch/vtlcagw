@@ -83,10 +83,12 @@ public class AirClientImpl implements AirClient {
 				throw e;
 			}
 		} catch (UcipException e) {
-		    LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+		    LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()
+                    +":ResponseCode:"+((response!=null)?response.getResponseCode():"No Response Available!!"));
 		    throw new XmlRpcException(e.getCode(), e.getMessage(), e);
 		} catch (Exception e) {
-            LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+            LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()
+                    +":ResponseCode:"+((response!=null)?response.getResponseCode():"No Response Available!!"));
             throw new XmlRpcException(999, "Unknown Exception - Check linked exception", e);
         }
 		
