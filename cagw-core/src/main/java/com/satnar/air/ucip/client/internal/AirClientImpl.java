@@ -64,19 +64,21 @@ public class AirClientImpl implements AirClient {
 			    xmlRpcClient.execute(request, response);
 			    LogService.stackTraceLog.info("UCIP.RES >> " + response.toString());
 			} else {
+			    LogService.appLog.error(String.format("UCIP Execution Failed for %s because no client available!!", request.getSubscriberNumber()));
 			    throw new XmlRpcException(999, "UCIP Stack had no available routes to send request!!");
 			}
 			
 			LogService.appLog.info(request.getClass().getName()+"."+request.getMethodName() +"() Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 		} catch (XmlRpcException e) {
-			LogService.appLog.debug(request.getClass().getName()+"."+request.getMethodName() +"() Success:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+			LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
 			if(e.code == 0) {
 				throw new XmlRpcException(e.getMessage(), e.linkedException);
 			} else {
 				throw e;
 			}
 		} catch (UcipException e) {
-			throw new XmlRpcException(e.getCode(), e.getMessage(), e);
+		    LogService.appLog.error(request.getClass().getName()+"."+request.getMethodName() +"() Failed:Msisdn:"+request.getSubscriberNumber()+":ResponseCode:"+response.getResponseCode());
+		    throw new XmlRpcException(e.getCode(), e.getMessage(), e);
 		}
 		
 		if(response.isResponseAvailable()) {
