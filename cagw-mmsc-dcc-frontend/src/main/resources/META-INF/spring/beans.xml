@@ -75,12 +75,17 @@
 		<threadPool id="mmsdcc-frontend" poolSize="1200"
 			maxPoolSize="1200" threadName="mmsdcc-frontend" camelContextId="com.ericsson.raso.cac.mmsdccfe" />
 		<camel:route id="com.ericsson.raso.cac.mmsdccfe">
+		
 			<camel:from uri="seda:cagw-backend?concurrentConsumers=500" />
-			<camel:doTry>
+			<camel:bean method="processRequest" ref="requestHandler"></camel:bean>
+			<camel:doTry>							
 				<camel:marshal ref="gsonCcr" />
 				<camel:log message="Entered mmsc front end camel route:${body}" />
 				<setHeader headerName="CamelHttpMethod">
 					<constant>POST</constant>
+				</setHeader>
+				<setHeader headerName="fe">
+					<constant>mmsc</constant>
 				</setHeader>
 				<camel:log message="BackendUrl:${{Mmsc_Cagw_BackendUrl}}"/>
 				<camel:to uri="{{Mmsc_Cagw_BackendUrl}}">
