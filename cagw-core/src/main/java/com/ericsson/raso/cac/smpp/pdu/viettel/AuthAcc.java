@@ -132,8 +132,8 @@ public class AuthAcc extends SmppPdu {
 			
 			this.version = WinVersion.valueOf(parser.read());
 			this.smscAddress = CDecimalString.readString(parser);
-			this.moMscNoa = (Byte) SmppParameter.getInstance(Type.BYTE, parser.read());
-			this.moMscNpi = (Byte) SmppParameter.getInstance(Type.BYTE, parser.read());
+			this.moMscNoa = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read());
+			this.moMscNpi = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read());
 			this.moMscAddress = CDecimalString.readString(parser);
 			this.moMtFlag = WinMoMtFlag.valueOf(parser.read());
 			this.smId = CHexString.readString(parser);
