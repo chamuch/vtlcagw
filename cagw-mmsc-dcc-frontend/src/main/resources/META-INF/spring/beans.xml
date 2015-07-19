@@ -13,48 +13,51 @@
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
 	<import resource="classpath:META-INF/cagw-core/beans.xml" />
-       
+
 	<!-- Retrieve loaded configuration properties -->
 	<bean id="cfg" class="com.ericsson.raso.cac.config.ConfigService" />
-	<bean id="cgProperties"
-		class="com.ericsson.raso.cac.config.ComponentPropertiesBean">
+	<bean id="cgProperties" class="com.ericsson.raso.cac.config.ComponentPropertiesBean">
 		<constructor-arg name="config" ref="cfg" />
 		<constructor-arg name="component" value="Cagw_EndPoint" />
 	</bean>
-	<context:property-placeholder properties-ref="cgProperties" />
-	
-	
-	<bean id="mmscFe" class="com.ericsson.raso.cac.diameter.dcc.server.viettel.SpringHelper" />
-	
-	<!-- This is a reference to ApplicationRequestListener in DccService and also responsible to send request to BE -->
-	<bean id="requestHandler" class="com.ericsson.raso.cac.diameter.dcc.server.viettel.RequestHandler">
+	<context:property-placeholder
+		properties-ref="cgProperties" />
+
+
+	<bean id="mmscFe"
+		class="com.ericsson.raso.cac.diameter.dcc.server.viettel.SpringHelper" />
+
+	<!-- This is a reference to ApplicationRequestListener in DccService and 
+		also responsible to send request to BE -->
+	<bean id="requestHandler"
+		class="com.ericsson.raso.cac.diameter.dcc.server.viettel.RequestHandler">
 		<constructor-arg name="camelContext" ref="com.ericsson.raso.cac.mmsdccfe" />
-	</bean>	
-	
+	</bean>
+
 	<bean id="dccSrvcEndPoint"
 		class="com.satnar.charging.diameter.dcc.server.DccServiceEndpoint">
 	</bean>
 
 	<!-- To listen for requests from DCC service -->
-	<!-- <bean id="dccMmsc1"
-		class="com.ericsson.raso.cac.diameter.dcc.server.viettel.DccService"
-		init-method="start" destroy-method="stop">
-		<constructor-arg name="serviceConfig"
-			value="#{cfg.getProperties('Dcc_Props1')}" />
-	</bean> -->
-	
+	<!-- <bean id="dccMmsc1" class="com.ericsson.raso.cac.diameter.dcc.server.viettel.DccService" 
+		init-method="start" destroy-method="stop"> <constructor-arg name="serviceConfig" 
+		value="#{cfg.getProperties('Dcc_Props1')}" /> </bean> -->
+
 	<bean id="dccMmsc1"
 		class="com.ericsson.raso.cac.diameter.dcc.server.viettel.DccService">
 		<constructor-arg name="serviceConfig"
 			value="#{cfg.getProperties('Dcc_Props1')}" />
 	</bean>
-	
-	<!-- Unmarshall Request Pojo to ESME -->
-	<bean id="gson" class="org.apache.camel.component.gson.GsonDataFormat">
-		<!-- we want to unmarshal to ChargingInfo pojo -->
+
+	<bean id="gsonCcr" class="org.apache.camel.component.gson.GsonDataFormat">
 		<property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Ccr" />
 	</bean>
-	
+
+
+	<bean id="gsonCca" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Cca" />
+	</bean>
+
 	<!-- For Http communication with backend -->
 	<bean id="http4" class="org.apache.camel.component.http4.HttpComponent">
 		<property name="camelContext" ref="com.ericsson.raso.cac.mmsdccfe" />
@@ -64,29 +67,35 @@
 	</bean>
 
 	<!-- Routing request to cagw-backend over REST -->
-	<camelContext id="com.ericsson.raso.cac.mmsdccfe" xmlns="http://camel.apache.org/schema/spring">
+	<camel:camelContext id="com.ericsson.raso.cac.mmsdccfe"
+		xmlns="http://camel.apache.org/schema/spring">
 		<propertyPlaceholder id="properties" location="ref:cgProperties" />
 		<threadPoolProfile id="defaultProfile"
-			defaultProfile="true" poolSize="1200" maxPoolSize="1200" maxQueueSize="10" />
-		<threadPool id="mmsdcc-frontend" poolSize="1200" maxPoolSize="1200"
-			threadName="mmsdcc-frontend" camelContextId="com.ericsson.raso.cac.mmsdccfe" />
-		<route id="com.ericsson.raso.cac.mmsdccfe">
-			<from uri="seda:cagw-backend?concurrentConsumers=500" />
-			<camel:marshal ref="gson" />
-			<camel:log message="Entered mmsc front end camel route:${body}"
-						logName="com.ericsson.raso.cac.mmsfe" />
-			<setHeader headerName="CamelHttpMethod">
-				<constant>POST</constant>
-			</setHeader>
-			<camel:log message="BackendUrl:${{Mmsc_Cagw_BackendUrl}}"
-						logName="com.ericsson.raso.cac.mmsfe" />
-			<camel:to uri="{{Mmsc_Cagw_BackendUrl}}">
-			</camel:to>
-			
-			<camel:log message="Exit mmsc front end camel route:${body}"
-						logName="com.ericsson.raso.cac.mmsfe" />
-			<camel:unmarshal ref="gson"/>
-		</route>
-	</camelContext>
-	
+			defaultProfile="true" poolSize="1200" maxPoolSize="1200"
+			maxQueueSize="10" />
+		<threadPool id="mmsdcc-frontend" poolSize="1200"
+			maxPoolSize="1200" threadName="mmsdcc-frontend" camelContextId="com.ericsson.raso.cac.mmsdccfe" />
+		<camel:route id="com.ericsson.raso.cac.mmsdccfe">
+			<camel:from uri="seda:cagw-backend?concurrentConsumers=500" />
+			<camel:doTry>
+				<camel:marshal ref="gsonCcr" />
+				<camel:log message="Entered mmsc front end camel route:${body}" />
+				<setHeader headerName="CamelHttpMethod">
+					<constant>POST</constant>
+				</setHeader>
+				<camel:log message="BackendUrl:${{Mmsc_Cagw_BackendUrl}}"/>
+				<camel:to uri="{{Mmsc_Cagw_BackendUrl}}">
+				</camel:to>
+				<camel:log message="Exit MMSC front end camel route:${body}" />
+				<camel:unmarshal ref="gsonCca" />
+				<camel:doCatch>
+					<camel:exception>java.lang.Exception</camel:exception>
+					<camel:log message="From MMSC FrontEnd Exception: ${exception.stacktrace}" />
+				</camel:doCatch>
+				<camel:doFinally>
+					<camel:log message="Leave MMSC Frontend:${body}" />
+				</camel:doFinally>
+		</camel:route>
+	</camel:camelContext>
+
 </beans>
