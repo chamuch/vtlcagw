@@ -121,6 +121,7 @@ public class AuthAcc extends SmppPdu {
 	@Override
 	public void decode(byte[] payload) throws SmppCodecException {
 		try {
+			LogService.appLog.info("AuthAcc-decode:Entered");
 			ByteArrayInputStream buffer = new ByteArrayInputStream(payload);
 			DataInputStream parser = new DataInputStream(buffer);
 			
