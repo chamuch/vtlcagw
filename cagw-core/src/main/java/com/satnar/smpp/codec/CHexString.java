@@ -67,7 +67,8 @@ public class CHexString extends SmppParameter {
 	    		buffer.write(i);
 	    	} while (true);
 	    	
-	    	string = new String(buffer.toByteArray());
+	    	if (buffer.size() > 0)
+	    	    string = new String(buffer.toByteArray());
 	    	
 	    	buffer.close();
 	    	buffer = null;
