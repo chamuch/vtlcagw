@@ -63,7 +63,7 @@ public class RequestHandler implements ApplicationRequestListener {
                 return response;
             } else {
             	LogService.appLog.debug("RequestHandler-processRequest:DIAMETER_TO_BUSY");
-                DiameterAnswer response = createAnswer(request, ResultCode.DIAMETER_TO_BUSY.getCode());                
+                DiameterAnswer response = createAnswer(request, ResultCode.DIAMETER_TOO_BUSY.getCode());                
                 //TODO: based on CCA response from cagw-backend, copy relevant AVPs back.
                 return response;
             }
