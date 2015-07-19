@@ -94,11 +94,11 @@ public class ParsingDelegate implements Callable<Void> {
                     return null;
                 default:
                     LogService.appLog.debug("UNKNOWN/EXTENDED Received and delegated");
-                    SmppPdu request = SpringHelper.getSmppPduImplementation(Integer.toHexString(commandId));
+                    pdu = SpringHelper.getSmppPduImplementation(Integer.toHexString(commandId));
                     pdu.decode(rawPdu);
 
                     // this is where we throw the event to backend for processing...
-                    LogService.appLog.debug("ParsingDeligate-call:Sending request to cagw-backend!!:CommandId:"+request.getCommandId().name()+"CommandSequence:"+request.getCommandSequence().getValue());
+                    LogService.appLog.debug("ParsingDeligate-call:Sending request to cagw-backend!!:CommandId:"+pdu.getCommandId().name()+"CommandSequence:"+pdu.getCommandSequence().getValue());
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
                         LogService.stackTraceLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
@@ -110,18 +110,18 @@ public class ParsingDelegate implements Callable<Void> {
                             //TODO: place some code here for camel exception handling
                             response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
                         }
-                    	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+request.getCommandId().name()+":CommandSequence:"+request.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
+                    	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                     } else {
                         LogService.stackTraceLog.info(String.format("Throttling ingress for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         EsmeHelper.sendThrottledResponse(pdu, this.channelMode);
                     }
                     
                     if ((commandId & EsmeHelper.REQUEST_MASK) == EsmeHelper.REQUEST_MASK) {                         
-                        String sessionId = StackMap.getEsmeLabel("" + request.getCommandSequence().getValue());
+                        String sessionId = StackMap.getEsmeLabel("" + pdu.getCommandSequence().getValue());
                         Esme session = StackMap.getStack(sessionId);
                         session.sendPdu(response, this.channelMode);
                         
-                        LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+request.getCommandId().name()+":CommandSequence:"+request.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
+                        LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                     }
                     com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     return null;
