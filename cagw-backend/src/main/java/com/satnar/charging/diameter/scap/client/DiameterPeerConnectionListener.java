@@ -1,4 +1,4 @@
-package com.satnar.charging.diameter.dcc.server;
+package com.satnar.charging.diameter.scap.client;
 
 import com.ericsson.pps.diameter.rfcapi.base.PeerConnectionListener;
 import com.satnar.common.LogService;

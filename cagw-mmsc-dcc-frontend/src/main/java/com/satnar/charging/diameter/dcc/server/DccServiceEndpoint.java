@@ -54,6 +54,8 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
         
         try {
             this.dccStack.start();
+            this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
+            
         } catch (IOException e) {
             // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("DccServiceEndpoint-start:Unable to start the DCC Stack: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress,e);
@@ -87,6 +89,7 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
         try {
             this.dccStack = new DCCStack();        
             this.applicationId = new ApplicationId(this.vendorId, this.accountId, this.authId);
+            this.peerConnectionListener = new DiameterPeerConnectionListener();
             
             // TODO: Set the Timeout directly in the front end project where the request listener is implemented
             
@@ -96,7 +99,7 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             this.dccStack.setOwnProductId(this.ownProductId);
             this.dccStack.setOriginRealm(this.originRealm);
             this.dccStack.setOwnDiameterUri("aaa://" + this.ownTcpAddress + ":" + this.ownTcpPort + ";transport=tcp");
-            //this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
+            this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
             //this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, this.applicationId);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.OWN_IP_ADDRESS, this.ownTcpAddress);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.ACCEPT_UNKNOWN_PEERS, this.acceptUnknownPeers);
@@ -105,7 +108,6 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_QUEUE_SIZE, this.sendQueueSize);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_MESSAGE_LIMIT, this.sendMessageLimit);
             
-            //this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
             this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, this.applicationId);
                 
             LogService.stackTraceLog.debug("DccServiceEndpoint-prepareStack:Success: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress);
