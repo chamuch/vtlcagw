@@ -23,36 +23,34 @@
 	<context:property-placeholder
 		properties-ref="cgProperties" />
 	
-	<bean id="waterGate" class="com.satnar.common.WaterGate">
-		<constructor-arg name="frontend"
-			value="#{configservice.getValue('Water_Gate','frontend')}" />
-		<constructor-arg name="nodeThreshold"
-			value="#{configservice.getValue('Water_Gate','nodeThreshold')}" />
-		<constructor-arg name="systemWideThreshold"
-			value="#{configservice.getValue('Water_Gate','systemWideThreshold')}" />
-	</bean>
-	
-	<bean id="clusterService" class="com.satnar.common.ClusterService" />
-	
 	<!-- ESME Instances - One instance for each SMSC -->
 
 	<bean id="esmeSmsc1" class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
 		<constructor-arg name="esmeConfig" value="#{cfg.getProperties('GLOBAL')}" />
 	</bean>
+	
+	<bean id="smppFeSpringHelper" class="com.satnar.smpp.SpringHelper" />
 
 	<bean id="parsingDelegate" class="com.satnar.smpp.pdu.ParsingDelegate">
 		<constructor-arg name="context" ref="com.ericsson.raso.cac.smppfe" />
 	</bean>
 
 	<!-- Register request and response beans -->
-	<bean id="1000001" class="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc">
+	<bean id="1000001"
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc"
+		scope="prototype">
 	</bean>
-	<bean id="81000001" class="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse">
+	<bean id="81000001"
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse"
+		scope="prototype">
 	</bean>
-	<bean id="1000002" class="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify">
+	<bean id="1000002"
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify"
+		scope="prototype">
 	</bean>
 	<bean id="81000002"
-		class="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse">
+		class="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse"
+		scope="prototype">
 	</bean>
 
 	<bean id="gsonAuthAcc" class="org.apache.camel.component.gson.GsonDataFormat">
