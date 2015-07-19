@@ -42,6 +42,7 @@ public class DccService implements SmartLifecycle {
         this.dccServiceEndpoint.setPeerConnectionListener(this.peerConnectionListener);*/
         
         this.requestListener = SpringHelper.getRequestListener();
+        LogService.appLog.debug("Application Request Listener configured is available: " + (this.requestListener != null));
         this.dccServiceEndpoint.setRequestListener(requestListener);
         
         try {

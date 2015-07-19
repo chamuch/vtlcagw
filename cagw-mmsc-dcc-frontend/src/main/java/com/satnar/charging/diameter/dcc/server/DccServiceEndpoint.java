@@ -76,7 +76,8 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
     
     @Override
     public void setRequestListener(ApplicationRequestListener requestListener) {
-        this.applicationRequestListener = requestListener;        
+        this.applicationRequestListener = requestListener;    
+        LogService.appLog.debug("Application Request Listener is now attached to Stack. Instance of type: " + requestListener.getClass().getCanonicalName());
     }
 
     @Override
@@ -102,8 +103,6 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             this.dccStack.setOwnProductId(this.ownProductId);
             this.dccStack.setOriginRealm(this.originRealm);
             this.dccStack.setOwnDiameterUri("aaa://" + this.ownTcpAddress + ":" + this.ownTcpPort + ";transport=tcp");
-            this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
-            //this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, this.applicationId);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.OWN_IP_ADDRESS, this.ownTcpAddress);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.ACCEPT_UNKNOWN_PEERS, this.acceptUnknownPeers);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.NUMBER_OF_THREADS_THAT_HANDLES_RECEIVED_REQUESTS, this.threadPoolSize);
@@ -111,6 +110,7 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_QUEUE_SIZE, this.sendQueueSize);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_MESSAGE_LIMIT, this.sendMessageLimit);
             
+            this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
             this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, this.applicationId);
                 
             LogService.stackTraceLog.debug("DccServiceEndpoint-prepareStack:Success: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress);
