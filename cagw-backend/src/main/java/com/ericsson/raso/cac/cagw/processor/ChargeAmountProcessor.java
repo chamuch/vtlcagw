@@ -3,15 +3,18 @@ package com.ericsson.raso.cac.cagw.processor;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.UnknownServiceException;
+import java.security.Timestamp;
 import java.util.Date;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
 import com.ericsson.pps.diameter.dccapi.avp.CCRequestNumberAvp;
+import com.ericsson.pps.diameter.dccapi.avp.CCRequestTypeAvp;
 import com.ericsson.pps.diameter.dccapi.avp.CCServiceSpecificUnitsAvp;
 import com.ericsson.pps.diameter.dccapi.avp.CCTimeAvp;
 import com.ericsson.pps.diameter.dccapi.avp.CCTotalOctetsAvp;
+import com.ericsson.pps.diameter.dccapi.avp.RequestedActionAvp;
 import com.ericsson.pps.diameter.dccapi.avp.RequestedServiceUnitAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceIdentifierAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceParameterInfoAvp;
@@ -43,22 +46,25 @@ public class ChargeAmountProcessor implements Processor {
     
     private static int SCAP_SERVICE_IDENTIFIER = 8; //as per Mikael's inputs; no mail or written requirements though!!!
 	
-
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		//System.out.println("Entered into MMS_DCC::DIRECT_DEBIT ChargeAmountProcessor");
-		LogService.appLog.info("Entered into DIRECT_DEBIT ChargeAmountProcessor");
-		
+	    Ccr dccRequest = (Ccr) exchange.getIn().getBody();
+	    LogService.stackTraceLog.info("MMS DCC Request>> " + dccRequest.toString());
+        
 		try {
-		    Ccr dccRequest = (Ccr) exchange.getIn().getBody();
-	        Ccr scapRequest = this.getScapRequest(dccRequest);
+		    LogService.appLog.debug("Preparing SCAP Request for MMS DCC Request# " + dccRequest.getSessionId());
+            Ccr scapRequest = this.getScapRequest(dccRequest);
 	        
-	        Cca scapResponse = scapRequest.send();
-	        Cca dccResponse = new Cca(dccRequest, scapResponse.getResultCode());
+            LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC: " + scapRequest.toString());
+            Cca scapResponse = scapRequest.send();
+            LogService.stackTraceLog.info("Received SCAP CCA Response from OCC: " + scapResponse.toString());
+            
+            Cca dccResponse = new Cca(dccRequest, scapResponse.getResultCode());
 	        //TODO: SCAP Response ==> (Granted Units, Cost Info)
 	        //TODO: DCC Response -- need to add params based on customer inputs, during integration testing.
 	        
-	        exchange.getOut().setBody(dccResponse);
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 	        
 	        LogService.appLog.debug("ChargeAmountProcessor-process:Done.SessionId:"+scapRequest.getSessionId()
 	        		+":ResultCode"+scapResponse.getResultCode());
@@ -96,31 +102,27 @@ public class ChargeAmountProcessor implements Processor {
 
 	private Ccr getScapRequest(Ccr dccRequest) throws ServiceLogicException {
 	    Ccr scapCcr = null;
-	    LogService.appLog.info("Entered into ChargeAmountProcessor-getScapRequest.");
 	    ScapChargingEndpoint scapStack = (ScapChargingEndpoint) SpringHelper.getScapDiameter();
-	    StringBuilder logMsg = null;
 	    try {
+	        ScapChargingEndpoint scapEndpoint = (ScapChargingEndpoint) SpringHelper.getScapDiameter();
+            LogService.appLog.debug("SCAP Endpoint as configured in CAMEL available: " + (scapEndpoint != null));
+            
+            if(scapEndpoint == null) {
+                LogService.appLog.error("SCAP Endpoint instance could not be acquired!!");
+                throw new ServiceLogicException("Backend (SCAP Endpoint) not available for processing this request# " + dccRequest.getSessionId());
+            }
+            
 	    	scapCcr = new Ccr(dccRequest.getSessionId(), scapStack.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);	    	
+	    	LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + dccRequest.getSessionId()); 
+            
+	    	
 	    	Peer route = scapStack.getScapLoadBalancer().getPeerBySite("1");
-	    	scapCcr.setDestinationHost(route.getHostId());	    	
 	    	scapCcr.setDestinationRealm(route.getRealm());	    	
+	    	scapCcr.setCCRequestNumber(0x00);  // DCC::DIRECT_DEBIT
+	    	scapCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); 
+	    	scapCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); 
+            
 	    	
-	    	scapCcr.setOriginHost(ChargingHelper.ORIGIN_HOST);	    	
-	    	
-	    	scapCcr.addAvp(new CCRequestNumberAvp(0x00)); // DCC::DIRECT_DEBIT
-	    	scapCcr.setCCRequestType(dccRequest.getCCRequestType());	    	
-	    	scapCcr.addAvp(dccRequest.getAvp(EventTimestampAvp.AVP_CODE));
-	    	
-	    	if (dccRequest.getRequestedAction() != null)
-				scapCcr.setRequestedAction(dccRequest.getRequestedAction());
-	    	
-	    	logMsg = new StringBuilder("");
-	    	logMsg.append("Ccr:SessionId:"+scapCcr.getSessionId());
-	    	logMsg.append(":DestinationHost:"+scapCcr.getDestinationHost());
-	    	logMsg.append(":DestinationRealm:"+scapCcr.getDestinationRealm());
-	    	logMsg.append(":OriginHost:"+scapCcr.getOriginHost());
-	    	logMsg.append(":CCRequestType:"+scapCcr.getCCRequestType());
-	    	logMsg.append(":RequestedAction:"+scapCcr.getRequestedAction());
 	    	
 	    	// MSSC
 	    	if (dccRequest.getMultipleServicesIndicator() != null) {
@@ -138,48 +140,47 @@ public class ChargeAmountProcessor implements Processor {
 	    						if (requestedUnits.getAvpCode() == CCTotalOctetsAvp.AVP_CODE) {
 	    							CCTotalOctetsAvp cctoAvp = new CCTotalOctetsAvp();
 	    							cctoAvp.setData(((CCTotalOctetsAvp)requestedUnits).getValueAsLong());
-	    							rsuAvp.addSubAvp(cctoAvp);
-	    							//TODO: add RSUcounter=1, for which AVP type is unknown.
-	    							
-	    							logMsg.append(":CCTotalOctets:"+((CCTotalOctetsAvp)requestedUnits).getValueAsLong());
+                                    scapCcr.setRequestedServiceUnit(cctoAvp);
+	    							LogService.appLog.debug(":CCTotalOctets:"+((CCTotalOctetsAvp)requestedUnits).getValueAsLong());
 	    						}
 	    						
 	    						// handle cc-time
 	    						if (requestedUnits.getAvpCode() == CCTimeAvp.AVP_CODE) {
 	    							CCTimeAvp cctAvp = new CCTimeAvp();
 	    							cctAvp.setData(((CCTimeAvp)requestedUnits).getValue());
-	    							rsuAvp.addSubAvp(cctAvp);
-	    							
-	    							logMsg.append(":CCTime:"+((CCTimeAvp)requestedUnits).getValue());
+                                    scapCcr.setRequestedServiceUnit(cctAvp);
+	    							LogService.appLog.debug(":CCTime:"+((CCTimeAvp)requestedUnits).getValue());
 	    						}
 	    						
 	    						// handle cc-service-specific-units
 	    						if (requestedUnits.getAvpCode() == CCServiceSpecificUnitsAvp.AVP_CODE) {
 	    							CCServiceSpecificUnitsAvp ccssuAvp = new CCServiceSpecificUnitsAvp();
 	    							ccssuAvp.setData(((CCServiceSpecificUnitsAvp)requestedUnits).getValueAsLong());
-	    							rsuAvp.addSubAvp(ccssuAvp);
-	    							
-	    							logMsg.append(":CCServiceSpecificUnit:"+((CCServiceSpecificUnitsAvp)requestedUnits).getValueAsLong());
+	    							scapCcr.setRequestedServiceUnit(ccssuAvp);
+	    							LogService.appLog.debug(":CCServiceSpecificUnit:"+((CCServiceSpecificUnitsAvp)requestedUnits).getValueAsLong());
 	    						}
 	    					}
 	    				}
 	    			}
 	    		}
-	    		scapCcr.addAvp(rsuAvp);
 	    	}
 	    	
 	    	// Traffic case
 	    	int trafficCase = ZteDccHelper.getTrafficCase(dccRequest);
+	    	LogService.appLog.debug("traffic Case from Zte Request: " + trafficCase);
 	    	if (trafficCase == 2) {
 	    		scapCcr.addAvp(new TrafficCaseAvp(21));
-	    		
+	    		LogService.appLog.debug("SCAP traffic Case set to MO, value: 21");
+	            	
 	    		Avp osiAvp = ZteDccHelper.getOaSubscriptionId(dccRequest);
 	    		
+	    		String aParty = ZteDccHelper.getOaSubscriptionIdData(dccRequest);
+	    		int aPartyType = ZteDccHelper.getOaSubscriptionIdType(dccRequest);
 	    		OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp();
-	    		opitAvp.setData(ZteDccHelper.getOaSubscriptionIdType(dccRequest));
-	    		
+	    		opitAvp.setData(aPartyType);
 	    		OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp();
-	    		opidAvp.setData(ZteDccHelper.getOaSubscriptionIdData(dccRequest));
+	    		opidAvp.setData(aParty);
+	    		LogService.appLog.debug("A-Party number from Zte Request: " + aParty + ", type: " + aPartyType);
 	    		
 	    		OtherPartyIdAvp otherPartyIdAvp = new OtherPartyIdAvp();
 	    		otherPartyIdAvp.addSubAvp(opitAvp);
@@ -187,80 +188,97 @@ public class ChargeAmountProcessor implements Processor {
 	    		otherPartyIdAvp.addSubAvp(new OtherPartyIdNatureAvp(0));
 	    		
 	    		scapCcr.addAvp(otherPartyIdAvp);
-	    		
-	    		logMsg.append(":SubscriptionIdType:"+opitAvp.getAsUTF8String());
-	    		logMsg.append(":SubscriptionIdData:"+opidAvp.getAsUTF8String());
+	    		scapCcr.addSubscriptionId(aParty, aPartyType);
+	    		LogService.appLog.debug("SubscriptionId added: " + aParty + ", type: " + aPartyType);
+                
 	    	} else {
 	    		scapCcr.addAvp(new TrafficCaseAvp(20));
-	    		
+	    		LogService.appLog.debug("SCAP traffic Case set to MT, value: 20");
+                
 	    		Avp osiAvp = ZteDccHelper.getOaSubscriptionId(dccRequest);
 	    		
+	    		String bParty = ZteDccHelper.getDaSubscriptionIdData(dccRequest);
+	    		int bPartyType = ZteDccHelper.getDaSubscriptionIdType(dccRequest);
 	    		OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp();
-	    		opitAvp.setData(ZteDccHelper.getDaSubscriptionIdType(dccRequest));
-	    		
+	    		opitAvp.setData(bPartyType);
 	    		OtherPartyIdDataAvp opidAvp = new OtherPartyIdDataAvp();
-	    		opidAvp.setData(ZteDccHelper.getDaSubscriptionIdData(dccRequest));
-	    		
+	    		opidAvp.setData(bParty);
+	    		LogService.appLog.debug("A-Party number from Zte Request: " + bParty + ", type: " + bPartyType);
+                
 	    		OtherPartyIdAvp otherPartyIdAvp = new OtherPartyIdAvp();
 	    		otherPartyIdAvp.addSubAvp(opitAvp);
 	    		otherPartyIdAvp.addSubAvp(opidAvp);
 	    		otherPartyIdAvp.addSubAvp(new OtherPartyIdNatureAvp(0));
 
 	    		scapCcr.addAvp(otherPartyIdAvp);
-	    		
-	    		logMsg.append(":SubscriptionIdType:"+opitAvp.getAsUTF8String());
-	    		logMsg.append(":SubscriptionIdData:"+opidAvp.getAsUTF8String());
+	    		scapCcr.addSubscriptionId(bParty, bPartyType);
+                LogService.appLog.debug("SubscriptionId added: " + bParty + ", type: " + bPartyType);
 	    	}
 	    	
 	    	// service identifier
 	    	scapCcr.addAvp(new ServiceIdentifierAvp(SCAP_SERVICE_IDENTIFIER));
-	    	logMsg.append(":ServiceIdentifier:"+SCAP_SERVICE_IDENTIFIER);
+	    	LogService.appLog.debug("ServiceIdentifier:"+SCAP_SERVICE_IDENTIFIER);
+	    	
 	    	// SPI - Service Enabler Type
-	    	ServiceParameterInfoAvp spiAvp = ChargingHelper.createSPI(100, Integer.toHexString(ZteDccHelper.getServiceEnablerType(dccRequest)));
+	    	String serviceEnablerType = Integer.toHexString(ZteDccHelper.getServiceEnablerType(dccRequest));
+	    	ServiceParameterInfoAvp spiAvp = ChargingHelper.createSPI(100, serviceEnablerType);
 	    	scapCcr.addAvp(spiAvp);
-	    	
+	    	LogService.appLog.debug("SPI(100) Service Enabler Type added:" + serviceEnablerType);
+            	    	
 	    	// SPI - Message ID
-	    	spiAvp = ChargingHelper.createSPI(500, ZteDccHelper.getMessageId(dccRequest));
+	    	int messageId = ZteDccHelper.getMessageId(dccRequest);
+	    	spiAvp = ChargingHelper.createSPI(500, messageId);
 	    	scapCcr.addAvp(spiAvp);
-	    		    	
+	    	LogService.appLog.debug("SPI(500) Message ID added:" + messageId);
+            	    	
 	    	// SPI - OA Subscription ID Type
-	    	spiAvp = ChargingHelper.createSPI(300, ZteDccHelper.getOaSubscriptionIdType(dccRequest));
+	    	int aPartyType = ZteDccHelper.getOaSubscriptionIdType(dccRequest);
+	    	spiAvp = ChargingHelper.createSPI(300, aPartyType);
 	    	scapCcr.addAvp(spiAvp);
-	    	
+	    	LogService.appLog.debug("SPI(300) A-Party Type added:" + aPartyType);
+            
 	    	// SPI - OA Subscription ID Data
-	    	spiAvp = ChargingHelper.createSPI(301, ZteDccHelper.getOaSubscriptionIdData(dccRequest));
+	    	String aParty = ZteDccHelper.getOaSubscriptionIdData(dccRequest);
+	    	spiAvp = ChargingHelper.createSPI(301, aParty);
 	    	scapCcr.addAvp(spiAvp);
+            LogService.appLog.debug("SPI(301) A-Party added:" + aParty);
 	    	
 	    	// SPI - DA Subscription ID Type
-	    	spiAvp = ChargingHelper.createSPI(302, ZteDccHelper.getDaSubscriptionIdType(dccRequest));
+            int bPartyType = ZteDccHelper.getDaSubscriptionIdType(dccRequest);
+	    	spiAvp = ChargingHelper.createSPI(302, bPartyType);
 	    	scapCcr.addAvp(spiAvp);
-	    	
+	    	LogService.appLog.debug("SPI(302) B-Party Type added:" + bPartyType);
+            
 	    	// SPI - DA Subscription ID Data
-	    	spiAvp = ChargingHelper.createSPI(303, ZteDccHelper.getDaSubscriptionIdData(dccRequest));
+	    	String bParty = ZteDccHelper.getDaSubscriptionIdData(dccRequest);
+            spiAvp = ChargingHelper.createSPI(303, bParty);
 	    	scapCcr.addAvp(spiAvp);
-	    	
+	    	LogService.appLog.debug("SPI(303) B-Party added:" + aParty);
+            
 	    	// SPI - SP ID
-            spiAvp = ChargingHelper.createSPI(501, ZteDccHelper.getSpId(dccRequest));
+	    	String spId = ZteDccHelper.getSpId(dccRequest);
+            spiAvp = ChargingHelper.createSPI(501, spId);
             scapCcr.addAvp(spiAvp);
+            LogService.appLog.debug("SPI(501) SP-ID added:" + spId);
             
             //SPI - ISMP-Info-ChargingType
+            String chargingType = ZteDccHelper.getChargingType(dccRequest);
             spiAvp = ChargingHelper.createSPI(101, ZteDccHelper.getChargingType(dccRequest));
-            //TODO: unknown DCC source
+            scapCcr.addAvp(spiAvp);
+            LogService.appLog.debug("SPI(101) Charging Type added:" + chargingType);
+            
             
             // Event-Timestamp
-            scapCcr.addAvp(new EventTimestampAvp(new Time(new Date(System.currentTimeMillis()))));
+            Time timestamp = new Time(new Date(System.currentTimeMillis()));
+            scapCcr.addAvp(new EventTimestampAvp(timestamp));
+            LogService.appLog.debug("Timestamp added:" + timestamp);
             	
 	    	// Timezone
-            scapCcr.addAvp(new TimeZoneAvp((byte)11, (byte)0, (byte)0));
-
-			/*
-			 * public void format(DataObject dataSource) throws Exception    
-			 * {         AddSPI("101",decToHex(dataSource.getValueAsInt(
-			 * "Service-Information-ISMP-Information-ChargingType")));     }
-			 */		
+            scapCcr.addAvp(new TimeZoneAvp((byte)10, (byte)0, (byte)0));
+            LogService.appLog.debug("Timezone added: 10h 0mins 0dst");
             
-            LogService.stackTraceLog.debug("ChargeAmountProcessor-getScapRequest:Done:"+logMsg.toString());
-            logMsg = null;
+           
+            LogService.stackTraceLog.debug("ChargeAmountProcessor-getScapRequest:final construction:"+scapCcr.toString());
 	    } catch (AvpDataException e) {
 	    	//TODO: Log for troubleshooting
 	    	LogService.stackTraceLog.debug("ChargeAmountProcessor-getScapRequest:Direct Debit Use Failed!",e);

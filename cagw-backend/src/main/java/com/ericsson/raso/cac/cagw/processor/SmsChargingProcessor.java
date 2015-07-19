@@ -49,8 +49,7 @@ import com.satnar.smpp.CommandStatus;
 public class SmsChargingProcessor implements Processor {
     
     private static int SCAP_SERVICE_IDENTIFIER = 4; //as per Mikael's inputs; no mail or written requirements though!!!
-    private static String SCAP_SERVICE_CONTEXT_ID = "SCAP_V.2.0@ericsson.com";
-
+    
 	@Override
 	public void process(Exchange exchange) throws Exception {
 	    AuthAcc smppRequest = (AuthAcc) exchange.getIn().getBody();
@@ -204,8 +203,7 @@ public class SmsChargingProcessor implements Processor {
 
     private Ccr getScapRequest(AuthAcc smppRequest) throws ServiceLogicException {
         Ccr dccCcr = null;
-        StringBuilder logMsg = null;
-	    try {
+        try {
 	        ScapChargingEndpoint scapEndpoint = (ScapChargingEndpoint) SpringHelper.getScapDiameter();
 	        LogService.appLog.debug("SCAP Endpoint as configured in CAMEL available: " + (scapEndpoint != null));
 	        
@@ -218,22 +216,18 @@ public class SmsChargingProcessor implements Processor {
 	        dccCcr = new Ccr(ChargingHelper.createChargingSessionId(smppRequest), scapEndpoint.getDccStack().getDiameterStack(), ChargingHelper.SERVICE_CONTEXT_ID);
 	        LogService.appLog.debug("DCC CCR (SCAP Variant) created for request# " + smppRequest.getSmId().getString()); 
 	        
-	        logMsg = new StringBuilder("");
-	        logMsg.append("Ccr::SessionId:" + dccCcr.getSessionId());
-            
 	        // things that we can manage on our own...
 	        Peer route = scapEndpoint.getScapLoadBalancer().getPeerBySite("1"); 
-	        dccCcr.setDestinationRealm(route.getRealm()); logMsg.append(", DestinationRealm:"+dccCcr.getDestinationRealm());
-	        dccCcr.setCCRequestNumber(0x00);  logMsg.append(", CCRequestNumber:"+dccCcr.getCCRequestNumber()); // DCC::DIRECT_DEBIT
-	        dccCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); logMsg.append(", CCRequestType:"+dccCcr.getCCRequestType());
-	        dccCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); logMsg.append(", RequestedAction:"+dccCcr.getRequestedAction());
+	        dccCcr.setDestinationRealm(route.getRealm()); 
+	        dccCcr.setCCRequestNumber(0x00);  // DCC::DIRECT_DEBIT
+	        dccCcr.setCCRequestType(CCRequestTypeAvp.EVENT_REQUEST); 
+	        dccCcr.setRequestedAction(RequestedActionAvp.DIRECT_DEBITING); 
 	        
 	        // things we expect shit from Viettel...
 	        RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
 	        CCServiceSpecificUnitsAvp ssuAvp = new CCServiceSpecificUnitsAvp(1); // 1 SMS unit to charge
 	        //rsuAvp.addSubAvp(ssuAvp);
 	        dccCcr.setRequestedServiceUnit(ssuAvp);
-            logMsg.append(", RequestedServicesUnit->ServiceSpecificUnits(1)");
             
 	    	if (smppRequest.getMoMtFlag() == WinMoMtFlag.MO) {
 	            dccCcr.addAvp(new TrafficCaseAvp(21)); //MO Charging
@@ -279,7 +273,6 @@ public class SmsChargingProcessor implements Processor {
 	    	
 	        // service identifier
 	    	dccCcr.setServiceIdentifier(SCAP_SERVICE_IDENTIFIER);
-	        logMsg.append(", ServiceIdentifier(" + SCAP_SERVICE_IDENTIFIER + ")");
             
 	        // Roaming indicator (subscribe-id-location)
             dccCcr.addAvp(new SubscriptionIdLocationAvp(smppRequest.getMoMscAddress().getString()));
@@ -312,15 +305,12 @@ public class SmsChargingProcessor implements Processor {
             // Event-Timestamp
             Date timestamp = new Date(System.currentTimeMillis());
             dccCcr.setEventTimestamp(new Time(timestamp));
-            logMsg.append(", EventTimestamp(" + timestamp + ")");
             
 	        // Timezone
             dccCcr.addAvp(new TimeZoneAvp((byte)10, (byte)0, (byte)0));
-	        logMsg.append(", TimeZone(11hours 0mins 0dst)");
             
             
-	        LogService.stackTraceLog.debug("SmsChargingProcessor-getScapRequest: Final Construction:" + logMsg.toString());
-            logMsg = null;
+	        LogService.stackTraceLog.debug("SmsChargingProcessor-getScapRequest: Final Construction:" + dccCcr.toString());
             
 	        return dccCcr;
 	    } catch (Exception e) {
