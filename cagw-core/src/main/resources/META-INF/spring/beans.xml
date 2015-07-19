@@ -16,7 +16,7 @@
 	<bean id ="smppSpringHelper" class="com.satnar.smpp.SpringHelper" />
 	
 		
-	<bean id="waterGate" class="com.satnar.common.WaterGate">
+	<!-- <bean id="waterGate" class="com.satnar.common.WaterGate">
 		<constructor-arg name="frontend"
 			value="#{configservice.getValue('Water_Gate','frontend')}" />
 		<constructor-arg name="nodeThreshold"
@@ -25,7 +25,7 @@
 			value="#{configservice.getValue('Water_Gate','systemWideThreshold')}" />
 	</bean>
 	
-	<bean id="clusterService" class="com.satnar.common.ClusterService" />
+	<bean id="clusterService" class="com.satnar.common.ClusterService" /> -->
 		
 	<!-- <bean id="dccServiceEndPoint" class="com.satnar.charging.diameter.dcc.server.DccServiceEndpoint" >
 		<constructor-arg name="dccConfig"
