@@ -37,10 +37,10 @@ public enum CommandId {
     ALERT_NOTIFICATION      (0x00000102, false, true, false, true, new SmppSessionState[]{SmppSessionState.BOUND_RX, SmppSessionState.BOUND_TRX}),
     EXTENDED                (0xffffffff, false, false, false, false, new SmppSessionState[]{}),
     //29-June-2015: HuaWei Extended commands
-    AUTH_ACC                (0x01000001, true, false, true, false, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX}),
-    AUTH_ACC_RESP           (0x81000001, true, false, false, true, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX}),
-    SM_RESULT_NOTIFY        (0x01000002, true, false, true, false, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX}),
-    SM_RESULT_NOTIFY_RESP   (0x81000002, true, false, false, true, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX});
+    AUTH_ACC                (0x01000001, false, true, true, false, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX}),
+    AUTH_ACC_RESP           (0x81000001, false, true, false, true, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX}),
+    SM_RESULT_NOTIFY        (0x01000002, false, true, true, false, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX}),
+    SM_RESULT_NOTIFY_RESP   (0x81000002, false, true, false, true, new SmppSessionState[]{SmppSessionState.BOUND_TX, SmppSessionState.BOUND_TRX});
     
     
     private int     commandId    = 0;
