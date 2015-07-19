@@ -18,8 +18,8 @@ public class SpringHelper implements ApplicationContextAware {
     }
     
     public static SmppPdu getSmppPduImplementation(String commandId) {
-        //return applicationContext.getBean(commandId, SmppPdu.class);
-    	return (SmppPdu)applicationContext.getBean(commandId);    	
+        return applicationContext.getBean(commandId, SmppPdu.class);
+    	//return (SmppPdu)applicationContext.getBean("authAccBean");    	
     }
     
 }
