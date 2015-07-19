@@ -851,10 +851,10 @@ public class Esme {
         if (this.trxChannel != null)
             return this.trxChannel.getEsmeLabel();
         
-        if (this.txChannel != null)
-            return this.txChannel.getEsmeLabel();
-        else
+        if (this.rxChannel != null)
             return this.rxChannel.getEsmeLabel();
+        else
+            return this.txChannel.getEsmeLabel();
     }
 
     @Override
