@@ -95,6 +95,7 @@
 				<camel:doFinally>
 					<camel:log message="Leave MMSC Frontend:${body}" />
 				</camel:doFinally>
+				</camel:doTry>
 		</camel:route>
 	</camel:camelContext>
 
