@@ -54,6 +54,8 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
         
         try {
             this.dccStack.start();
+            this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
+            
         } catch (IOException e) {
             // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("DccServiceEndpoint-start:Unable to start the DCC Stack: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress,e);
@@ -105,7 +107,6 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_QUEUE_SIZE, this.sendQueueSize);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.SEND_MESSAGE_LIMIT, this.sendMessageLimit);
             
-            //this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
             this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, this.applicationId);
                 
             LogService.stackTraceLog.debug("DccServiceEndpoint-prepareStack:Success: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress);
