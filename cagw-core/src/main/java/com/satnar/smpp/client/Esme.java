@@ -270,13 +270,15 @@ public class Esme {
             }
             
             LogService.appLog.debug(this.getEsmeLabel() + " - Standard Command ID: " + pdu.getCommandId());
-            if (pdu.getCommandId().isTxCompatible()) {
+            if (pdu.getCommandId().isRxCompatible()) {
+                LogService.appLog.debug(this.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
+                this.rxWriter.writeLazy(pdu);
+            } else if (pdu.getCommandId().isTxCompatible()) {
                 LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                 this.txWriter.writeLazy(pdu);
             } else {
-                LogService.appLog.debug(this.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
-                this.rxWriter.writeLazy(pdu);
-           }
+                LogService.appLog.error(String.format("Quite Strange that CommandID: %s is not compatible with both Tx and Rx", pdu.getCommandId()));
+            }
             
         } catch (SmppTransportException e) {
             //TODO: Log for troubelshooting. Seems like the transport is broken. Must stop the stack.
