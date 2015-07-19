@@ -55,6 +55,7 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
         try {
             this.dccStack.start();
             this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
+            LogService.appLog.debug("Check for configured apps supported: " + this.dccStack.getDiameterStack().ownPeerInfo.getApplications());
             
         } catch (IOException e) {
             // TODO log for troubleshooting
@@ -94,6 +95,8 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             // TODO: Set the Timeout directly in the front end project where the request listener is implemented
             
             this.dccStack.getDiameterConfig().addApplication(this.applicationId);
+            this.dccStack.getDiameterStack().ownPeerInfo.addApplication(this.applicationId);
+            this.dccStack.getDiameterStack().ownPeerInfo.addApplication(0, 0, 4);
             this.dccStack.setOwnFqdn(this.ownFqdn);
             this.dccStack.getDiameterConfig().setValue(DiameterConfig.DEFAULT_MESSAGE_TIMEOUT, this.messageTimeout);
             this.dccStack.setOwnProductId(this.ownProductId);
