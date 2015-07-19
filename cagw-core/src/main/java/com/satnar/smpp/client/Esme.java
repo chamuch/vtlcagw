@@ -285,7 +285,7 @@ public class Esme {
         	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
             this.stop();
         } catch (Exception e){
-        	LogService.stackTraceLog.debug("ESME-SendPDU:Encountered exception..:"+e);
+        	LogService.stackTraceLog.debug("ESME-SendPDU:Encountered exception..:", e);
         }
     }
     
