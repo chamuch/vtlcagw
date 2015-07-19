@@ -82,7 +82,7 @@ public class TransactionDao {
             if(cluster != null && session != null) {
                 Delete delete = QueryBuilder.delete().from(connection.getKeyspace(), TRANSACTION_TABLE);
                                              delete.where(eq("transactionTime", txnInfo.getTransactionTime()))
-                                                    .and((eq("transactId", txnInfo.getTransactionId())));
+                                                    .and((eq("transactionId", txnInfo.getTransactionId())));
                 
                 session.execute(delete);
                 

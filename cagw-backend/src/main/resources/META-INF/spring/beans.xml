@@ -30,15 +30,15 @@
 		<constructor-arg name="scapConfig"
 			value="#{cfg.getProperties('Scap_Props_Occ')}" />
 	</bean>
-	
+
 	<bean id="airContect" class="com.satnar.air.ucip.client.internal.CsAirContext" />
-	
+
 	<bean id="airClient" class="com.satnar.air.ucip.client.internal.AirClientImpl"
-	init-method="init">
+		init-method="init">
 		<constructor-arg name="ucipConfig"
 			value="#{cfg.getProperties('cs-air1')}" />
 	</bean>
-	
+
 	<bean id="xmlRpcClientFactory"
 		class="com.satnar.air.ucip.client.xmlrpc.internal.DefaultXmlRpcClientFactory" />
 
@@ -88,37 +88,40 @@
 		<route id="cg-engine-route">
 			<from uri="cxfrs://bean://cgeServer" />
 			<camel:doTry>
-				<camel:when>				
-				<camel:simple>${header.fe} == 'auth_acc'</camel:simple>
-				<camel:unmarshal ref="gsonAuthAcc" />
-				<camel:log message="From Backend :${body}" />
-				<camel:bean
-					beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+				<camel:when>
+					<camel:simple>${header.fe} == 'auth_acc'</camel:simple>
+					<camel:unmarshal ref="gsonAuthAcc" />
+					<camel:log message="From Backend :${body}" />
+					<camel:bean
+						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
 					<camel:marshal ref="gsonAuthAccResponse" />
 				</camel:when>
-				<camel:when>				
-				<camel:simple>${header.fe} == 'sm_result'</camel:simple>
-				<camel:unmarshal ref="gsonSmResultNotify" />
-				<camel:log message="From Backend :${body}" />
-				<camel:bean
-					beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+				<camel:when>
+					<camel:simple>${header.fe} == 'sm_result'</camel:simple>
+					<camel:unmarshal ref="gsonSmResultNotify" />
+					<camel:log message="From Backend :${body}" />
+					<camel:bean
+						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
 					<camel:marshal ref="gsonSmResultNotifyResponse" />
 				</camel:when>
-				<camel:when>				
-				<camel:simple>${header.fe} == 'mmsc'</camel:simple>
-				<camel:unmarshal ref="gsonCcr" />
-				<camel:log message="From Backend :${body}" />
-				<camel:bean
-					beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+				<camel:when>
+					<camel:simple>${header.fe} == 'mmsc'</camel:simple>
+					<camel:unmarshal ref="gsonCcr" />
+					<camel:log message="From Backend :${body}" />
+					<camel:bean
+						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
 					<camel:marshal ref="gsonCca" />
 				</camel:when>
 				<camel:doCatch>
 					<camel:exception>java.lang.Exception</camel:exception>
-					<camel:log message="From Backend Exception" />
+					<!-- <setHeader headerName="exception">
+						<simple>${exception.stacktrace}</simple>
+					</setHeader> -->
+					<camel:log message="From Backend Exception: ${exception.stacktrace}" />
 				</camel:doCatch>
-				<camel:doFinally>					
-					<camel:log message="Leave-Backend:${body}"/>
-				</camel:doFinally>				
+				<camel:doFinally>
+					<camel:log message="Leave-Backend:${body}" />
+				</camel:doFinally>
 			</camel:doTry>
 		</route>
 	</camelContext>

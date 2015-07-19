@@ -43,6 +43,7 @@
 			org.apache.commons.httpclient,
 			org.apache.commons.httpclient.params,
 			org.apache.commons.httpclient.util,
+			org.apache.commons.httpclient.methods,
 			org.apache.commons.codec.binary,
 			com.hazelcast.core,
 			com.hazelcast.client,
