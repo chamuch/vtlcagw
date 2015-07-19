@@ -38,6 +38,7 @@ import com.ericsson.raso.cac.cagw.SpringHelper;
 import com.satnar.charging.diameter.scap.client.ScapChargingEndpoint;
 import com.satnar.common.LogService;
 import com.satnar.common.charging.diameter.Peer;
+import com.satnar.common.charging.diameter.ResultCode;
 
 
 
@@ -48,6 +49,8 @@ public class ChargeAmountProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
+	    Cca scapResponse = null;
+        Cca dccResponse = null;
 	    Ccr dccRequest = (Ccr) exchange.getIn().getBody();
 	    LogService.stackTraceLog.info("MMS DCC Request>> " + dccRequest.toString());
         
@@ -55,11 +58,11 @@ public class ChargeAmountProcessor implements Processor {
 		    LogService.appLog.debug("Preparing SCAP Request for MMS DCC Request# " + dccRequest.getSessionId());
             Ccr scapRequest = this.getScapRequest(dccRequest);
 	        
-            LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC: " + scapRequest.toString());
-            Cca scapResponse = scapRequest.send();
-            LogService.stackTraceLog.info("Received SCAP CCA Response from OCC: " + scapResponse.toString());
+            LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC>> " + scapRequest.toString());
+            scapResponse = scapRequest.send();
+            LogService.stackTraceLog.info("Received SCAP CCA Response from OCC>> " + scapResponse.toString());
             
-            Cca dccResponse = new Cca(dccRequest, scapResponse.getResultCode());
+            dccResponse = new Cca(dccRequest, scapResponse.getResultCode());
 	        //TODO: SCAP Response ==> (Granted Units, Cost Info)
 	        //TODO: DCC Response -- need to add params based on customer inputs, during integration testing.
 	        
@@ -69,32 +72,40 @@ public class ChargeAmountProcessor implements Processor {
 	        LogService.appLog.debug("ChargeAmountProcessor-process:Done.SessionId:"+scapRequest.getSessionId()
 	        		+":ResultCode"+scapResponse.getResultCode());
 		} catch (NoRouteException e) {
-		    //TODO: Log for troubleshooting
 			LogService.appLog.debug("ChargeAmountProcessor-process:No Diamter Peer available based on the Stack Config & Request Parameters!!",e);
-		    throw new ServiceLogicException("No Diamter Peer available based on the Stack Config & Request Parameters!!", e);
+			dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+			LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		} catch (BadMessageException e) {
-            //TODO: Log for troubleshooting
 			LogService.appLog.debug("ChargeAmountProcessor-process:Request rejected by OCC/CCN!!",e);
-            throw new ServiceLogicException("Request rejected by OCC/CCN!!", e);
+            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		} catch (URISyntaxException e) {
-            //TODO: Log for troubleshooting
 			LogService.appLog.debug("ChargeAmountProcessor-process:Bad Peer configuration for the route!!",e);
-            throw new ServiceLogicException("Bad Peer configuration for the route!!", e);
+            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		} catch (UnknownServiceException e) {
-            //TODO: Log for troubleshooting
 			LogService.appLog.debug("ChargeAmountProcessor-process:Bad Stack Configuration - Service!!",e);
-			throw new ServiceLogicException("Bad Stack Configuration - Service!!", e);
+            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		} catch (AvpDataException e) {
-            //TODO: Log for troubleshooting
 			LogService.appLog.debug("ChargeAmountProcessor-process:Presentation Tier Failure for Raquest Parameter!!",e);
-			throw new ServiceLogicException("Presentation Tier Failure for Raquest Parameter!!", e);
+            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		} catch (IOException e) {
-            //TODO: Log for troubleshooting
 			LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",e);
-            throw new ServiceLogicException("Transport Tier Failure for Raquest!!", e);
+            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		} catch (Exception genE){//Added for debugging
 			LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",genE);
-            throw genE;
+            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
+            exchange.getOut().setBody(dccResponse);
 		}
 				
 		LogService.appLog.info("Exiting from DIRECT_DEBIT ChargeAmountProcessor");

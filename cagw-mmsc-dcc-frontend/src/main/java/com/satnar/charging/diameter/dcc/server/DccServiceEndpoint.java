@@ -112,6 +112,8 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             
             this.dccStack.getDiameterStack().addPeerConnectionListener(this.peerConnectionListener);
             this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, this.applicationId);
+            this.dccStack.getDiameterConfig().addRequestListener(this.applicationRequestListener, new ApplicationId(0, 0, 4));
+            
                 
             LogService.stackTraceLog.debug("DccServiceEndpoint-prepareStack:Success: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress);
         } catch (ApplicationAlreadyInUseException e) {
