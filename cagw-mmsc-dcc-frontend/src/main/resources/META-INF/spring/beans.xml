@@ -22,7 +22,17 @@
 	</bean>
 	<context:property-placeholder
 		properties-ref="cgProperties" />
+	
+	<bean id="clusterService" class="com.satnar.common.ClusterService" />
 
+	<bean id="waterGate" class="com.satnar.common.WaterGate">
+		<constructor-arg name="frontend"
+			value="#{configservice.getValue('Water_Gate','frontend')}" />
+		<constructor-arg name="nodeThreshold"
+			value="#{configservice.getValue('Water_Gate','nodeThreshold')}" />
+		<constructor-arg name="systemWideThreshold"
+			value="#{configservice.getValue('Water_Gate','systemWideThreshold')}" />
+	</bean>
 
 	<bean id="mmscFe"
 		class="com.ericsson.raso.cac.diameter.dcc.server.viettel.SpringHelper" />

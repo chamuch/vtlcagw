@@ -20,13 +20,13 @@ public class SpringHelper implements ApplicationContextAware {
         return context.getBean(IngressValve.class);
     }
     
-    /*public static ClusterService getClusterService() {
+    public static ClusterService getClusterService() {
         return context.getBean(ClusterService.class);
-    }*/
-
-    public static IClusterService getClusterService() {
-        return context.getBean(IClusterService.class);
     }
+
+   /*public static IClusterService getClusterService() {
+        return context.getBean(IClusterService.class);
+    }*/
     
     public static IConfig getConfig() {
         return context.getBean(ConfigService.class);
