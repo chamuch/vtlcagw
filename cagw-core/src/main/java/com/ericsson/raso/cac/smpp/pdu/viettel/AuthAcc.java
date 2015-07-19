@@ -138,14 +138,15 @@ public class AuthAcc extends SmppPdu {
 			this.moMtFlag = WinMoMtFlag.valueOf(parser.read());
 			this.smId = CHexString.readString(parser);
 			this.smLength = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt());
-			this.serviceId = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt());
+			if (parser.available() > 0)
+			    this.serviceId = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt());
 			
 			parser.close();
 			parser = null;
 			
 			LogService.appLog.info("AuthAcc-decode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
 		} catch (IOException e) {
-			LogService.appLog.debug("AuthAcc-decode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
+			LogService.appLog.debug("AuthAcc-decode:Failed to deserialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         } catch (Exception e) {
             LogService.appLog.debug("AuthAcc-decode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);

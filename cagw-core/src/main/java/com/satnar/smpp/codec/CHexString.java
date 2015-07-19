@@ -77,9 +77,8 @@ public class CHexString extends SmppParameter {
 	    	LogService.appLog.debug("CHexString-readString: Encountered exception",e);
 	    }
 	    
-	    CHexString output = (CHexString) SmppParameter.getInstance(Type.C_HEX_STRING);
-	    output.setValue(string);
-		return output;
+	    CHexString output = (CHexString) SmppParameter.getInstance(Type.C_HEX_STRING, string);
+	    return output;
     }
     
 	

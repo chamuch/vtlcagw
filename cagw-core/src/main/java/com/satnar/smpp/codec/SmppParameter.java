@@ -22,6 +22,8 @@ public abstract class SmppParameter {
                 return new COctetString();
             case C_DECIMAL_STRING:
             	return new CDecimalString();
+            case C_HEX_STRING:
+                return new CHexString();
             case OCTET_STRING:
                 return new OctetString();
             default:
