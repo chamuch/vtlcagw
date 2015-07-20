@@ -48,7 +48,7 @@ public class RequestHandler implements ApplicationRequestListener {
             	logMsg.append(":OriginRealm:");logMsg.append(dccRequest.getOriginRealm());
             	logMsg.append(":DestinationHost:");logMsg.append(dccRequest.getDestinationHost());
             	logMsg.append(":DestinationRealm:");logMsg.append(dccRequest.getDestinationHost());
-            	LogService.appLog.debug("RequestHandler-ProcessRequest:Sending Request.."+logMsg.toString());
+            	LogService.appLog.debug("RequestHandler-ProcessRequest: Handling Request.."+logMsg.toString());
             	
             	
             	MmsDccCharge charge = new MmsDccCharge();
@@ -84,8 +84,9 @@ public class RequestHandler implements ApplicationRequestListener {
         } catch (AvpDataException e) {
         	LogService.appLog.debug("RequestHandler-processRequest:Encounterd exception",e);
             return createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
-        }finally{
-        	logMsg = null;
+        } catch (Error e) {
+            LogService.appLog.debug("RequestHandler-processRequest:Encounterd exception",e);
+            return createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
         }
     }
     
