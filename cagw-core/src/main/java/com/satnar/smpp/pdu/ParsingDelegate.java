@@ -103,7 +103,7 @@ public class ParsingDelegate implements Callable<Void> {
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
                         LogService.appLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
-                        if (pdu.getCommandId() == CommandId.AUTH_ACC) {
+                        if (pdu.getCommandId().getId() == CommandId.AUTH_ACC.getId()) {
                             try {
                                 LogService.stackTraceLog.info("BACKEND REQ>> " + pdu.toString());
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
@@ -122,7 +122,7 @@ public class ParsingDelegate implements Callable<Void> {
                                 LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             }
                         }
-                        if (pdu.getCommandId() == CommandId.SM_RESULT_NOTIFY) {
+                        if (pdu.getCommandId().getId() == CommandId.SM_RESULT_NOTIFY.getId()) {
                             try {
                                 LogService.stackTraceLog.info("BACKEND REQ>> " + pdu.toString());
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
