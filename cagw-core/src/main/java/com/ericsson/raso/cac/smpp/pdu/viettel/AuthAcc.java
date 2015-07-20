@@ -127,16 +127,17 @@ public class AuthAcc extends SmppPdu {
 			sequence.setValue(parser.readInt());
 			super.setCommandSequence(sequence);
 			
-			this.version = WinVersion.valueOf(parser.read());
-			this.smscAddress = CDecimalString.readString(parser);
-			this.moMscNoa = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read());
-			this.moMscNpi = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read());
-			this.moMscAddress = CDecimalString.readString(parser);
-			this.moMtFlag = WinMoMtFlag.valueOf(parser.read());
-			this.smId = CHexString.readString(parser);
-			this.smLength = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt());
-			if (parser.available() > 0)
-			    this.serviceId = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt());
+			this.version = WinVersion.valueOf(parser.read()); LogService.appLog.debug("Read version: " + this.version);
+			this.smscAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read smscAddress: " + this.smscAddress);
+			this.moMscNoa = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read()); LogService.appLog.debug("Read moMscNoa: " + this.moMscNoa);
+			this.moMscNpi = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read()); LogService.appLog.debug("Read moMscNpi: " + this.moMscNpi);
+			this.moMscAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read moMscAddress: " + this.moMscAddress);
+			this.moMtFlag = WinMoMtFlag.valueOf(parser.read()); LogService.appLog.debug("Read moMtFlag: " + this.moMtFlag);
+			this.smId = CHexString.readString(parser); LogService.appLog.debug("Read smId: " + this.smId);
+			this.smLength = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt()); LogService.appLog.debug("Read smLength: " + this.smLength);
+			if (parser.available() > 0) {
+			    this.serviceId = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt()); LogService.appLog.debug("Read serviceId: " + this.serviceId);
+			}
 			
 			parser.close();
 			parser = null;
