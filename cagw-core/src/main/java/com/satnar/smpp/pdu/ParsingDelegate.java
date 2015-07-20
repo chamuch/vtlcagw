@@ -102,33 +102,43 @@ public class ParsingDelegate implements Callable<Void> {
                     LogService.appLog.debug("ParsingDeligate-call:Sending request to cagw-backend!!:CommandId:"+pdu.getCommandId().name()+"CommandSequence:"+pdu.getCommandSequence().getValue());
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
-                        LogService.stackTraceLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
+                        LogService.appLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         if (pdu.getCommandId() == CommandId.AUTH_ACC) {
                             try {
+                                LogService.stackTraceLog.info("BACKEND REQ>> " + pdu.toString());
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             } catch (CamelExecutionException e) {
                                 LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             } catch (Exception e) {
                                 LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             } catch (Error e) {
                                 LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             }
                         }
                         if (pdu.getCommandId() == CommandId.SM_RESULT_NOTIFY) {
                             try {
+                                LogService.stackTraceLog.info("BACKEND REQ>> " + pdu.toString());
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             } catch (CamelExecutionException e) {
                                 LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             } catch (Exception e) {
                                 LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             } catch (Error e) {
                                 LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
                             }
                             
                         }
