@@ -48,10 +48,10 @@ public class WriteHelper {
             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
-                //TODO: Log - socket seems to be broken.
-            	LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
+                LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
-                session.stop();
+                if (!((TcpConnection)this.smppConnection).isShutdownMode())
+                    session.stop();
             }
             
         }

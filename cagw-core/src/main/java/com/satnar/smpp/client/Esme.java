@@ -612,20 +612,19 @@ public class Esme {
     private void unbindTrx() throws SmppServiceException, SmppTransportException {
         SmppPdu unbind = null;
         try {
+            ((TcpConnection)this.rxChannel).setShutdownMode(true);
             unbind = EsmeHelper.getUnbind();
             this.trxWriter.writeImmediate(unbind);
         } catch (SmppCodecException e) {
-            // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-unbindTrx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.trxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         } catch (SmppTransportException e) {
-            // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-unbindTrx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.trxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
 
         while (this.trxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
@@ -638,20 +637,20 @@ public class Esme {
     private void unbindTx() throws SmppServiceException, SmppTransportException {
         SmppPdu unbind = null;
         try {
+            ((TcpConnection)this.rxChannel).setShutdownMode(true);
             unbind = EsmeHelper.getUnbind();
-            this.trxWriter.writeImmediate(unbind);
+            this.txWriter.writeImmediate(unbind);
         } catch (SmppCodecException e) {
-            // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-unbindTx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.txChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         } catch (SmppTransportException e) {
             // TODO Log for troubleshooting
         	LogService.stackTraceLog.debug("Esme-unbindTx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.txChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
 
         while (this.txChannel.getConnectionState() == SmppSessionState.UNBOUND || 
@@ -664,20 +663,19 @@ public class Esme {
     private void unbindRx() throws SmppServiceException, SmppTransportException {
         SmppPdu unbind = null;
         try {
+            ((TcpConnection)this.rxChannel).setShutdownMode(true);
             unbind = EsmeHelper.getUnbind();
             this.rxWriter.writeImmediate(unbind);
         } catch (SmppCodecException e) {
-            // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         } catch (SmppTransportException e) {
-            // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
 
         while (this.rxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
