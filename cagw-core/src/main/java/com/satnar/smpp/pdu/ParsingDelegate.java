@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.util.concurrent.Callable;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 
 import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAcc;
@@ -103,12 +104,18 @@ public class ParsingDelegate implements Callable<Void> {
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
                         LogService.stackTraceLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         if (pdu.getCommandId() == CommandId.AUTH_ACC) {
-                            //TODO: place some code here for camel exception handling
-                            response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
+                            try {
+                                response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
+                            } catch (CamelExecutionException e) {
+                                response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                            }
                         }
                         if (pdu.getCommandId() == CommandId.SM_RESULT_NOTIFY) {
-                            //TODO: place some code here for camel exception handling
-                            response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
+                            try {
+                                response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
+                            } catch (CamelExecutionException e) {
+                                response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                            }
                         }
                     	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                     } else {

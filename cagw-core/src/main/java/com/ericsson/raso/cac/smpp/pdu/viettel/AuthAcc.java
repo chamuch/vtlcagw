@@ -160,6 +160,17 @@ public class AuthAcc extends SmppPdu {
 
 	}
 	
+	public AuthAccResponse getFailedResponse(CommandStatus esmeResultCode) {
+	    AuthAccResponse response = new AuthAccResponse();
+	    response.setCommandStatus(esmeResultCode);
+	    response.setCommandSequence(this.getCommandSequence());
+	    response.setNotifyMode(WinNotifyMode.NOTIFY_NEVER);
+	    response.setOperationResult(WinOperationResult.OTHER_ERRORS);
+	    return response;
+    }
+
+
+	
 	public String toString() {
 	    return "PDU:: Command Length: " + this.getCommandLength().getValue() + ", " 
                 + CommandId.AUTH_ACC + "(" + java.lang.Integer.toHexString(CommandId.AUTH_ACC.getId())
@@ -289,4 +300,5 @@ public class AuthAcc extends SmppPdu {
 	}
 
 
+    
 }

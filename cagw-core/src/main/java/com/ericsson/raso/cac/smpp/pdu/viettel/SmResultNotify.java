@@ -127,6 +127,17 @@ public class SmResultNotify extends SmppPdu {
 		// TODO do nothing...we dont know anything about this chinese shit!!
 
 	}
+	
+    public SmResultNotifyResponse getFailedResponse(CommandStatus esmeResultCode) {
+        SmResultNotifyResponse response = new SmResultNotifyResponse();
+        response.setCommandSequence(this.getCommandSequence());
+        response.setCommandStatus(esmeResultCode);
+        response.setOperationResult(WinOperationResult.OTHER_ERRORS);
+        return response;
+    }
+    
+    
+
 
 	@Override
     public Integer getCommandLength() {
@@ -270,7 +281,6 @@ public class SmResultNotify extends SmppPdu {
 	public void setServiceId(Integer serviceId) {
 		this.serviceId = serviceId;
 	}
-	
-	
+
 
 }

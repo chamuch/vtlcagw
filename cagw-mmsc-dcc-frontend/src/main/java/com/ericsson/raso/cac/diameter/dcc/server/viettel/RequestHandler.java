@@ -3,6 +3,7 @@ package com.ericsson.raso.cac.diameter.dcc.server.viettel;
 import java.util.Properties;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 
 import com.ericsson.pps.diameter.dccapi.avp.CCRequestNumberAvp;
@@ -23,8 +24,6 @@ import com.satnar.common.charging.diameter.ResultCode;
 public class RequestHandler implements ApplicationRequestListener {
     
     private static final String BACKEND_ENDPOINT = "seda:cagw-backend";
-    private static final long  DIAMETER_COMMAND_UNSUPPORTED = 3001;
-    private static final long  DIAMETER_UNABLE_TO_COMPLY = 5012;
     
     
     private CamelContext context = null;
@@ -51,13 +50,20 @@ public class RequestHandler implements ApplicationRequestListener {
             	logMsg.append(":DestinationRealm:");logMsg.append(dccRequest.getDestinationHost());
             	LogService.appLog.debug("RequestHandler-ProcessRequest:Sending Request.."+logMsg.toString());
             	
-                Cca dccResponse = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, dccRequest, "fe", "mmsc", Cca.class);
-                logMsg.append(":ResultCode:");logMsg.append(dccResponse.getResultCode());
-                LogService.stackTraceLog.debug("RequestHandler-ProcessRequest:Received Response.."+logMsg.toString());
-                
-                DiameterAnswer response = createAnswer(request, dccResponse.getResultCode());
+            	DiameterAnswer response = null;
+                try {
+                    Cca dccResponse = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, dccRequest, "fe", "mmsc", Cca.class);
+                    logMsg.append(":ResultCode:");logMsg.append(dccResponse.getResultCode());
+                    LogService.stackTraceLog.debug("RequestHandler-ProcessRequest:Received Response.."+logMsg.toString());
+                    
+                    response = createAnswer(request, dccResponse.getResultCode());
                 //TODO: based on CCA response from cagw-backend, copy relevant AVPs back.
-             
+                } catch(AvpDataException e) {
+                    response = createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
+                } catch (CamelExecutionException e) {
+                    response = createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+                }
+                
                 com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                 
                 return response;
@@ -69,13 +75,11 @@ public class RequestHandler implements ApplicationRequestListener {
             }
             
         } catch (BadMessageException e) {
-            //TODO: log to troubleshoot... wont handle anything for CCRs...
         	LogService.appLog.debug("RequestHandler-processRequest:Encountered Exception. wont handle anything for CCRs...",e);
-            return createAnswer(request, DIAMETER_COMMAND_UNSUPPORTED);
+            return createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
         } catch (AvpDataException e) {
-            // TODO Auto-generated catch block
         	LogService.appLog.debug("RequestHandler-processRequest:Encounterd exception",e);
-            return createAnswer(request, DIAMETER_UNABLE_TO_COMPLY);
+            return createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
         }finally{
         	logMsg = null;
         }
