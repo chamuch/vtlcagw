@@ -122,17 +122,37 @@ public class AuthAcc extends SmppPdu {
 			ByteArrayInputStream buffer = new ByteArrayInputStream(payload);
 			DataInputStream parser = new DataInputStream(buffer);
 			
+			/*
+			 * 1 0 0 1 - command id
+			 * 0 0 0 0 - command status 
+			 * 0 0 0 4 - command sequence
+			 * 3 - version 
+			 * 38 34 39 38 30 32 30 30 36 31 33 0 - smsc addr 
+			 * 4 - msc noa
+			 * 1 - msc npi
+			 * 38 34 39 38 30 32 30 30 33 30 34 0 - msc addr
+			 * 38 34 31 36 36 39 30 30 38 33 34 32 0 - source addr
+			 * 38 34 31 36 33 33 35 33 30 30 39 33 0 - dest addr
+			 * 1 - momtflag
+			 * 41 31 42 38 39 41 43 31 0 - smid 
+			 * 0 0 0 0 - sm len 
+			 * 0 0 0 1 - service id
+			 */
+			
+			
 			super.setCommandStatus(CommandStatus.valueOf(parser.readInt()));
 			CommandSequence sequence = CommandSequence.getInstance();
 			sequence.setValue(parser.readInt());
 			super.setCommandSequence(sequence);
 			
-			this.version = WinVersion.valueOf(parser.read()); LogService.appLog.debug("Read version: " + this.version);
+            this.version = WinVersion.valueOf(parser.read()); LogService.appLog.debug("Read version: " + this.version);
 			this.smscAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read smscAddress: " + this.smscAddress);
 			this.moMscNoa = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read()); LogService.appLog.debug("Read moMscNoa: " + this.moMscNoa);
 			this.moMscNpi = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read()); LogService.appLog.debug("Read moMscNpi: " + this.moMscNpi);
 			this.moMscAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read moMscAddress: " + this.moMscAddress);
-			this.moMtFlag = WinMoMtFlag.valueOf(parser.read()); LogService.appLog.debug("Read moMtFlag: " + this.moMtFlag);
+			this.sourceAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read sourceAddress: " + this.moMscAddress);
+			this.destinationAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read sourceAddress: " + this.moMscAddress);
+            this.moMtFlag = WinMoMtFlag.valueOf(parser.read()); LogService.appLog.debug("Read moMtFlag: " + this.moMtFlag);
 			this.smId = CHexString.readString(parser); LogService.appLog.debug("Read smId: " + this.smId);
 			this.smLength = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt()); LogService.appLog.debug("Read smLength: " + this.smLength);
 			if (parser.available() > 0) {

@@ -1,5 +1,6 @@
 package com.ericsson.raso.cac.smpp.pdu.viettel;
 
+import com.satnar.common.LogService;
 import com.satnar.smpp.codec.Byte;
 import com.satnar.smpp.codec.SmppParameter;
 import com.satnar.smpp.codec.SmppParameter.Type;
@@ -20,8 +21,8 @@ public enum WinMoMtFlag {
 		return value;
 	}
 	
-	public static WinMoMtFlag valueOf(int version) {
-		switch(version) {
+	public static WinMoMtFlag valueOf(int value) {
+		switch(value) {
 			case 1:
 				return MO;
 			case 2:
@@ -29,6 +30,7 @@ public enum WinMoMtFlag {
 			case 3:
 				return RESERVED;
 			default:
+			    LogService.appLog.debug("UNknown value received: " + value);
 				return null;
 		}
 	}
