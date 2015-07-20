@@ -75,13 +75,10 @@ public class AuthAcc extends SmppPdu {
 									this.moMtFlag.getValue().getLength() +
 									this.smId.getLength() +
 									this.smLength.getLength() +
-									this.serviceId.getLength();
+									((this.serviceId != null)?this.serviceId.getLength():0);
 		}
 	    
-        Integer len  = (Integer) SmppParameter.getInstance(Type.INTEGER);
-        len.setValue(this.myCommandLength);
-
-        return len;
+        return (Integer) SmppParameter.getInstance(Type.INTEGER, this.myCommandLength);
     }
 
 	@Override
