@@ -54,7 +54,7 @@ public enum CommandId {
     private static final List<Integer> reserved = new ArrayList<Integer>();
     
     
-    private CommandId(int command, boolean transmitterSupported, boolean receiverSupported, boolean esmeOriginated, boolean smscOriginated, SmppSessionState[] validStates) {
+    private CommandId(int command, boolean transmitterSupported, boolean receiverSupported, boolean smscOriginated, boolean esmeOriginated, SmppSessionState[] validStates) {
         this.commandId = command;
         this.txCompatible = transmitterSupported;
         this.rxCompatible = receiverSupported;

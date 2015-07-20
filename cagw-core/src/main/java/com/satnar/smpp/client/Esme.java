@@ -248,7 +248,7 @@ public class Esme {
     }
     
     public void sendPdu(SmppPdu pdu, ChannelMode mode) throws SmppCodecException {
-        LogService.stackTraceLog.debug(this.getEsmeLabel() + " - Esme-sendPdu: Attempting... CommandId:"+pdu.getCommandId().name()+", CommandSequence:"+pdu.getCommandSequence().getValue());
+        LogService.stackTraceLog.debug(this.getEsmeLabel() + " - Esme-sendPdu: Attempting... pdu:"+pdu);
 
         try {
             if (this.canUseTrx) {

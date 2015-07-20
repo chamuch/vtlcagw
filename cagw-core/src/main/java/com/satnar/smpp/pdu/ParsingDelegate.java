@@ -149,11 +149,16 @@ public class ParsingDelegate implements Callable<Void> {
                     }
                     
                     if ((commandId & EsmeHelper.REQUEST_MASK) == EsmeHelper.REQUEST_MASK) {                         
+                        LogService.appLog.debug("ParsingDeligate-call:Sending response for :CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                         String sessionId = StackMap.getEsmeLabel("" + pdu.getCommandSequence().getValue());
-                        Esme session = StackMap.getStack(sessionId);
-                        session.sendPdu(response, this.channelMode);
-                        
-                        LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
+                        if (sessionId != null) {
+                            LogService.appLog.debug(String.format("Found session %s for request.sequence: %s", sessionId, pdu.getCommandSequence().getValue()));
+                            Esme session = StackMap.getStack(sessionId);
+                            if (session != null) {
+                                LogService.appLog.debug(String.format("Found session %s is available: %s", sessionId, (session != null)));
+                                session.sendPdu(response, this.channelMode);
+                            }
+                        }
                     }
                     com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     return null;
