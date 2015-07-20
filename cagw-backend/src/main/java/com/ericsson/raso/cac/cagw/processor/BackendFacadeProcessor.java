@@ -31,11 +31,11 @@ public class BackendFacadeProcessor implements Processor {
             }
         }
         
-        if (request instanceof Ccr) {
-            Ccr dccRequest = (Ccr) request;
+        if (request instanceof MmsDccCharge) {
+            MmsDccCharge dccRequest = (MmsDccCharge) request;
             
-            if (dccRequest.getCCRequestType() == CCRequestTypeAvp.EVENT_REQUEST ||
-                    dccRequest.getRequestedAction() == RequestedActionAvp.DIRECT_DEBITING) {
+            if (dccRequest.getAvp(CCRequestTypeAvp.AVP_CODE).getAsInt() == CCRequestTypeAvp.EVENT_REQUEST ||
+                    dccRequest.getAvp(RequestedActionAvp.AVP_CODE).getAsInt() == RequestedActionAvp.DIRECT_DEBITING) {
                 delegate = Usecase.DIRECT_DEBIT.getProcessor();
             } else {
                 delegate = new DccNotImplementedProcessor();
