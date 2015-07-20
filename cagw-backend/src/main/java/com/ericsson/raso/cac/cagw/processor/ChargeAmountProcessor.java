@@ -189,7 +189,7 @@ public class ChargeAmountProcessor implements Processor {
 	    		RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
 	    		
 	    		for (Avp msccAvp: dccRequest.getAvp(456).getDataAsGroup()) { // MSCC Array Avp
-	    			for (Avp usuAvp: ((DccGrouped)msccAvp).getValues()) {
+	    			for (Avp usuAvp: (msccAvp).getDataAsGroup()) {
 	    				if (usuAvp.getAvpCode() == UsedServiceUnitAvp.AVP_CODE) {
 	    					for (Avp requestedUnits: ((DccGrouped)usuAvp).getValues()) {
 	    						// handle cc-total-octets
