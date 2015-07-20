@@ -17,7 +17,8 @@ public abstract class StackMap {
     }
     
     public static void removeSession(String label) {
-        stackIndex.remove(label);
+        if (label != null)
+            stackIndex.remove(label);
     }
     
     public static Esme getStack(String label) {
@@ -29,7 +30,8 @@ public abstract class StackMap {
     }
 
     public static void removeMessageIndex(String sequence) {
-        messageIndex.remove(sequence);
+        if (sequence != null)
+            messageIndex.remove(sequence);
     }
     
     public static String getEsmeLabel(String sequence) {
