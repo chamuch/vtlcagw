@@ -95,6 +95,7 @@ public class ScapChargingEndpoint implements IScapCharging {
         this.dccStack.getDiameterConfig().addSupportedVendor(this.supportedVendor);
         this.dccStack.getDiameterConfig().addSupportedVendor(10415);
         
+        
         LogService.appLog.debug("ScapChargingEndpoint-prepareStack:Sucess - Realm: " + this.originRealm + ", Address: " + this.ownTcpAddress);
         
     }

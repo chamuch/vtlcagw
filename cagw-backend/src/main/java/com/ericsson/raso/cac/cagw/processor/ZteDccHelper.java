@@ -19,7 +19,7 @@ public class ZteDccHelper {
 	private static final int	ZTE_DA_SUBSCRIPTION_ID	 = 20512;
 	private static final int    ZTE_CHARGING_TYPE        = 20515;
 	
-	public static int getTrafficCase(Ccr dccRequest) throws ServiceLogicException {
+	public static int getTrafficCase(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -40,7 +40,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static Avp getServiceInformation(Ccr dccRequest) {
+	public static Avp getServiceInformation(MmsDccCharge dccRequest) {
 		return dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 	}
 	
@@ -52,7 +52,7 @@ public class ZteDccHelper {
 		return ((DccGrouped) serviceInformation).getSubAvp(ZTE_ISMP_INFORMATION);
 	}
 	
-	public static Avp getOaSubscriptionId(Ccr dccRequest) throws ServiceLogicException {
+	public static Avp getOaSubscriptionId(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -68,7 +68,7 @@ public class ZteDccHelper {
 		return osiAvp;
 	}
 	
-	public static Avp getDaSubscriptionId(Ccr dccRequest) throws ServiceLogicException {
+	public static Avp getDaSubscriptionId(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -84,7 +84,7 @@ public class ZteDccHelper {
 		return osiAvp;
 	}
 	
-	public static int getOaSubscriptionIdType(Ccr dccRequest) throws ServiceLogicException {
+	public static int getOaSubscriptionIdType(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -109,7 +109,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static int getDaSubscriptionIdType(Ccr dccRequest) throws ServiceLogicException {
+	public static int getDaSubscriptionIdType(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -134,7 +134,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static String getOaSubscriptionIdData(Ccr dccRequest) throws ServiceLogicException {
+	public static String getOaSubscriptionIdData(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -159,7 +159,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static String getDaSubscriptionIdData(Ccr dccRequest) throws ServiceLogicException {
+	public static String getDaSubscriptionIdData(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -184,7 +184,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static int getServiceEnablerType(Ccr dccRequest) throws ServiceLogicException {
+	public static int getServiceEnablerType(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -205,7 +205,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static int getMessageId(Ccr dccRequest) throws ServiceLogicException {
+	public static int getMessageId(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -226,7 +226,7 @@ public class ZteDccHelper {
 		}
 	}
 	
-	public static String getSpId(Ccr dccRequest) throws ServiceLogicException {
+	public static String getSpId(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
 		if (serviceInformation == null)
 			throw new ServiceLogicException("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -247,7 +247,7 @@ public class ZteDccHelper {
 		}
 	}
 
-    public static String getChargingType(Ccr dccRequest) throws ServiceLogicException {
+    public static String getChargingType(MmsDccCharge dccRequest) throws ServiceLogicException {
         // TODO DCC-Req->Service-Info->ISMP->ChargingType
         Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
         if (serviceInformation == null)

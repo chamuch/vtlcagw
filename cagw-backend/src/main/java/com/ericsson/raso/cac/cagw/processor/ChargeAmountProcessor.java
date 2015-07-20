@@ -25,6 +25,8 @@ import com.ericsson.pps.diameter.dccapi.command.Ccr;
 import com.ericsson.pps.diameter.rfcapi.base.avp.Avp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
 import com.ericsson.pps.diameter.rfcapi.base.avp.EventTimestampAvp;
+import com.ericsson.pps.diameter.rfcapi.base.avp.ResultCodeAvp;
+import com.ericsson.pps.diameter.rfcapi.base.avp.SessionIdAvp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.avpdatatypes.Time;
 import com.ericsson.pps.diameter.rfcapi.base.message.BadMessageException;
 import com.ericsson.pps.diameter.rfcapi.base.message.NoRouteException;
@@ -49,69 +51,112 @@ public class ChargeAmountProcessor implements Processor {
 	
 	@Override
 	public void process(Exchange exchange) throws Exception {
+	    MmsDccCharge response = null;
 	    Cca scapResponse = null;
-        Cca dccResponse = null;
-	    Ccr dccRequest = (Ccr) exchange.getIn().getBody();
-	    LogService.stackTraceLog.info("MMS DCC Request>> " + dccRequest.toString());
+	    MmsDccCharge mmsRequest = (MmsDccCharge) exchange.getIn().getBody();
+	    LogService.stackTraceLog.info("MMS DCC Request>> " + mmsRequest.toString());
         
 		try {
-		    LogService.appLog.debug("Preparing SCAP Request for MMS DCC Request# " + dccRequest.getSessionId());
-            Ccr scapRequest = this.getScapRequest(dccRequest);
+		    LogService.appLog.debug("Preparing SCAP Request for MMS DCC Request# " + mmsRequest.getSessionId());
+            Ccr scapRequest = this.getScapRequest(mmsRequest);
 	        
             LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC>> " + scapRequest.toString());
             scapResponse = scapRequest.send();
             LogService.stackTraceLog.info("Received SCAP CCA Response from OCC>> " + scapResponse.toString());
             
-            dccResponse = new Cca(dccRequest, scapResponse.getResultCode());
-	        //TODO: SCAP Response ==> (Granted Units, Cost Info)
-	        //TODO: DCC Response -- need to add params based on customer inputs, during integration testing.
-	        
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+            response = this.getResponse(mmsRequest, scapResponse, scapResponse.getResultCode());
+            
+            LogService.stackTraceLog.info("MMS DCC Response>> " + response.toString());
+            exchange.getOut().setBody(response);
 	        
 	        LogService.appLog.debug("ChargeAmountProcessor-process:Done.SessionId:"+scapRequest.getSessionId()
 	        		+":ResultCode"+scapResponse.getResultCode());
 		} catch (NoRouteException e) {
 			LogService.appLog.debug("ChargeAmountProcessor-process:No Diamter Peer available based on the Stack Config & Request Parameters!!",e);
-			dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-			LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+			mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+			LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
 		} catch (BadMessageException e) {
 			LogService.appLog.debug("ChargeAmountProcessor-process:Request rejected by OCC/CCN!!",e);
-            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
 		} catch (URISyntaxException e) {
 			LogService.appLog.debug("ChargeAmountProcessor-process:Bad Peer configuration for the route!!",e);
-            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
 		} catch (UnknownServiceException e) {
 			LogService.appLog.debug("ChargeAmountProcessor-process:Bad Stack Configuration - Service!!",e);
-            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
 		} catch (AvpDataException e) {
 			LogService.appLog.debug("ChargeAmountProcessor-process:Presentation Tier Failure for Raquest Parameter!!",e);
-            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
 		} catch (IOException e) {
 			LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",e);
-            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
 		} catch (Exception genE){//Added for debugging
 			LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",genE);
-            dccResponse = new Cca(dccRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
-            LogService.stackTraceLog.info("MMS DCC Response>> " + dccResponse.toString());
-            exchange.getOut().setBody(dccResponse);
-		}
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
+		} catch (Error genE){//Added for debugging
+            LogService.appLog.debug("ChargeAmountProcessor-process:Transport Tier Failure for Raquest!!",genE);
+            mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+            LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
+            exchange.getOut().setBody(mmsRequest);
+            return;
+        }
 				
 		LogService.appLog.info("Exiting from DIRECT_DEBIT ChargeAmountProcessor");
 	}
 
-	private Ccr getScapRequest(Ccr dccRequest) throws ServiceLogicException {
+	private MmsDccCharge getFailedResponse(MmsDccCharge mmsRequest, int code) {
+	        try {
+	            mmsRequest.setResultCode(new ResultCodeAvp(code));
+	           
+	        } catch (Error e) {
+	            LogService.appLog.error("Unable to read from SCAP DIAMETER Message. Returning error respose");
+	            mmsRequest.setResultCode(new ResultCodeAvp(ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode()));
+	        }
+	        return mmsRequest;
+	}
+
+    private MmsDccCharge getResponse(MmsDccCharge mmsRequest, Cca scapResponse, Long resultCode) {
+        MmsDccCharge response = new MmsDccCharge();
+        try {
+            response.setResultCode(new ResultCodeAvp(resultCode));
+            response.addAvp(new CCRequestNumberAvp(scapResponse.getCCRequestNumber()));
+            response.addAvp(new CCRequestTypeAvp(scapResponse.getCCRequestType()));
+            response.addAvp(new SessionIdAvp(scapResponse.getSessionId()));
+
+            //TODO: SCAP Response ==> (Granted Units, Cost Info)
+            //TODO: DCC Response -- need to add params based on customer inputs, during integration testing.
+
+        } catch (AvpDataException e) {
+            LogService.appLog.error("Unable to read from SCAP DIAMETER Message. Returning error respose");
+            response.setResultCode(new ResultCodeAvp(ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode()));
+        } catch (Error e) {
+            LogService.appLog.error("Unable to read from SCAP DIAMETER Message. Returning error respose");
+            response.setResultCode(new ResultCodeAvp(ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode()));
+        }
+        return response;
+    }
+
+    private Ccr getScapRequest(MmsDccCharge dccRequest) throws ServiceLogicException {
 	    Ccr scapCcr = null;
 	    ScapChargingEndpoint scapStack = (ScapChargingEndpoint) SpringHelper.getScapDiameter();
 	    try {
@@ -136,14 +181,14 @@ public class ChargeAmountProcessor implements Processor {
 	    	
 	    	
 	    	// MSSC
-	    	if (dccRequest.getMultipleServicesIndicator() != null) {
+	    	if (dccRequest.getAvp(455) != null) { // MSCC Indicator
 	    		//TODO: MSSCC Ind to be confirmed by Per
 	    		//scapCcr.addAvp(new MultipleServicesIndicatorAvp(dccRequest.getMultipleServicesIndicator())); 
 	    		
 	    		// viettel specific (as instructed by Per)
 	    		RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
 	    		
-	    		for (Avp msccAvp: dccRequest.getMultipleServicesCreditControlArray()) {
+	    		for (Avp msccAvp: dccRequest.getAvp(456).getDataAsGroup()) { // MSCC Array Avp
 	    			for (Avp usuAvp: ((DccGrouped)msccAvp).getValues()) {
 	    				if (usuAvp.getAvpCode() == UsedServiceUnitAvp.AVP_CODE) {
 	    					for (Avp requestedUnits: ((DccGrouped)usuAvp).getValues()) {

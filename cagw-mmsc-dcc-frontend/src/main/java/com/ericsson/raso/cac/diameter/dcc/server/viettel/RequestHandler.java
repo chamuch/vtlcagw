@@ -50,21 +50,25 @@ public class RequestHandler implements ApplicationRequestListener {
             	logMsg.append(":DestinationRealm:");logMsg.append(dccRequest.getDestinationHost());
             	LogService.appLog.debug("RequestHandler-ProcessRequest:Sending Request.."+logMsg.toString());
             	
+            	
+            	MmsDccCharge charge = new MmsDccCharge();
+            	charge.addAvps(request.getAvps());
+            	
             	DiameterAnswer response = null;
-                try {
-                    Cca dccResponse = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, dccRequest, "fe", "mmsc", Cca.class);
-                    logMsg.append(":ResultCode:");logMsg.append(dccResponse.getResultCode());
-                    LogService.stackTraceLog.debug("RequestHandler-ProcessRequest:Received Response.."+logMsg.toString());
-                    
-                    response = createAnswer(request, dccResponse.getResultCode());
-                //TODO: based on CCA response from cagw-backend, copy relevant AVPs back.
-                } catch(AvpDataException e) {
+            	try {
+            	    LogService.stackTraceLog.info("BACKEND.REQ>> " + charge);
+            	    charge = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, charge, "fe", "mmsc", MmsDccCharge.class);
+            	    LogService.stackTraceLog.info("BACKEND.RES>> " + charge);
+            	    response = createAnswer(request, charge.getResultCode().getAsLong());
+            	} catch(AvpDataException e) {
                     response = createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
                 } catch (CamelExecutionException e) {
                     response = createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+                } catch (Error e) {
+                    response = createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
                 }
-                
-                com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+ 
+            	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                 
                 return response;
             } else {
@@ -105,6 +109,8 @@ public class RequestHandler implements ApplicationRequestListener {
         if (authAvp != null) {
             answer.getDiameterMessage().add(authAvp);
         }
+        
+        //TODO: Add other avps from mmscharge based on integration inputs from Viettel
         return answer;
     }
 
