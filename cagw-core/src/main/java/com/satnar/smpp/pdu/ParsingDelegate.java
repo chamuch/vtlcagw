@@ -107,6 +107,13 @@ public class ParsingDelegate implements Callable<Void> {
                             try {
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
                             } catch (CamelExecutionException e) {
+                                LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
+                                response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                            } catch (Exception e) {
+                                LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
+                                response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                            } catch (Error e) {
+                                LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                             }
                         }
@@ -114,8 +121,16 @@ public class ParsingDelegate implements Callable<Void> {
                             try {
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
                             } catch (CamelExecutionException e) {
+                                LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
+                                response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                            } catch (Exception e) {
+                                LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
+                                response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
+                            } catch (Error e) {
+                                LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                             }
+                            
                         }
                     	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                     } else {
