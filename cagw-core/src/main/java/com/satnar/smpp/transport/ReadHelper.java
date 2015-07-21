@@ -87,7 +87,7 @@ public class ReadHelper implements Runnable {
                                 int pduLength = parser.readInt();
                                 LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes");
                                 if ( (pduLength - 4) <= parser.available() ){
-                                    LogService.appLog.debug("Next PDU payload has (" + pduLength + ") bytes to read & process");
+                                    LogService.appLog.debug("Sliding Window has (" + pduLength + ") bytes to read & process");
                                     
                                     byte[] pduPayload = new byte[pduLength - 4];
                                     parser.read(pduPayload);

@@ -62,103 +62,104 @@ public class ParsingDelegate implements Callable<Void> {
         if (pduName != null) {
             switch (pduName) {
                 case GENERIC_NACK:
-                    LogService.appLog.debug("GNACK Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - GNACK Received and delegated", this.esmeLabel));
                     EsmeHelper.handleGNack(rawPdu);
                     return null;
                 case BIND_RECEIVER_RESP:
-                    LogService.appLog.debug("BIND_RECEIVER_RESP Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - BIND_RECEIVER_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleBindReceiverResponse(rawPdu);
                     return null;
                 case BIND_TRANSCEIVER_RESP:
-                    LogService.appLog.debug("BIND_TRANSCEIVER_RESP Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - BIND_TRANSCEIVER_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleBindTransceiverResponse(rawPdu);
                     return null;
                 case BIND_TRANSMITTER_RESP:
-                    LogService.appLog.debug("BIND_TRANSMITTER_RESP Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - BIND_TRANSMITTER_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleBindTransmitterResponse(rawPdu);
                     return null;
                 case DELIVER_SM:
-                    LogService.appLog.debug("DELIVER_SM Received and delegated");
-                    if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress())
+                    LogService.appLog.debug(String.format("Session: %s - DELIVER_SM Received and delegated", this.esmeLabel));
+                    if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()) {
                         EsmeHelper.handleDeliverSmRequest(rawPdu);
-                    else
+                        com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+                    } else
                         EsmeHelper.sendDeliverSmThrottled(rawPdu);
-                    com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     return null;
                 case ENQUIRE_LINK:
-                    LogService.appLog.debug("ENQUIRE_LINK Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK Received and delegated", this.esmeLabel));
                     EsmeHelper.handleEnquireLinkRequest(rawPdu, this.esmeLabel, this.channelMode);
                     return null;
                 case ENQUIRE_LINK_RESP:
-                    LogService.appLog.debug("ENQUIRE_LINK_RESP Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleEnquireLinkResponse(rawPdu);
                     return null;
                 default:
-                    LogService.appLog.debug("UNKNOWN/EXTENDED Received and delegated");
+                    LogService.appLog.debug(String.format("Session: %s - UNKNOWN/EXTENDED Received and delegated", this.esmeLabel));
                     pdu = SpringHelper.getSmppPduImplementation(Integer.toHexString(commandId));
                     pdu.decode(rawPdu);
 
                     // this is where we throw the event to backend for processing...
-                    LogService.appLog.debug("ParsingDeligate-call:Sending request to cagw-backend!!:CommandId:"+pdu.getCommandId().name()+"CommandSequence:"+pdu.getCommandSequence().getValue());
+                    LogService.appLog.debug(String.format("Session: %s - Sending request to cagw-backend!!:CommandId: %s, Sequence: %s", this.esmeLabel, pdu.getCommandId(), 
+                            pdu.getCommandSequence().getValue()));
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
-                        LogService.appLog.info(String.format("Delegating ingress to backend for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
+                        LogService.appLog.info(String.format("Session: %s - Watergate approved ingress!!:CommandId: %s, Sequence: %s", this.esmeLabel, pdu.getCommandId(), 
+                                pdu.getCommandSequence().getValue()));
                         if (pdu.getCommandId().getId() == CommandId.AUTH_ACC.getId()) {
                             try {
-                                LogService.stackTraceLog.info("BACKEND REQ>> " + pdu.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND REQ>> %s", this.esmeLabel, pdu));
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (AuthAcc)pdu, "fe", "auth_acc", AuthAccResponse.class);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             } catch (CamelExecutionException e) {
                                 LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             } catch (Exception e) {
-                                LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
+                                LogService.appLog.error("CatchAll Execution Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             } catch (Error e) {
-                                LogService.appLog.error("CAMEL Execution Failure for AUTH_ACC.", e);
+                                LogService.appLog.error("Runtime Error Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             }
                         }
                         if (pdu.getCommandId().getId() == CommandId.SM_RESULT_NOTIFY.getId()) {
                             try {
-                                LogService.stackTraceLog.info("BACKEND REQ>> " + pdu.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND REQ>> %s", this.esmeLabel, pdu));
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             } catch (CamelExecutionException e) {
                                 LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             } catch (Exception e) {
-                                LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
+                                LogService.appLog.error("CatchAll Execution Failure for AUTH_ACC.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             } catch (Error e) {
-                                LogService.appLog.error("CAMEL Execution Failure for SM_RESULT_NOTIFY.", e);
+                                LogService.appLog.error("Runtime Error Failure for AUTH_ACC.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
-                                LogService.stackTraceLog.info("BACKEND RES>> " + response.toString());
+                                LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             }
                             
                         }
-                    	LogService.appLog.debug("ParsingDeligate-call:Received response:CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
                     } else {
-                        LogService.stackTraceLog.info(String.format("Throttling ingress for Command: %s & Sequence: %s", pdu.getCommandId(), pdu.getCommandSequence().getValue()));
+                        LogService.stackTraceLog.info(String.format("Session: %s - Throttling ingress for Command: %s & Sequence: %s", this.esmeLabel, pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         EsmeHelper.sendThrottledResponse(pdu, this.channelMode);
                     }
                     
                     if ((commandId & EsmeHelper.REQUEST_MASK) == EsmeHelper.REQUEST_MASK) {                         
-                        LogService.appLog.debug("ParsingDeligate-call:Sending response for :CommandId:"+pdu.getCommandId().name()+":CommandSequence:"+pdu.getCommandSequence().getValue()+":Command Status:"+response.getCommandStatus().name());
-                        String sessionId = StackMap.getEsmeLabel("" + pdu.getCommandSequence().getValue());
-                        if (sessionId != null) {
-                            LogService.appLog.debug(String.format("Found session %s for request.sequence: %s", sessionId, pdu.getCommandSequence().getValue()));
-                            Esme session = StackMap.getStack(sessionId);
-                            if (session != null) {
-                                LogService.appLog.debug(String.format("Found session %s is available: %s", sessionId, (session != null)));
-                                session.sendPdu(response, this.channelMode);
-                            }
+                        LogService.appLog.debug(String.format("Session: %s - Sending response for CommandId: %s, Sequence: %s, with Status: %s", this.esmeLabel, 
+                                pdu.getCommandId(), pdu.getCommandSequence(), response.getCommandStatus()));
+                        Esme session = StackMap.getStack(this.esmeLabel);
+                        if (session != null) {
+                            LogService.appLog.debug(String.format("Found session %s is available: %s", this.esmeLabel, (session != null)));
+                            session.sendPdu(response, this.channelMode);
+                        } else {
+                            LogService.appLog.error("Unable to find the session: %s to send a response back!!", this.esmeLabel);
                         }
+                        
                     }
                     com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     return null;
