@@ -10,7 +10,7 @@ import com.satnar.common.LogService;
 
 public class ZteDccHelper {
 	
-    public static final int ZTE_SERVICE_INFORMATION  = 873;
+    public static final int ZTE_SERVICE_INFORMATION  = 873; 
     public static final int ZTE_ISMP_INFORMATION     = 20500;
     public static final int ZTE_MESSAGE_ID           = 20501;
     public static final int ZTE_CHARGE_PARTY_TYPE    = 20502;

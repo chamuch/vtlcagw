@@ -14,7 +14,7 @@ import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.pdu.ParsingDelegate;
 
-public class ReadHelper implements Runnable {
+public class ReadHelper implements Runnable { 
     
     private boolean         canRun         = true;
     private Connection      smppConnection = null;

@@ -3,7 +3,6 @@ package com.ericsson.raso.cac.cagw.processor;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.UnknownServiceException;
-import java.security.Timestamp;
 import java.util.Date;
 
 import org.apache.camel.Exchange;
@@ -20,7 +19,6 @@ import com.ericsson.pps.diameter.dccapi.avp.RequestedServiceUnitAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceIdentifierAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceParameterInfoAvp;
 import com.ericsson.pps.diameter.dccapi.avp.UsedServiceUnitAvp;
-import com.ericsson.pps.diameter.dccapi.avp.avpdatatypes.DccGrouped;
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
 import com.ericsson.pps.diameter.rfcapi.base.avp.Avp;

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.satnar.common.LogService;
 
-public class LazyWriteBuffer {
+public class LazyWriteBuffer { 
     
     private String esmeLabel = null;
     private ByteArrayOutputStream lazyBuffer = null;

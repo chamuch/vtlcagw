@@ -21,7 +21,7 @@ import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.ChannelMode;
 import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.client.EsmeHelper;
-
+ 
 public class ParsingDelegate implements Callable<Void> {
     
     private static final String     processingEndpoint = "seda:cagw-backend";

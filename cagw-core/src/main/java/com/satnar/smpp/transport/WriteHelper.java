@@ -11,7 +11,7 @@ import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.codec.SmppCodecException;
 import com.satnar.smpp.pdu.SmppPdu;
 
-public class WriteHelper {
+public class WriteHelper { 
     
     private int lazyWritePeriod = 0;
     private Timer lazyWriteSchedule = null;
