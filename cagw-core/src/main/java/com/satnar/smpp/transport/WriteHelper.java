@@ -21,7 +21,7 @@ public class WriteHelper {
     
     public WriteHelper(Connection connection) {
         this.smppConnection = connection;
-        this.lazyWriteBuffer = new LazyWriteBuffer();
+        this.lazyWriteBuffer = new LazyWriteBuffer(this.smppConnection.getEsmeLabel());
         lazyWritePeriod = this.smppConnection.getLazyWriteWait();
         this.lazyWriteSchedule = new Timer("LazyWriter-" + this.smppConnection.getEsmeLabel());
         LogService.appLog.info("Lazy Writer Scheduled with Frequency: " + this.lazyWritePeriod);
@@ -130,7 +130,8 @@ public class WriteHelper {
                         this.connection.getConnectionState() == SmppSessionState.BOUND_TX ||
                         this.connection.getConnectionState() == SmppSessionState.BOUND_TRX) {
                     
-                    LogService.appLog.debug("LazyWriter - connection state:" + this.connection.getConnectionState() + ", valid for write!!");
+                    LogService.appLog.debug(String.format("Session: %s - LazyWriter check connection state: %s, valid for write!!", 
+                            this.connection.getEsmeLabel(), this.connection.getConnectionState()));
                     if (this.lazyWriteBuffer.hasContent()) {
                         ByteBuffer writeBuffer = this.connection.getRequestBuffer();
                         synchronized (writeBuffer) {
@@ -142,14 +143,13 @@ public class WriteHelper {
                             LogService.stackTraceLog.debug(this.connection.getEsmeLabel() + " - flushed transmission window");
                         }
                     } else {
-                        LogService.appLog.debug("LazyWriter - nothing to flush");
+                        LogService.appLog.debug(String.format("Session: %s - LazyWriter - nothing to flush", this.connection.getEsmeLabel()));
                     }
                 }
                 
             } catch (SmppTransportException e) {
                 if (e.getCause() != null && e.getCause() instanceof IOException) {
-                    //TODO: Log - socket seems to be broken.
-                	LogService.stackTraceLog.debug("WriteHelper-LazyWriterTask-run:socket seems to be broken.");
+                    LogService.stackTraceLog.debug(String.format("Session: %s - LazyWriter: socket seems to be broken.", this.connection.getEsmeLabel()));
                     Esme session = StackMap.getStack(this.connection.getEsmeLabel());
                     session.stop();
                 }

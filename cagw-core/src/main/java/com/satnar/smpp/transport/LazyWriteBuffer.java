@@ -7,11 +7,16 @@ import com.satnar.common.LogService;
 
 public class LazyWriteBuffer {
     
+    private String esmeLabel = null;
     private ByteArrayOutputStream lazyBuffer = null;
+    
+    public LazyWriteBuffer(String esmeLabel) {
+        this.esmeLabel = esmeLabel;
+    }
     
     public synchronized void write(byte[] payload) {
         if (payload == null || payload.length == 0) {
-            LogService.appLog.debug("payload was empty/null... No action!!");
+            LogService.appLog.debug(String.format("Session: %s - payload was empty/null... No action!!", this.esmeLabel));
             return;
         }
         
@@ -20,36 +25,38 @@ public class LazyWriteBuffer {
         
         try {
             lazyBuffer.write(payload);
-            LogService.appLog.info("Buffering payload for size: " + payload.length + ", current lazy buffer size: " + this.lazyBuffer.size());
+            LogService.appLog.info(String.format("Session: %s - Buffering payload for size: %s, current lazy buffer size: ", this.lazyBuffer.size(), payload.length));
         } catch (IOException e) {
-            LogService.appLog.error("Unable to buffer lazy write payload for size: " + payload.length);
+            LogService.appLog.error(String.format("Session: %s - Unable to buffer lazy write payload for size: %s", this.esmeLabel, payload.length));
         }
     }
     
     public boolean readyToTransmit() {
         if (this.lazyBuffer == null) {
-            LogService.appLog.debug("Lazy Buffer has no content!! Not ready to transmit");
+            LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!! Not ready to transmit", this.esmeLabel));
             return false;
         }
         
-        LogService.appLog.debug("Current Lazy Buffer Size: " + this.lazyBuffer.size());
         if (this.lazyBuffer.size() > 1000) {
+            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return true;
         } else {
+            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Not Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return false;
         }
     }
     
     public boolean hasContent() {
         if (this.lazyBuffer == null) {
-            LogService.appLog.debug("Lazy Buffer has no content!!");
+            LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!!", this.esmeLabel));
             return false;
         }
         
-        LogService.appLog.debug("Current Lazy Buffer Size: " + this.lazyBuffer.size());
         if (this.lazyBuffer.size() > 0) {
+            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return true;
         } else {
+            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Not Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return false;
         }
     }
