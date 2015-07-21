@@ -51,20 +51,31 @@ public class RequestHandler implements ApplicationRequestListener {
             	LogService.appLog.debug("RequestHandler-ProcessRequest: Handling Request.."+logMsg.toString());
             	
             	
-            	MmsDccCharge charge = new MmsDccCharge();
-            	charge.addAvps(request.getAvps());
+            	MmsDccCharge chargeRequest = new MmsDccCharge();
+            	chargeRequest.addAvps(request.getAvps());
             	
             	DiameterAnswer response = null;
+            	MmsDccCharge chargeResponse = null;
             	try {
-            	    LogService.stackTraceLog.info("BACKEND.REQ>> " + charge);
-            	    charge = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, charge, "fe", "mmsc", MmsDccCharge.class);
-            	    LogService.stackTraceLog.info("BACKEND.RES>> " + charge);
-            	    response = createAnswer(request, charge.getResultCode().getAsLong());
+            	    LogService.stackTraceLog.info("BACKEND.REQ>> " + chargeRequest);
+            	    chargeResponse = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, chargeRequest, "fe", "mmsc", MmsDccCharge.class);
+            	    LogService.stackTraceLog.info("BACKEND.RES>> " + chargeRequest);
+            	    
+            	    if (chargeResponse == null) {
+                        LogService.appLog.error("Null Response for MMS DCC CCR. Could be timedout or unmarshall error");
+                        response = createAnswer(request, ResultCode.DIAMETER_TOO_BUSY.getCode());
+            	    } else {
+                        LogService.appLog.info("Converting Response into MMS DCC CCR. pdu: " + chargeResponse);
+                        response = createAnswer(request, chargeResponse.getResultCode().getAsLong());
+            	    }
             	} catch(AvpDataException e) {
+                    LogService.appLog.error("CAMEL Execution Failure for MMS DCC CCR.", e);
                     response = createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
                 } catch (CamelExecutionException e) {
+                    LogService.appLog.error("General Execution Failure for MMS DCC CCR.", e);
                     response = createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
                 } catch (Error e) {
+                    LogService.appLog.error("Runtime Error for MMS DCC CCR.", e);
                     response = createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
                 }
  
