@@ -192,23 +192,25 @@ public class ChargeAmountProcessor implements Processor {
             {
 	    	    RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
 	    	    
-	    	    Avp siAvp = mmsDccChargeRequest.getAvp(ZteDccHelper.ZTE_SERVICE_INFORMATION);
-	    	    if (siAvp == null) {
-	    	        LogService.appLog.error(String.format("Cannot find ZTE Service Infor (avpCode: %s) in mms dcc charge request", ZteDccHelper.ZTE_SERVICE_INFORMATION));
-	    	        throw new ServiceLogicException(String.format("Cannot find MSCCArray(avpCode: %s) in mms dcc charge request", ZteDccHelper.ZTE_SERVICE_INFORMATION));
-	    	    }
+//	    	    Avp siAvp = mmsDccChargeRequest.getAvp(ZteDccHelper.ZTE_SERVICE_INFORMATION);
+//	    	    if (siAvp == null) {
+//	    	        LogService.appLog.error(String.format("Cannot find ZTE Service Infor (avpCode: %s) in mms dcc charge request", ZteDccHelper.ZTE_SERVICE_INFORMATION));
+//	    	        throw new ServiceLogicException(String.format("Cannot find MSCCArray(avpCode: %s) in mms dcc charge request", ZteDccHelper.ZTE_SERVICE_INFORMATION));
+//	    	    }
 	    	    
-	    	    Avp msccAvp = ZteDccHelper.getSubAvp(siAvp, 456);
-	    	    if (msccAvp == null) {
+//	    	    Avp msccAvp = ZteDccHelper.getSubAvp(siAvp, 456);
+	    	    Avp msccAvp = mmsDccChargeRequest.getAvp(456);
+                if (msccAvp == null) {
 	    	        LogService.appLog.error(String.format("Cannot find MSCCArray(avpCode: %s) in mms dcc charge request", MultipleServicesCreditControlAvp.AVP_CODE));
 	    	        throw new ServiceLogicException(String.format("Cannot find MSCCArray(avpCode: %s) in mms dcc charge request", MultipleServicesCreditControlAvp.AVP_CODE));
 	    	    }
 	    	    
-	    	    Avp usuAvp = ZteDccHelper.getSubAvp(msccAvp, UsedServiceUnitAvp.AVP_CODE);
+	    	    Avp usuAvp = ZteDccHelper.getSubAvp(msccAvp, 446); // ZTE Used Service Unit
 	    	    if (usuAvp == null) {
 	    	        LogService.appLog.error(String.format("Cannot find UsedServiceUnitAvp(avpCode: %s) in mms dcc charge request", UsedServiceUnitAvp.AVP_CODE));
 	    	        throw new ServiceLogicException(String.format("Cannot find UsedServiceUnitAvp(avpCode: %s) in mms dcc charge request", UsedServiceUnitAvp.AVP_CODE));
 	    	    }
+	    	    
 	    	    
 	    	    Avp cctoAvp = ZteDccHelper.getSubAvp(usuAvp, CCTotalOctetsAvp.AVP_CODE);
 	    	    if (cctoAvp != null) {
