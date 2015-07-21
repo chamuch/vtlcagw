@@ -4,13 +4,17 @@
 	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:q0="http://nsn.com/ossbss/charge.once/wsdl/entity/Tis/xsd/1"
 	xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:osgi="http://www.springframework.org/schema/osgi"
 	xmlns:cxf="http://camel.apache.org/schema/cxf" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:cxfcore="http://cxf.apache.org/core"
+	xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
 	xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
-       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd">
 
 	<import resource="classpath:META-INF/cagw-core/beans.xml" />
 
@@ -72,22 +76,37 @@
 			value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse" />
 	</bean>
 
-	<bean id="gsonCcr" class="org.apache.camel.component.gson.GsonDataFormat">
-		<property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Ccr" />
+	<bean id="gsonMmsc" class="org.apache.camel.component.gson.GsonDataFormat">
+		<property name="unmarshalType"
+			value="com.ericsson.raso.cac.cagw.processor.MmsDccCharge" />
 	</bean>
 
+	<cxfcore:bus name="cagwBackendEngine" />
 
-	<bean id="gsonCca" class="org.apache.camel.component.gson.GsonDataFormat">
-		<property name="unmarshalType" value="com.ericsson.pps.diameter.dccapi.command.Cca" />
-	</bean>
+	<httpj:engine-factory bus="cagwBackendEngine">
+		<httpj:engine port="9090">
+			<httpj:threadingParameters minThreads="50"
+				maxThreads="500" />
+			<httpj:sessionSupport>false</httpj:sessionSupport>
+			<httpj:reuseAddress>true</httpj:reuseAddress>
+		</httpj:engine>
+	</httpj:engine-factory>
 
-	<cxf:rsServer id="cgeServer" address="http://0.0.0.0:9090/cagw-backend/"
-		serviceClass="com.ericsson.raso.cac.cagw.web.CagwBackendRestEndpoint" />
+	<cxf:rsServer id="cgeServer" bus="cagwBackendEngine"
+		address="http://0.0.0.0:9090/cagw-backend/" serviceClass="com.ericsson.raso.cac.cagw.web.CagwBackendRestEndpoint" />
 
 	<camelContext id="com.ericsson.raso.cac.cagw" xmlns="http://camel.apache.org/schema/spring">
 		<route id="cg-engine-route">
 			<from uri="cxfrs://bean://cgeServer" />
 			<camel:doTry>
+				<camel:when>
+					<camel:simple>${header.fe} == 'mmsc'</camel:simple>
+					<camel:unmarshal ref="gsonMmsc" />
+					<camel:log message="From Backend :${body}" />
+					<camel:bean
+						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+					<camel:marshal ref="gsonMmsc" />
+				</camel:when>
 				<camel:when>
 					<camel:simple>${header.fe} == 'auth_acc'</camel:simple>
 					<camel:unmarshal ref="gsonAuthAcc" />
@@ -104,19 +123,8 @@
 						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
 					<camel:marshal ref="gsonSmResultNotifyResponse" />
 				</camel:when>
-				<camel:when>
-					<camel:simple>${header.fe} == 'mmsc'</camel:simple>
-					<camel:unmarshal ref="gsonCcr" />
-					<camel:log message="From Backend :${body}" />
-					<camel:bean
-						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
-					<camel:marshal ref="gsonCca" />
-				</camel:when>
 				<camel:doCatch>
 					<camel:exception>java.lang.Exception</camel:exception>
-					<!-- <setHeader headerName="exception">
-						<simple>${exception.stacktrace}</simple>
-					</setHeader> -->
 					<camel:log message="From Backend Exception: ${exception.stacktrace}" />
 				</camel:doCatch>
 				<camel:doFinally>
