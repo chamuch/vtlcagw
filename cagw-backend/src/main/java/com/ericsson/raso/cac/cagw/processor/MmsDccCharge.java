@@ -8,6 +8,7 @@ import java.util.Map;
 import com.ericsson.pps.diameter.rfcapi.base.avp.Avp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
 import com.ericsson.pps.diameter.rfcapi.base.avp.ResultCodeAvp;
+import com.satnar.common.LogService;
 
 public class MmsDccCharge {
     private Map<Integer, Avp> avpList = new HashMap<Integer, Avp>();
@@ -41,6 +42,7 @@ public class MmsDccCharge {
     }
     
     public Avp getAvp(int avpCode) {
+        LogService.appLog.debug(String.format("Looking for avpCode: %s in request AvpList", avpCode));
         return this.avpList.get(avpCode);
     }
     
