@@ -10,15 +10,15 @@ import com.satnar.common.LogService;
 
 public class ZteDccHelper {
 	
-	private static final int	ZTE_SERVICE_INFORMATION	 = 873;
-	private static final int	ZTE_ISMP_INFORMATION	 = 20500;
-	private static final int	ZTE_MESSAGE_ID	         = 20501;
-	private static final int	ZTE_CHARGE_PARTY_TYPE	 = 20502;
-	private static final int	ZTE_SP_ID	             = 20504;
-	private static final int	ZTE_SERVICE_ENABLER_TYPE = 20505;
-	private static final int	ZTE_OA_SUBSCRIPTION_ID	 = 20511;
-	private static final int	ZTE_DA_SUBSCRIPTION_ID	 = 20512;
-	private static final int    ZTE_CHARGING_TYPE        = 20515;
+    public static final int ZTE_SERVICE_INFORMATION  = 873;
+    public static final int ZTE_ISMP_INFORMATION     = 20500;
+    public static final int ZTE_MESSAGE_ID           = 20501;
+    public static final int ZTE_CHARGE_PARTY_TYPE    = 20502;
+    public static final int ZTE_SP_ID                = 20504;
+    public static final int ZTE_SERVICE_ENABLER_TYPE = 20505;
+    public static final int ZTE_OA_SUBSCRIPTION_ID   = 20511;
+    public static final int ZTE_DA_SUBSCRIPTION_ID   = 20512;
+    public static final int ZTE_CHARGING_TYPE        = 20515;
 	
 	public static int getTrafficCase(MmsDccCharge dccRequest) throws ServiceLogicException {
 		Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
