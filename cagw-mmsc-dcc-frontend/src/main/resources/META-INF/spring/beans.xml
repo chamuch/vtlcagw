@@ -89,8 +89,8 @@
 				<camel:log message="BackendUrl:${{Mmsc_Cagw_BackendUrl}}" />
 				<camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process">
 				</camel:to>
-				<camel:log message="Exit MMSC front end camel route:${body}" />
 				<camel:unmarshal ref="gson" />
+				<camel:log message="Exit MMSC front end camel route:${body}" />				
 				<camel:doCatch>
 					<camel:exception>java.lang.Exception</camel:exception>
 					<camel:log message="From MMSC FrontEnd Exception: ${exception.stacktrace}" />
