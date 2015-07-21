@@ -58,7 +58,7 @@
 		<property name="camelContext" ref="com.ericsson.raso.cac.mmsdccfe" />
 		<property name="maxTotalConnections" value="500" />
 		<property name="connectionsPerRoute" value="500" />
-		<!-- <property name="connectionTimeToLive" value="1000" /> -->
+		<property name="connectionTimeToLive" value="120000" />
 	</bean>
 
 	<!-- Routing request to cagw-backend over REST -->
