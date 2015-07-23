@@ -284,13 +284,13 @@ public class SmsChargingProcessor implements Processor {
 	        spiAvp = ChargingHelper.createSPI(500, smppRequest.getSmId().getString()); // message id
 	        dccCcr.addAvp(spiAvp);
             
-	        spiAvp = ChargingHelper.createSPI(300, OtherPartyIdTypeAvp.END_USER_E164); // source addr type
+	        spiAvp = ChargingHelper.createSPI(300, Integer.toString(OtherPartyIdTypeAvp.END_USER_E164)); // source addr type
 	        dccCcr.addAvp(spiAvp);
 
 	        spiAvp = ChargingHelper.createSPI(301, smppRequest.getSourceAddress().getString()); // source addr
 	        dccCcr.addAvp(spiAvp);
 
-	        spiAvp = ChargingHelper.createSPI(302, OtherPartyIdTypeAvp.END_USER_E164); // destn addr type
+	        spiAvp = ChargingHelper.createSPI(302, Integer.toString(OtherPartyIdTypeAvp.END_USER_E164)); // destn addr type
 	        dccCcr.addAvp(spiAvp);
 
 	        spiAvp = ChargingHelper.createSPI(303, smppRequest.getDestinationAddress().getString()); // destn addr
