@@ -64,40 +64,55 @@ public class SmsScapEdrConsumer {
                     txn.setAmount(amounts);
                     txn.setAccountType(accountTypes);
                     txn.setChargeStatus(true);*/
-                txn.setSourceAddress(fields[0]);
-                txn.setDestinationAddress(fields[1]);
-                txn.setChargedParty(fields[2]);
-                txn.setMessageId(fields[3]);
-                txn.setChargingSessionId(fields[5]); 
+                System.out.println("From file messageid:"+fields[3]+":SourceAddress:"+fields[0]+":DestinationAddress:"+fields[1]);
+                txn = new TransactionDao().fetchSmsCharging(fields[3],fields[0],fields[1]);
                 
-                Transaction dbTxn = new TransactionDao().fetchSmsCharging(txn.getMessageId(), 
-    		            txn.getSourceAddress(), 
-    		            txn.getDestinationAddress());
-                
-                if(fields.length > 6){
-                	String accounts = "";
-                    String amounts = "";
-                    String accountTypes = "";
-                	String[] daList = fields[6].split(SEMI_COLON);//split with semi colon
-                	for(int i=1; i< daList.length; i++){
-                        String[] accountInfo = daList[i].split(ACCT_DELIM);
-                        if (accounts.length() > 0) { accounts += PIPE; }
-                        accounts += accountInfo[0];
-                        if (amounts.length() > 0) { amounts += PIPE; }
-                        amounts += accountInfo[0];
-                        if (accountTypes.length() > 0) { accountTypes += PIPE; }
-                        accountTypes += accountInfo[0];
-                	}
-                    txnHelper.updateSmsCharging(dbTxn);
-                } else {
-                    //TODO: delete the transaction...
-                    txn.setChargeStatus(true);
-                    txnHelper.deleteSmsCharging(dbTxn);
+                if(txn != null){
+                	System.out.println("Record found for messageId:"+txn.getMessageId());
+	                txn.setSourceAddress(fields[0]);
+	                txn.setDestinationAddress(fields[1]);
+	                txn.setChargedParty(fields[2]);
+	                txn.setMessageId(fields[3]);
+	                txn.setChargingSessionId(fields[5]); 
+	                
+	                System.out.println("Fields Length:"+fields.length);
+	                
+	                if(fields.length > 6){
+	                	String accounts = "";
+	                    String amounts = "";
+	                    String accountTypes = "";
+	                	String[] daList = fields[6].split(SEMI_COLON);//split with semi colon
+	                	
+	                	for(int i=0; i< daList.length; i++){
+	                		System.out.println("DA:"+daList[i]);
+	                        String[] accountInfo = daList[i].split(ACCT_DELIM);
+	                        if (accounts.length() > 0) { accounts += PIPE; }
+	                        accounts += accountInfo[0];
+	                        if (amounts.length() > 0) { amounts += PIPE; }
+	                        amounts += accountInfo[1];
+	                        if (accountTypes.length() > 0) { accountTypes += PIPE; }
+	                        accountTypes += accountInfo[2];
+	                	}
+	                	txn.setAccountId(accounts);
+	                	txn.setAmount(amounts);
+	                	txn.setAccountType(accountTypes);
+	                	
+	                	System.out.println("Updating sms charging for transaction time:"+txn.getTransactionTime() + ":transactionId:"+txn.getTransactionId());
+	                    txnHelper.updateSmsCharging(txn);
+	                    System.out.println("update successful");
+	                } else {
+	                    //TODO: delete the transaction...
+	                	System.out.println("Deleting record");
+	                    txn.setChargeStatus(true);
+	                    txnHelper.deleteSmsCharging(txn);
+	                }
+                }else{
+                	System.out.println("No record exists with messageid:"+fields[3]+":SourceAddress:"+fields[0]+":DestinationAddress:"+fields[1]);
                 }
             }
             new File(csvPath + ".success").createNewFile();
-            System.out.println("Successfully processed the file: " + csvPath);
-            
+            System.out.println("Successfully processed the file: " + csvPath);            
+            System.exit(0);
         } catch (FileNotFoundException e) {
             System.out.println("File Not Found: " + e.getMessage());
             try {
