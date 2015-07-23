@@ -11,6 +11,7 @@ public class SmsScapEdrConsumer {
     private static final String COMMA = ",";
     private static final String PIPE = "|";
     private static final String ACCT_DELIM = "/";
+    private static final String SEMI_COLON = ";";
     
     public static void main(String[] args) {
         if (args.length < 3) {
@@ -41,7 +42,7 @@ public class SmsScapEdrConsumer {
                 // Handle record
                 Transaction txn = new Transaction();
                 String[] fields = recordEntry.split(COMMA);
-                txn.setChargedParty(fields[0]);
+                /*txn.setChargedParty(fields[0]);
                 txn.setMessageId(fields[1]);
                 txn.setChargingSessionId(fields[2]);
                 txn.setSourceAddress(fields[3]);
@@ -62,16 +63,37 @@ public class SmsScapEdrConsumer {
                     txn.setAccountId(accounts);
                     txn.setAmount(amounts);
                     txn.setAccountType(accountTypes);
-                    txn.setChargeStatus(true);
-                    
-                    txnHelper.updateSmsCharging(txn);
+                    txn.setChargeStatus(true);*/
+                txn.setSourceAddress(fields[0]);
+                txn.setDestinationAddress(fields[1]);
+                txn.setChargedParty(fields[2]);
+                txn.setMessageId(fields[3]);
+                txn.setChargingSessionId(fields[5]); 
+                
+                Transaction dbTxn = new TransactionDao().fetchSmsCharging(txn.getMessageId(), 
+    		            txn.getSourceAddress(), 
+    		            txn.getDestinationAddress());
+                
+                if(fields.length > 6){
+                	String accounts = "";
+                    String amounts = "";
+                    String accountTypes = "";
+                	String[] daList = fields[6].split(SEMI_COLON);//split with semi colon
+                	for(int i=1; i< daList.length; i++){
+                        String[] accountInfo = daList[i].split(ACCT_DELIM);
+                        if (accounts.length() > 0) { accounts += PIPE; }
+                        accounts += accountInfo[0];
+                        if (amounts.length() > 0) { amounts += PIPE; }
+                        amounts += accountInfo[0];
+                        if (accountTypes.length() > 0) { accountTypes += PIPE; }
+                        accountTypes += accountInfo[0];
+                	}
+                    txnHelper.updateSmsCharging(dbTxn);
                 } else {
                     //TODO: delete the transaction...
                     txn.setChargeStatus(true);
-                    txnHelper.deleteSmsCharging(txn);
+                    txnHelper.deleteSmsCharging(dbTxn);
                 }
-                
-                
             }
             new File(csvPath + ".success").createNewFile();
             System.out.println("Successfully processed the file: " + csvPath);
