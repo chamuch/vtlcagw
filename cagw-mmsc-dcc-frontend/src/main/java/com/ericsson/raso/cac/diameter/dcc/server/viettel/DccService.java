@@ -9,6 +9,7 @@ import com.ericsson.pps.diameter.rfcapi.base.message.ApplicationRequestListener;
 import com.satnar.charging.diameter.dcc.server.DccServiceEndpoint;
 import com.satnar.charging.diameter.dcc.server.DiameterServiceEndpoint;
 import com.satnar.common.LogService;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.common.charging.ChargingStackLifeCycleException;
 
 public class DccService implements SmartLifecycle {
@@ -49,6 +50,7 @@ public class DccService implements SmartLifecycle {
         	LogService.appLog.debug("DccService-start:Initiated...");
             this.dccServiceEndpoint.start();
             this.state = State.RUNNING;
+            LogService.alarm(AlarmCode.SYSTEM_START_UP, (Object) null);
         } catch (ChargingStackLifeCycleException e) {
             // TODO Log this to troubleshoot. putting the stack to SHUTDOWN mode...
         	LogService.appLog.debug("DccService-start:Encountered Excception.Putting the stack to SHUTDOWN mode..",e);
@@ -60,6 +62,7 @@ public class DccService implements SmartLifecycle {
     public void stop() {
         this.dccServiceEndpoint.stop();
         this.state = State.SHUTDOWN;
+        LogService.alarm(AlarmCode.SYSTEM_SHUTDOWN, (Object)null);
     }
 
     @Override

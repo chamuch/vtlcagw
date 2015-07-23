@@ -26,7 +26,7 @@ public class SmppSession {
 		LogService.appLog.debug("SmppSession:Constructor changed...");
 		this.state = State.NOT_INIT;
 		
-		LogService.alarm(AlarmCode.SYSTEM_START_UP, null);
+		LogService.alarm(AlarmCode.SYSTEM_START_UP, (Object)null);
 		
 		//14-Jul-2015: init from bean is behaving as singleton
 		this.startStackSessions();
@@ -76,7 +76,7 @@ public class SmppSession {
     protected void finalize() throws Throwable {
         LogService.appLog.info("SMS Service is shutting down");
         this.stopStackSessions();
-        LogService.alarm(AlarmCode.SYSTEM_SHUTDOWN, null);
+        LogService.alarm(AlarmCode.SYSTEM_SHUTDOWN, (Object)null);
         super.finalize();
     }
 

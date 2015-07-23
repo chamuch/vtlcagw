@@ -13,12 +13,15 @@ import com.ericsson.pps.diameter.dccapi.command.Ccr;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AuthApplicationIdAvp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.Avp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
+import com.ericsson.pps.diameter.rfcapi.base.avp.OriginHostAvp;
+import com.ericsson.pps.diameter.rfcapi.base.avp.OriginRealmAvp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.SessionIdAvp;
 import com.ericsson.pps.diameter.rfcapi.base.message.ApplicationRequestListener;
 import com.ericsson.pps.diameter.rfcapi.base.message.BadMessageException;
 import com.ericsson.pps.diameter.rfcapi.base.message.DiameterAnswer;
 import com.ericsson.pps.diameter.rfcapi.base.message.DiameterRequest;
 import com.satnar.common.LogService;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.common.charging.diameter.ResultCode;
 
 public class RequestHandler implements ApplicationRequestListener {
@@ -42,6 +45,7 @@ public class RequestHandler implements ApplicationRequestListener {
             //TODO: if any AVPs must be expliclitly copied, perform the same here...
             
             if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()) {
+                LogService.alarm(AlarmCode.MMS_THROTTLE_ABATE, ((OriginHostAvp)request.getAvp(OriginHostAvp.AVP_CODE)).getValue());
                 logMsg = new StringBuilder("");
             	logMsg.append(":SessionId:");logMsg.append(dccRequest.getSessionId());
             	logMsg.append(":OriginHost:");logMsg.append(dccRequest.getOriginHost());
@@ -84,15 +88,16 @@ public class RequestHandler implements ApplicationRequestListener {
                 
                 return response;
             } else {
-            	LogService.appLog.debug("RequestHandler-processRequest:DIAMETER_TO_BUSY");
+            	LogService.alarm(AlarmCode.MMS_THROTTLE_REJECT, ((OriginHostAvp)request.getAvp(OriginHostAvp.AVP_CODE)).getValue());
+                LogService.appLog.warn("RequestHandler-processRequest:DIAMETER_TO_BUSY");
                 DiameterAnswer response = createAnswer(request, ResultCode.DIAMETER_TOO_BUSY.getCode());                
-                //TODO: based on CCA response from cagw-backend, copy relevant AVPs back.
                 return response;
             }
             
         } catch (BadMessageException e) {
+            LogService.alarm(AlarmCode.MMS_UNSUPPORTED_REQUEST, request.toString());
         	LogService.appLog.debug("RequestHandler-processRequest:Encountered Exception. wont handle anything for CCRs...",e);
-            return createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
+            return createAnswer(request, ResultCode.DIAMETER_COMMAND_UNSUPPORTED.getCode());
         } catch (AvpDataException e) {
         	LogService.appLog.debug("RequestHandler-processRequest:Encounterd exception",e);
             return createAnswer(request, ResultCode.DIAMETER_INVALID_AVP_VALUE.getCode());
