@@ -230,7 +230,7 @@ public class SmsChargingProcessor implements Processor {
 	        dccCcr.setRequestedServiceUnit(ssuAvp);
             
 	    	if (smppRequest.getMoMtFlag() == WinMoMtFlag.MO) {
-	            dccCcr.addAvp(new TrafficCaseAvp(21)); //MO Charging
+	            dccCcr.addAvp(new TrafficCaseAvp(20)); //MO Charging
 	            
 	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
 	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
@@ -251,7 +251,7 @@ public class SmsChargingProcessor implements Processor {
 	            
 	            
 	        } else {
-	            dccCcr.addAvp(new TrafficCaseAvp(20)); //MT Charging
+	            dccCcr.addAvp(new TrafficCaseAvp(21)); //MT Charging
 
 	            OtherPartyIdAvp opiAvp = new OtherPartyIdAvp();
 	            OtherPartyIdTypeAvp opitAvp = new OtherPartyIdTypeAvp(OtherPartyIdTypeAvp.END_USER_E164);
