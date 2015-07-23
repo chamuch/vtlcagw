@@ -78,8 +78,9 @@ public class RequestHandler implements ApplicationRequestListener {
                     LogService.appLog.error("Runtime Error for MMS DCC CCR.", e);
                     response = createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
                 }
- 
-            	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+            	
+            	//23-Jul-2015 - Moving to finally block
+            	//com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                 
                 return response;
             } else {
@@ -98,6 +99,8 @@ public class RequestHandler implements ApplicationRequestListener {
         } catch (Error e) {
             LogService.appLog.debug("RequestHandler-processRequest:Encounterd exception",e);
             return createAnswer(request, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
+        } finally{
+        	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
         }
     }
     

@@ -122,6 +122,8 @@ public class ParsingDelegate implements Callable<Void> {
                                 LogService.appLog.error("Runtime Error Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                                 LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
+                            }finally{
+                            	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                             }
                         }
                         if (pdu.getCommandId().getId() == CommandId.SM_RESULT_NOTIFY.getId()) {
@@ -141,6 +143,8 @@ public class ParsingDelegate implements Callable<Void> {
                                 LogService.appLog.error("Runtime Error Failure for AUTH_ACC.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                                 LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
+                            }finally{
+                            	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                             }
                             
                         }
@@ -161,7 +165,8 @@ public class ParsingDelegate implements Callable<Void> {
                         }
                         
                     }
-                    com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+                    //23-Jul-2015 - Moving to finally block
+                    //com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     return null;
             }
         } else {
