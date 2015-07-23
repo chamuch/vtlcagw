@@ -144,6 +144,7 @@ public class ParsingDelegate implements Callable<Void> {
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                                 LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
                             }finally{
+                            	
                             	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                             }
                             
