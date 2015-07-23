@@ -19,6 +19,7 @@ import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.Properties;
 
 import com.satnar.common.LogService;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.client.ChannelMode;
 
 public class TcpConnection extends Connection {
@@ -71,6 +72,8 @@ public class TcpConnection extends Connection {
                 continue;
             this.setConnectionState(SmppSessionState.OPEN);
             LogService.stackTraceLog.info("TcpConnection-connect:Connected successfully. Address:"+this.address);
+            
+            LogService.alarm(AlarmCode.SMS_CONNECTED, this.label, this.address);
             
         } catch (AlreadyConnectedException e) {
             // TODO: Logger

@@ -9,6 +9,7 @@ import org.springframework.context.SmartLifecycle;
 import com.ericsson.raso.cac.config.ConfigService;
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.client.SmppServiceException;
 
@@ -25,13 +26,12 @@ public class SmppSession {
 		LogService.appLog.debug("SmppSession:Constructor changed...");
 		this.state = State.NOT_INIT;
 		
+		LogService.alarm(AlarmCode.SYSTEM_START_UP, null);
+		
 		//14-Jul-2015: init from bean is behaving as singleton
 		this.startStackSessions();
 	}
 
-//	public boolean isRunning() {
-//		return (this.state == State.RUNNING);
-//	}
 
 	public void startStackSessions() {
 	    try {
@@ -72,19 +72,15 @@ public class SmppSession {
 	}
 
 
-//	public int getPhase() {
-//		return 0;
-//	}
-//
-//
-//	public boolean isAutoStartup() {
-//		return true;
-//	}
-//
-//
-//	public void stop(Runnable callback) {
-//		this.smppSession.stop();
-//	}
+    @Override
+    protected void finalize() throws Throwable {
+        LogService.appLog.info("SMS Service is shutting down");
+        this.stopStackSessions();
+        LogService.alarm(AlarmCode.SYSTEM_SHUTDOWN, null);
+        super.finalize();
+    }
+
+
 	
 	
 

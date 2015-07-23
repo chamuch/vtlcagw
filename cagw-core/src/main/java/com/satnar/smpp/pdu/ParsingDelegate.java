@@ -13,6 +13,7 @@ import com.ericsson.raso.cac.smpp.pdu.viettel.AuthAccResponse;
 import com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotify;
 import com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse;
 import com.satnar.common.LogService;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandSequence;
 import com.satnar.smpp.CommandStatus;
@@ -103,6 +104,7 @@ public class ParsingDelegate implements Callable<Void> {
                             pdu.getCommandSequence().getValue()));
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
+                        LogService.alarm(AlarmCode.SMS_THROTTLE_ABATE, this.esmeLabel);
                         LogService.appLog.info(String.format("Session: %s - Watergate approved ingress!!:CommandId: %s, Sequence: %s", this.esmeLabel, pdu.getCommandId(), 
                                 pdu.getCommandSequence().getValue()));
                         if (pdu.getCommandId().getId() == CommandId.AUTH_ACC.getId()) {
@@ -122,11 +124,8 @@ public class ParsingDelegate implements Callable<Void> {
                                 LogService.appLog.error("Runtime Error Failure for AUTH_ACC.", e);
                                 response = ((AuthAcc)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                                 LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
-                            }finally{
-                            	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                             }
-                        }
-                        if (pdu.getCommandId().getId() == CommandId.SM_RESULT_NOTIFY.getId()) {
+                        } else if (pdu.getCommandId().getId() == CommandId.SM_RESULT_NOTIFY.getId()) {
                             try {
                                 LogService.stackTraceLog.info(String.format("Session: %s - BACKEND REQ>> %s", this.esmeLabel, pdu));
                                 response = producerTemplate.requestBodyAndHeader(processingEndpoint, (SmResultNotify)pdu, "fe", "sm_result", SmResultNotifyResponse.class);
@@ -143,13 +142,31 @@ public class ParsingDelegate implements Callable<Void> {
                                 LogService.appLog.error("Runtime Error Failure for AUTH_ACC.", e);
                                 response = ((SmResultNotify)pdu).getFailedResponse(CommandStatus.ESME_RUNKNOWNERR);
                                 LogService.stackTraceLog.info(String.format("Session: %s - BACKEND RES>> %s", this.esmeLabel, response));
-                            }finally{
-                            	
-                            	com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                             }
+                        } else {
+                            LogService.appLog.error(String.format("Session: %s - Unknown Command: %s with Sequence: %s recieved. Rejecting!!", 
+                                    this.esmeLabel, pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                             
+                            pdu = new GNack();
+                            parser.readInt(); // skip the status;
+                            pdu.setCommandStatus(CommandStatus.ESME_RINVCMDID);
+                            CommandSequence seq = CommandSequence.getInstance();
+                            seq.setValue(parser.readInt()); // copy the sequence from request.
+                            pdu.setCommandSequence(seq);
+                            
+                            String sessionId = StackMap.getEsmeLabel("" + seq.getValue());
+                            Esme session = StackMap.getStack(sessionId);
+                            session.sendPdu(pdu, this.channelMode);
+                            
+                            LogService.alarm(AlarmCode.SMS_UNKNOWN_PDU, this.esmeLabel, pdu.getCommandId(), pdu.getCommandSequence());
+                            com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+                            return null;
                         }
+
+                        // this will update on all exgress
+                        com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     } else {
+                        LogService.alarm(AlarmCode.SMS_THROTTLE_REJECT, this.esmeLabel);
                         LogService.stackTraceLog.info(String.format("Session: %s - Throttling ingress for Command: %s & Sequence: %s", this.esmeLabel, pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         EsmeHelper.sendThrottledResponse(pdu, this.channelMode);
                     }
@@ -166,8 +183,7 @@ public class ParsingDelegate implements Callable<Void> {
                         }
                         
                     }
-                    //23-Jul-2015 - Moving to finally block
-                    //com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+                    
                     return null;
             }
         } else {

@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.satnar.common.LogService;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandSequence;
 import com.satnar.smpp.InterfaceVersion;
@@ -103,6 +104,7 @@ public class Esme {
                 this.trxChannel = new TcpConnection(this.trxConfig, ChannelMode.TRX);
                 this.trxChannel.connect();
                 LogService.appLog.debug("Socket Conneted for :" + this.getEsmeLabel() );
+                
                 
                 this.trxWriter = new WriteHelper(this.trxChannel);
                 LogService.appLog.debug("Lazy Write Ready for :" + this.getEsmeLabel() );
@@ -548,6 +550,9 @@ public class Esme {
         }
         StackMap.removeMessageIndex("" + bindTrx.getCommandSequence().getValue());
         
+        LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now BOUND_TRX");
+        LogService.alarm(AlarmCode.SMS_BOUND, this.getEsmeLabel(), ((TcpConnection)this.trxChannel).getAddress(), this.trxChannel.getConnectionState());
+
     }
     
     private void bindTransmitter() throws SmppServiceException, SmppTransportException {
@@ -578,7 +583,10 @@ public class Esme {
             continue;
         }
         StackMap.removeMessageIndex("" + bindTx.getCommandSequence().getValue());
-   }
+        
+        LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now BOUND_TX");
+        LogService.alarm(AlarmCode.SMS_BOUND, this.getEsmeLabel(), ((TcpConnection)this.txChannel).getAddress(), this.txChannel.getConnectionState());
+  }
     
     private void bindReceiver() throws SmppServiceException, SmppTransportException {
         SmppPdu bindRx = null;
@@ -607,6 +615,9 @@ public class Esme {
             continue;
         }
         StackMap.removeMessageIndex("" + bindRx.getCommandSequence().getValue());
+        
+        LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now BOUND_RX");
+        LogService.alarm(AlarmCode.SMS_BOUND, this.getEsmeLabel(), ((TcpConnection)this.rxChannel).getAddress(), this.rxChannel.getConnectionState());
     }
     
     private void unbindTrx() throws SmppServiceException, SmppTransportException {
@@ -632,6 +643,9 @@ public class Esme {
             continue;
         }
         StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+        
+        LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now UNBOUND");
+        LogService.alarm(AlarmCode.SMS_UNBOUND, this.getEsmeLabel(), ((TcpConnection)this.trxChannel).getAddress(), this.trxChannel.getConnectionState());
     }
     
     private void unbindTx() throws SmppServiceException, SmppTransportException {
@@ -658,6 +672,9 @@ public class Esme {
             continue;
         }
         StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+
+        LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now UNBOUND");
+        LogService.alarm(AlarmCode.SMS_UNBOUND, this.getEsmeLabel(), ((TcpConnection)this.txChannel).getAddress(), this.trxChannel.getConnectionState());
     }
     
     private void unbindRx() throws SmppServiceException, SmppTransportException {
@@ -683,6 +700,10 @@ public class Esme {
             continue;
         }
         StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+
+        LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now UNBOUND");
+        LogService.alarm(AlarmCode.SMS_UNBOUND, this.getEsmeLabel(), ((TcpConnection)this.rxChannel).getAddress(), this.rxChannel.getConnectionState());
+
     }
     
     

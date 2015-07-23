@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.satnar.common.LogService;
+import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.pdu.ParsingDelegate;
@@ -98,9 +99,15 @@ public class ReadHelper implements Runnable {
                                         LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
+                                        LogService.alarm(AlarmCode.SMS_CONGESTTION_ABATE, this.smppConnection.getEsmeLabel());
                                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
                                         LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + prettyPrint(pduPayload) + ", Reason: ", e);
+                                        int commandId = parser.readInt();
+                                        parser.readInt(); // skip the status
+                                        int sequence = parser.readInt();
+                                        LogService.alarm(AlarmCode.SMS_CONGESTTION_DROP, this.smppConnection.getEsmeLabel(), commandId, sequence);
+                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Threadpool congested. Cannot handle PDU with commandId: " + commandId + " & sequence: " + sequence);
                                     }
                                 } else {
                                     LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - allow the sliding window to handle the rest of the burst in the next incoming packet");
