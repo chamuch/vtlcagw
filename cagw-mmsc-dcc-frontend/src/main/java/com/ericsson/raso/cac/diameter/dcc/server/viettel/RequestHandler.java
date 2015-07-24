@@ -70,7 +70,7 @@ public class RequestHandler implements ApplicationRequestListener {
                         response = createAnswer(request, ResultCode.DIAMETER_TOO_BUSY.getCode());
             	    } else {
                         LogService.appLog.info("Converting Response into MMS DCC CCR. pdu: " + chargeResponse);
-                        response = createAnswer(request, chargeResponse.getResultCode().getAsLong());
+                        response = createAnswer(request, chargeResponse.getResultCode().getValue());
             	    }
             	} catch(AvpDataException e) {
                     LogService.appLog.error("CAMEL Execution Failure for MMS DCC CCR.", e);
