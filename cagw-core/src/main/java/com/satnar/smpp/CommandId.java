@@ -103,55 +103,30 @@ public enum CommandId {
         return commandId;
     }
 
-    public void setId(int commandId) {
-        if (this == EXTENDED)
-            this.commandId = commandId;
-    }
-
     public boolean isTxCompatible() {
         return txCompatible;
     }
 
-    public void setTxCompatible(boolean txCompatible) {
-        if (this == EXTENDED)
-            this.txCompatible = txCompatible;
-    }
-
+    
     public boolean isRxCompatible() {
         return rxCompatible;
     }
 
-    public void setRxCompatible(boolean rxCompatible) {
-        if (this == EXTENDED)
-            this.rxCompatible = rxCompatible;
-    }
-
+    
     public boolean isEsmeInitiated() {
         return esmeInitiated;
     }
 
-    public void setEsmeInitiated(boolean esmeInitiated) {
-        if (this == EXTENDED)
-            this.esmeInitiated = esmeInitiated;
-    }
-
+    
     public boolean isSmscInitiated() {
         return smscInitiated;
     }
 
-    public void setSmscInitiated(boolean smscInitiated) {
-        if (this == EXTENDED)
-            this.smscInitiated = smscInitiated;
-    }
-
+    
     public List<SmppSessionState> getRequiredStates() {
         return requiredStates;
     }
 
-    public void setRequiredStates(List<SmppSessionState> requiredStates) {
-        if (this == EXTENDED)
-            this.requiredStates = requiredStates;
-    }
     
     
 }

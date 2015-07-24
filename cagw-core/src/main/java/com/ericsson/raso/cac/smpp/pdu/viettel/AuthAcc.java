@@ -42,19 +42,8 @@ public class AuthAcc extends SmppPdu {
 	
 	
 	public AuthAcc() {
-		CommandId commandId = CommandId.EXTENDED;
-		commandId.setId(0x01000001);
-		commandId.setEsmeInitiated(false);
-		commandId.setSmscInitiated(true);
-		commandId.setRxCompatible(true);
-		commandId.setTxCompatible(false);
-		
-		List<SmppSessionState> states = new ArrayList<>();
-		states.add(SmppSessionState.BOUND_RX);
-		states.add(SmppSessionState.BOUND_TRX);
-		commandId.setRequiredStates(states);
-	    super.setCommandId(commandId);
-	    super.setCommandStatus(CommandStatus.ESME_ROK);
+		super.setCommandId(CommandId.AUTH_ACC);
+		super.setCommandStatus(CommandStatus.ESME_ROK);
     }
 	
 	

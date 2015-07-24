@@ -41,18 +41,7 @@ public class SmResultNotify extends SmppPdu {
 	private int myCommandLength = 0;
 	
 	public SmResultNotify() {
-		CommandId commandId = CommandId.EXTENDED;
-		commandId.setId(0x01000002);
-		commandId.setEsmeInitiated(false);
-		commandId.setSmscInitiated(true);
-		commandId.setRxCompatible(true);
-		commandId.setTxCompatible(false);
-		
-		List<SmppSessionState> states = new ArrayList<>();
-		states.add(SmppSessionState.BOUND_RX);
-		states.add(SmppSessionState.BOUND_TRX);
-		commandId.setRequiredStates(states);
-	    super.setCommandId(commandId);
+		super.setCommandId(CommandId.SM_RESULT_NOTIFY);
 	    super.setCommandStatus(CommandStatus.ESME_ROK);
     }
 	

@@ -398,9 +398,7 @@ public abstract class EsmeHelper {
 
     public static void sendThrottledResponse(SmppPdu pdu, ChannelMode mode) {
         try {
-            CommandId commandId = pdu.getCommandId();
-            commandId.setId(commandId.getId() | RESPONSE_MASK);
-            pdu.setCommandId(commandId);
+            pdu.setCommandId(CommandId.valueOf(pdu.getCommandId().getId() | RESPONSE_MASK));
             pdu.setCommandStatus(CommandStatus.ESME_RTHROTTLED);
             
             String sessionId = StackMap.getEsmeLabel("" + pdu.getCommandSequence().getValue());
