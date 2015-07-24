@@ -136,16 +136,13 @@ public class ChargeAmountProcessor implements Processor {
         MmsDccCharge response = new MmsDccCharge();
         try {
             response.setResultCode(new ResultCodeAvp(resultCode));
-            response.addAvp(new CCRequestNumberAvp(scapResponse.getCCRequestNumber()));
-            response.addAvp(new CCRequestTypeAvp(scapResponse.getCCRequestType()));
-            response.addAvp(new SessionIdAvp(scapResponse.getSessionId()));
+            response.addAvp(mmsRequest.getAvp(CCRequestNumberAvp.AVP_CODE));
+            response.addAvp(mmsRequest.getAvp(CCRequestTypeAvp.AVP_CODE));
+            response.addAvp(mmsRequest.getAvp(SessionIdAvp.AVP_CODE));
 
             //TODO: SCAP Response ==> (Granted Units, Cost Info)
             //TODO: DCC Response -- need to add params based on customer inputs, during integration testing.
 
-        } catch (AvpDataException e) {
-            LogService.appLog.error("Unable to read from SCAP DIAMETER Message. Returning error respose");
-            response.setResultCode(new ResultCodeAvp(ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode()));
         } catch (Error e) {
             LogService.appLog.error("Unable to read from SCAP DIAMETER Message. Returning error respose");
             response.setResultCode(new ResultCodeAvp(ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode()));
