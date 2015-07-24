@@ -27,20 +27,23 @@ public class SmsScapEdrConsumer {
         System.out.println("Cassandra Connected with: " + cassandraIp);
         
         String recordEntry = null;
+        FileReader fileInput = null;
+        BufferedReader textReader = null;
+        Transaction txn = null;
         try {
-            FileReader fileInput = new FileReader(csvPath);
-            BufferedReader textReader = new BufferedReader(fileInput);
-            
+        	System.out.println("Processing started for file:"+csvPath);
+            fileInput = new FileReader(csvPath);
+            textReader = new BufferedReader(fileInput);            
             TransactionDao txnHelper = new TransactionDao();
             while(true) {
                 recordEntry = textReader.readLine();
                 if (recordEntry == null) {
-                    System.out.println("No more entries... exiting..");
+                    System.out.println("No more entries... exiting..from:"+csvPath);
                     break;
                 }
                 
                 // Handle record
-                Transaction txn = new Transaction();
+                txn = new Transaction();
                 String[] fields = recordEntry.split(COMMA);
                 /*txn.setChargedParty(fields[0]);
                 txn.setMessageId(fields[1]);
@@ -64,7 +67,7 @@ public class SmsScapEdrConsumer {
                     txn.setAmount(amounts);
                     txn.setAccountType(accountTypes);
                     txn.setChargeStatus(true);*/
-                System.out.println("From file messageid:"+fields[3]+":SourceAddress:"+fields[0]+":DestinationAddress:"+fields[1]);
+                
                 txn = new TransactionDao().fetchSmsCharging(fields[3],fields[0],fields[1]);
                 
                 if(txn != null){
@@ -75,7 +78,7 @@ public class SmsScapEdrConsumer {
 	                txn.setMessageId(fields[3]);
 	                txn.setChargingSessionId(fields[5]); 
 	                
-	                System.out.println("Fields Length:"+fields.length);
+	                //System.out.println("Fields Length:"+fields.length);
 	                
 	                if(fields.length > 6){
 	                	String accounts = "";
@@ -84,7 +87,6 @@ public class SmsScapEdrConsumer {
 	                	String[] daList = fields[6].split(SEMI_COLON);//split with semi colon
 	                	
 	                	for(int i=0; i< daList.length; i++){
-	                		System.out.println("DA:"+daList[i]);
 	                        String[] accountInfo = daList[i].split(ACCT_DELIM);
 	                        if (accounts.length() > 0) { accounts += PIPE; }
 	                        accounts += accountInfo[0];
@@ -96,49 +98,52 @@ public class SmsScapEdrConsumer {
 	                	txn.setAccountId(accounts);
 	                	txn.setAmount(amounts);
 	                	txn.setAccountType(accountTypes);
-	                	
-	                	System.out.println("Updating sms charging for transaction time:"+txn.getTransactionTime() + ":transactionId:"+txn.getTransactionId());
+	                	txn.setChargeStatus(true);	                	
 	                    txnHelper.updateSmsCharging(txn);
-	                    System.out.println("update successful");
+	                    System.out.println("Updating sms charging for messageId:"+txn.getMessageId()+":transaction time:"+txn.getTransactionTime() + ":transactionId:"+txn.getTransactionId());
 	                } else {
-	                    //TODO: delete the transaction...
-	                	System.out.println("Deleting record");
+	                    //TODO: delete the transaction...	                	
 	                    txn.setChargeStatus(true);
 	                    txnHelper.deleteSmsCharging(txn);
+	                    System.out.println("Updating sms charging for messageId:"+txn.getMessageId()+":transaction time:"+txn.getTransactionTime() + ":transactionId:"+txn.getTransactionId());
 	                }
                 }else{
                 	System.out.println("No record exists with messageid:"+fields[3]+":SourceAddress:"+fields[0]+":DestinationAddress:"+fields[1]);
                 }
             }
             new File(csvPath + ".success").createNewFile();
-            System.out.println("Successfully processed the file: " + csvPath);            
-            System.exit(0);
+            System.out.println("Successfully processed the file: " + csvPath); 
+            
         } catch (FileNotFoundException e) {
-            System.out.println("File Not Found: " + e.getMessage());
+            System.out.println("File Not Found: "+csvPath +":" + e.getMessage());
             try {
                 new File(csvPath + ".failed").createNewFile();
             } catch (IOException e1) {
-                System.out.println("Unable to create Failed File");
+                System.out.println("Unable to create Failed File for:"+csvPath);
             }
         } catch (IOException e) {
-            System.out.println("File IO Access Failed: " + e.getMessage());
+            System.out.println("File IO Access Failed for: "+csvPath + e.getMessage());
             try {
                 new File(csvPath + ".failed").createNewFile();
             } catch (IOException e1) {
-                System.out.println("Unable to create Failed File");
+            	System.out.println("Unable to create Failed File for:"+csvPath);
             }
         } catch (SecurityException e) {
-            System.out.println("File Access Privilege Failed: " + e.getMessage());
+            System.out.println("File Access Privilege Failed for: "+csvPath + e.getMessage());
             try {
                 new File(csvPath + ".failed").createNewFile();
             } catch (IOException e1) {
-                System.out.println("Unable to create Failed File");
+            	System.out.println("Unable to create Failed File for:"+csvPath);
             }
         } catch (PersistenceException e) {
             System.out.println("Processing stopped at entry: " + recordEntry);
             e.printStackTrace();
+        }finally{
+        	fileInput = null;
+        	textReader = null;
+        	txn = null;
+            System.exit(0);
         }
-        
     }
     
 }
