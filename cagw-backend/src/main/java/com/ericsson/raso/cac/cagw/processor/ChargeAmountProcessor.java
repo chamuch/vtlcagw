@@ -18,6 +18,7 @@ import com.ericsson.pps.diameter.dccapi.avp.RequestedActionAvp;
 import com.ericsson.pps.diameter.dccapi.avp.RequestedServiceUnitAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceIdentifierAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceParameterInfoAvp;
+import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdAvp;
 import com.ericsson.pps.diameter.dccapi.avp.UsedServiceUnitAvp;
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
@@ -45,10 +46,7 @@ import com.satnar.common.charging.diameter.ResultCode;
 
 public class ChargeAmountProcessor implements Processor {
 
-    
-    private static int SCAP_SERVICE_IDENTIFIER = 8; //as per Mikael's inputs; no mail or written requirements though!!!
-	
-	@Override
+    @Override
 	public void process(Exchange exchange) throws Exception {
 	    MmsDccCharge response = null;
 	    Cca scapResponse = null;
@@ -190,13 +188,6 @@ public class ChargeAmountProcessor implements Processor {
             {
 	    	    RequestedServiceUnitAvp rsuAvp = new RequestedServiceUnitAvp();
 	    	    
-//	    	    Avp siAvp = mmsDccChargeRequest.getAvp(ZteDccHelper.ZTE_SERVICE_INFORMATION);
-//	    	    if (siAvp == null) {
-//	    	        LogService.appLog.error(String.format("Cannot find ZTE Service Infor (avpCode: %s) in mms dcc charge request", ZteDccHelper.ZTE_SERVICE_INFORMATION));
-//	    	        throw new ServiceLogicException(String.format("Cannot find MSCCArray(avpCode: %s) in mms dcc charge request", ZteDccHelper.ZTE_SERVICE_INFORMATION));
-//	    	    }
-	    	    
-//	    	    Avp msccAvp = ZteDccHelper.getSubAvp(siAvp, 456);
 	    	    Avp msccAvp = mmsDccChargeRequest.getAvp(456);
                 if (msccAvp == null) {
 	    	        LogService.appLog.error(String.format("Cannot find MSCCArray(avpCode: %s) in mms dcc charge request", MultipleServicesCreditControlAvp.AVP_CODE));
@@ -214,16 +205,19 @@ public class ChargeAmountProcessor implements Processor {
 	    	    if (cctoAvp != null) {
 	    	        LogService.appLog.debug("Found CCTotalOctets under ZTE MSCC RSU with value: " + cctoAvp.getAsLong());
 	    	        scapCcr.setRequestedServiceUnit(cctoAvp);
+	    	        scapCcr.setServiceIdentifier(8); // as per sean's email on 23-Jul-2015
 	    	    } else {
 	    	        Avp cctAvp = ZteDccHelper.getSubAvp(usuAvp, CCTimeAvp.AVP_CODE);
 	    	        if (cctAvp != null) {
 	    	            LogService.appLog.debug("Found CCTime under ZTE MSCC RSU with value: " + cctAvp.getAsLong());
 	    	            scapCcr.setRequestedServiceUnit(cctAvp);
+	                    scapCcr.setServiceIdentifier(10); // as per sean's email on 23-Jul-2015
 	    	        } else {
 	    	            Avp ccssuAvp = ZteDccHelper.getSubAvp(usuAvp, CCServiceSpecificUnitsAvp.AVP_CODE);
 	    	            if (ccssuAvp != null) {
 	    	                LogService.appLog.debug("Found CCServiceSpecificUnits under ZTE MSCC RSU with value: " + ccssuAvp.getAsLong());
 	    	                scapCcr.setRequestedServiceUnit(ccssuAvp);
+	                        scapCcr.setServiceIdentifier(9); // as per sean's email on 23-Jul-2015
 	    	            } else {
 	    	                LogService.appLog.error("Unable to find Time, Octets or SSU units in RSU. Bad Request from ZTE!!");
 	    	                throw new ServiceLogicException("Unable to find Time, Octets or SSU units in RSU. Bad Request from ZTE!!");
@@ -256,7 +250,7 @@ public class ChargeAmountProcessor implements Processor {
 	    		otherPartyIdAvp.addSubAvp(new OtherPartyIdNatureAvp(0));
 	    		
 	    		scapCcr.addAvp(otherPartyIdAvp);
-	    		scapCcr.addSubscriptionId(aParty, aPartyType);
+	    		scapCcr.addSubscriptionId(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
 	    		LogService.appLog.debug("SubscriptionId added: " + aParty + ", type: " + aPartyType);
                 
 	    	} else {
@@ -279,29 +273,26 @@ public class ChargeAmountProcessor implements Processor {
 	    		otherPartyIdAvp.addSubAvp(new OtherPartyIdNatureAvp(0));
 
 	    		scapCcr.addAvp(otherPartyIdAvp);
-	    		scapCcr.addSubscriptionId(bParty, bPartyType);
+	    		scapCcr.addSubscriptionId(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
                 LogService.appLog.debug("SubscriptionId added: " + bParty + ", type: " + bPartyType);
 	    	}
 	    	
-	    	// service identifier
-	    	scapCcr.addAvp(new ServiceIdentifierAvp(SCAP_SERVICE_IDENTIFIER));
-	    	LogService.appLog.debug("ServiceIdentifier:"+SCAP_SERVICE_IDENTIFIER);
 	    	
 	    	// SPI - Service Enabler Type
-	    	String serviceEnablerType = Integer.toHexString(ZteDccHelper.getServiceEnablerType(mmsDccChargeRequest));
+	    	int serviceEnablerType = (ZteDccHelper.getServiceEnablerType(mmsDccChargeRequest));
 	    	ServiceParameterInfoAvp spiAvp = ChargingHelper.createSPI(100, serviceEnablerType);
 	    	scapCcr.addAvp(spiAvp);
 	    	LogService.appLog.debug("SPI(100) Service Enabler Type added:" + serviceEnablerType);
             	    	
 	    	// SPI - Message ID
 	    	int messageId = ZteDccHelper.getMessageId(mmsDccChargeRequest);
-	    	spiAvp = ChargingHelper.createSPI(500, messageId);
+	    	spiAvp = ChargingHelper.createSPI(102, messageId);
 	    	scapCcr.addAvp(spiAvp);
 	    	LogService.appLog.debug("SPI(500) Message ID added:" + messageId);
             	    	
 	    	// SPI - OA Subscription ID Type
 	    	int aPartyType = ZteDccHelper.getOaSubscriptionIdType(mmsDccChargeRequest);
-	    	spiAvp = ChargingHelper.createSPI(300, aPartyType);
+	    	spiAvp = ChargingHelper.createSPI(300, "" + aPartyType);
 	    	scapCcr.addAvp(spiAvp);
 	    	LogService.appLog.debug("SPI(300) A-Party Type added:" + aPartyType);
             
@@ -313,7 +304,7 @@ public class ChargeAmountProcessor implements Processor {
 	    	
 	    	// SPI - DA Subscription ID Type
             int bPartyType = ZteDccHelper.getDaSubscriptionIdType(mmsDccChargeRequest);
-	    	spiAvp = ChargingHelper.createSPI(302, bPartyType);
+	    	spiAvp = ChargingHelper.createSPI(302, "" + bPartyType);
 	    	scapCcr.addAvp(spiAvp);
 	    	LogService.appLog.debug("SPI(302) B-Party Type added:" + bPartyType);
             
@@ -324,13 +315,13 @@ public class ChargeAmountProcessor implements Processor {
 	    	LogService.appLog.debug("SPI(303) B-Party added:" + aParty);
             
 	    	// SPI - SP ID
-	    	String spId = ZteDccHelper.getSpId(mmsDccChargeRequest);
-            spiAvp = ChargingHelper.createSPI(501, spId);
-            scapCcr.addAvp(spiAvp);
-            LogService.appLog.debug("SPI(501) SP-ID added:" + spId);
+//	    	String spId = ZteDccHelper.getSpId(mmsDccChargeRequest);
+//            spiAvp = ChargingHelper.createSPI(501, spId);
+//            scapCcr.addAvp(spiAvp);
+//            LogService.appLog.debug("SPI(501) SP-ID added:" + spId);
             
             //SPI - ISMP-Info-ChargingType
-            String chargingType = ZteDccHelper.getChargingType(mmsDccChargeRequest);
+            int chargingType = ZteDccHelper.getChargingType(mmsDccChargeRequest);
             spiAvp = ChargingHelper.createSPI(101, ZteDccHelper.getChargingType(mmsDccChargeRequest));
             scapCcr.addAvp(spiAvp);
             LogService.appLog.debug("SPI(101) Charging Type added:" + chargingType);

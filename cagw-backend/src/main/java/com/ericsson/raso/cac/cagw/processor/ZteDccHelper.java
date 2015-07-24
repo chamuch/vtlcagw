@@ -323,7 +323,7 @@ public class ZteDccHelper {
 		}
 	}
 
-    public static String getChargingType(MmsDccCharge dccRequest) throws ServiceLogicException {
+    public static int getChargingType(MmsDccCharge dccRequest) throws ServiceLogicException {
         Avp serviceInformation = dccRequest.getAvp(ZTE_SERVICE_INFORMATION);
         if (serviceInformation == null) {
             LogService.appLog.error("Requested AVP cannot be found in DCC Request Hierarchy. Missing: ZTE_SERVICE_INFORMATION (" + ZTE_SERVICE_INFORMATION + ")");
@@ -343,7 +343,7 @@ public class ZteDccHelper {
         }
         
         try {
-            return ctAvp.getAsUTF8String();
+            return ctAvp.getAsInt();
         } catch (AvpDataException e) {
             LogService.appLog.error("Semantic Error deep inside the DIAMETER Stack. Context: ZTE_CHARGING_TYPE (" + ZTE_CHARGING_TYPE + ")");
             throw new ServiceLogicException("Semantic Error deep inside the DIAMETER Stack. Context: ZTE_CHARGING_TYPE (" + ZTE_CHARGING_TYPE + ")");
