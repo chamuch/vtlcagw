@@ -58,14 +58,21 @@ public class TransactionDao {
 	    try {
             if(cluster != null && session != null) {
                 
-                Update update = QueryBuilder.update(connection.getKeyspace(), TRANSACTION_TABLE);
+                /*Update update = QueryBuilder.update(connection.getKeyspace(), TRANSACTION_TABLE);
                                       update.with(set("accountId", txnInfo.getAccountId()));
                                       update.with(set("amount", txnInfo.getAmount()));
                                       update.with(set("accountType", txnInfo.getAccountType()));
                                       update.where(eq("messageId", txnInfo.getMessageId()))
                                             .and(eq("chargingSessionId", txnInfo.getChargingSessionId()))
                                             .and(eq("sourceAddress", txnInfo.getSourceAddress()))
-                                            .and(eq("chargedParty", txnInfo.getChargedParty()));
+                                            .and(eq("chargedParty", txnInfo.getChargedParty()));*/
+            	Update update = QueryBuilder.update(connection.getKeyspace(), TRANSACTION_TABLE);
+                update.with(set("accountId", txnInfo.getAccountId()));
+                update.with(set("amount", txnInfo.getAmount()));
+                update.with(set("accountType", txnInfo.getAccountType()));
+                update.where(eq("transactionTime", txnInfo.getTransactionTime()))
+                		.and((eq("transactionId", txnInfo.getTransactionId())));
+                
                 session.execute(update);
                 LogService.stackTraceLog.info("TransactionDao-updateSmsCharging:Success !!");
             }else{
