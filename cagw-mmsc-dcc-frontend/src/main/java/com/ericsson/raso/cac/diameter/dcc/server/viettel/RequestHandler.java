@@ -45,7 +45,7 @@ public class RequestHandler implements ApplicationRequestListener {
             //TODO: if any AVPs must be expliclitly copied, perform the same here...
             
             if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()) {
-                LogService.alarm(AlarmCode.MMS_THROTTLE_ABATE, ((OriginHostAvp)request.getAvp(OriginHostAvp.AVP_CODE)).getValue());
+                LogService.alarm(AlarmCode.MMS_THROTTLE_ABATE, request.getAvp(OriginHostAvp.AVP_CODE).getAsUTF8String());
                 logMsg = new StringBuilder("");
             	logMsg.append(":SessionId:");logMsg.append(dccRequest.getSessionId());
             	logMsg.append(":OriginHost:");logMsg.append(dccRequest.getOriginHost());
