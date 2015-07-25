@@ -71,7 +71,8 @@
 			com.satnar.smpp.client,
 			com.satnar.smpp.codec,
 			com.satnar.smpp.pdu,
-			com.satnar.smpp.transport,			
+			com.satnar.smpp.transport,
+			com.satnar.common.alarmlog,			
 			META-INF.cagw-core
 		</osgi-export-packages>
 	</properties>

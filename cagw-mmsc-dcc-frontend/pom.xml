@@ -51,6 +51,7 @@
  			com.ericsson.pps.diameter.rfcapi.base.impl.realmhandling,
  			com.ericsson.pps.diameter.rfcapi.base.impl.basemessages,
  			org.eclipse.jetty.server.nio,
+ 			com.satnar.common.alarmlog,
 			META-INF.cagw-core
 		</osgi-import-packages>
 		<osgi-export-packages>

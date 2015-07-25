@@ -36,7 +36,8 @@
 			com.satnar.smpp.pdu,
 			com.satnar.smpp.transport,
  			org.eclipse.jetty.server.nio,
- 			com.ericsson.raso.cac.smpp.pdu.viettel, 			
+ 			com.ericsson.raso.cac.smpp.pdu.viettel,
+ 			com.satnar.common.alarmlog, 			
 			META-INF.cagw-core
 		</osgi-import-packages>
 	</properties>
