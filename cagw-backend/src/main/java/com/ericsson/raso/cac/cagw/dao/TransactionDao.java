@@ -32,6 +32,28 @@ public class TransactionDao {
 	public void persistSmsCharging(Transaction txnInfo) throws PersistenceException {
 		try {
 			if(cluster != null && session != null) {
+				
+				/*25-JUL-2015: As per mail from Per's number normalization
+                 * destination : if length < 7 digits no change else keep it as international format
+                 * the below logic is from occ code snippet
+                 */
+                if(txnInfo.getDestinationAddress() != null
+                		&& txnInfo.getDestinationAddress().length() >= 7){
+                	String otherPartyData = txnInfo.getDestinationAddress();
+                    if (otherPartyData.matches("0")) {
+                        if (otherPartyData.matches("^[0][1-9].*")) {
+                        	otherPartyData = otherPartyData.replaceAll("^0","0084");
+                            txnInfo.setDestinationAddress(otherPartyData);
+                        }
+                        else {
+                            otherPartyData = "00"+otherPartyData;
+                            txnInfo.setDestinationAddress(otherPartyData);
+                        }
+                    }else{
+                    	otherPartyData = "00"+otherPartyData;
+                        txnInfo.setDestinationAddress(otherPartyData);
+                    }
+                }
 			    
 			    Insert insert = QueryBuilder.insertInto(connection.getKeyspace(), TRANSACTION_TABLE)
 			                                .value("transactionTime", txnInfo.getTransactionTime())
