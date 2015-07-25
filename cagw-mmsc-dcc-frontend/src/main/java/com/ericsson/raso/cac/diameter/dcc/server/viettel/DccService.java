@@ -20,8 +20,7 @@ public class DccService implements SmartLifecycle {
     private PeerConnectionListener peerConnectionListener = null;
     private State state = null;
     
-    public DccService(Properties serviceConfig) {
-    	System.out.println("HELLO:CRAZY123...");
+    public DccService(Properties serviceConfig) {    	
         this.config = serviceConfig;
         this.state = State.NOT_INIT;        
     }
@@ -33,8 +32,7 @@ public class DccService implements SmartLifecycle {
     }
 
     @Override
-    public void start() {
-    	System.out.println("HELLO:CRAZY...");
+    public void start() {    	
         this.state = State.NOT_INIT;
         this.dccServiceEndpoint = SpringHelper.getDiameterStack();
         ((DccServiceEndpoint)this.dccServiceEndpoint).setConfig(this.config);
