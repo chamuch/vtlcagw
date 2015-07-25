@@ -281,7 +281,8 @@ public class SmsChargingProcessor implements Processor {
             ServiceParameterInfoAvp spiAvp =  ChargingHelper.createSPI(100, SCAP_SERVICE_IDENTIFIER); // service enabler type
             dccCcr.addAvp(spiAvp);
 
-	        spiAvp = ChargingHelper.createSPI(500, smppRequest.getSmId().getString()); // message id
+	        //spiAvp = ChargingHelper.createSPI(500, smppRequest.getSmId().getString()); // message id
+            spiAvp = ChargingHelper.createSPI(306, smppRequest.getSmId().getString()); // message id
 	        dccCcr.addAvp(spiAvp);
             
 	        spiAvp = ChargingHelper.createSPI(300, Integer.toString(OtherPartyIdTypeAvp.END_USER_E164)); // source addr type
