@@ -87,18 +87,20 @@ public class SmsRefundProcessor implements Processor {
             List<DedicatedAccountUpdateInformation> dasToUpdate = new ArrayList<>();
 		    for (int i = 0; i < accounts.length; i++) {
 		        LogService.appLog.debug(String.format("Preparing DA with %d account: %s, amount: %s, type: %s", i, accounts[i], amounts[i], accountTypes[i]));
-		        if (accounts[i].equals("0")) {
+		        /*if (accounts[i].equals("0")) {
 		            ubdRequest.setAdjustmentAmountRelative("-" + amounts[i]);
 		            ubdRequest.setTransactionCurrency("VND");
 		            LogService.appLog.debug("Updating Main Account with " + amounts[i]);
-		        } else {
-		            DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
-		            dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
-		            dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
-		            dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
-		            dasToUpdate.add(dauInfo); 
-                    LogService.appLog.debug("Updating request with " + dauInfo.toString());
-		        }
+		        } else {*/
+		        
+		        //25-JUL-2015: As per CDR finalized parameters confirmation, MA will also be treated as DA - 1
+	            DedicatedAccountUpdateInformation dauInfo = new DedicatedAccountUpdateInformation();
+	            dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
+	            dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
+	            dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
+	            dasToUpdate.add(dauInfo); 
+                LogService.appLog.debug("Updating request with " + dauInfo.toString());
+		        //}
 		    }		
 		    if (dasToUpdate.size()>0) {
 		        ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
