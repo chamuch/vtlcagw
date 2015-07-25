@@ -12,6 +12,7 @@ public class SmsScapEdrConsumer {
     private static final String PIPE = "|";
     private static final String ACCT_DELIM = "/";
     private static final String SEMI_COLON = ";";
+    private static final String DA_PREFIX = "DA";
     
     public static void main(String[] args) {
         if (args.length < 3) {
@@ -30,12 +31,17 @@ public class SmsScapEdrConsumer {
         FileReader fileInput = null;
         BufferedReader textReader = null;
         Transaction txn = null;
+        //int totalCount = 0;
+        int successCount = 0;
+        //int failureCount = 0;
+        
         try {
         	System.out.println("Processing started for file:"+csvPath);
             fileInput = new FileReader(csvPath);
             textReader = new BufferedReader(fileInput);            
             TransactionDao txnHelper = new TransactionDao();
-            while(true) {
+            
+            while(true) {            	
                 recordEntry = textReader.readLine();
                 if (recordEntry == null) {
                     System.out.println("No more entries... exiting..from:"+csvPath);
@@ -43,6 +49,7 @@ public class SmsScapEdrConsumer {
                 }
                 
                 // Handle record
+                //totalCount = totalCount + 1;
                 txn = new Transaction();
                 String[] fields = recordEntry.split(COMMA);
                 /*txn.setChargedParty(fields[0]);
@@ -72,7 +79,7 @@ public class SmsScapEdrConsumer {
                 
                 if(txn != null){
                 	System.out.println("Record found for messageId:"+txn.getMessageId());
-	                txn.setSourceAddress(fields[0]);
+	                txn.setSourceAddress(fields[0]);	                
 	                txn.setDestinationAddress(fields[1]);
 	                txn.setChargedParty(fields[2]);
 	                txn.setMessageId(fields[3]);
@@ -89,9 +96,20 @@ public class SmsScapEdrConsumer {
 	                	for(int i=0; i< daList.length; i++){
 	                        String[] accountInfo = daList[i].split(ACCT_DELIM);
 	                        if (accounts.length() > 0) { accounts += PIPE; }
-	                        accounts += accountInfo[0];
+	                        
+	                        //25-JUL-2015: To remove prefix "DA"
+	                        if(accountInfo[0].matches("^[DA_PREFIX].*")){
+	                        	accounts += accountInfo[0].replace(DA_PREFIX, "");
+	                        }else{
+	                        	accounts += accountInfo[0];
+	                        }
+	                        
 	                        if (amounts.length() > 0) { amounts += PIPE; }
-	                        amounts += accountInfo[1];
+	                        
+	                        //25-JUL-2015: As per confirmation from Tanzeem amount to be divided by 1000000
+	                        //and should be multiplied by 100 when sending to AIR - so dividing by 10000
+	                        amounts += Long.valueOf(accountInfo[1])/10000;
+	                        
 	                        if (accountTypes.length() > 0) { accountTypes += PIPE; }
 	                        accountTypes += accountInfo[2];
 	                	}
@@ -112,9 +130,10 @@ public class SmsScapEdrConsumer {
                 }
             }
             new File(csvPath + ".success").createNewFile();
+            successCount = successCount + 1;
             System.out.println("Successfully processed the file: " + csvPath); 
             
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {        	
             System.out.println("File Not Found: "+csvPath +":" + e.getMessage());
             try {
                 new File(csvPath + ".failed").createNewFile();
@@ -139,6 +158,7 @@ public class SmsScapEdrConsumer {
             System.out.println("Processing stopped at entry: " + recordEntry);
             e.printStackTrace();
         }finally{
+        	System.out.println("Success Record Count: " + successCount); 
         	fileInput = null;
         	textReader = null;
         	txn = null;
