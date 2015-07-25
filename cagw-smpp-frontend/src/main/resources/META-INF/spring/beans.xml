@@ -81,8 +81,8 @@
 	<!-- Routing request to cagw-backend over REST -->
 	<camel:camelContext id="com.ericsson.raso.cac.smppfe"
 		xmlns="http://camel.apache.org/schema/spring">
-		<!-- <propertyPlaceholder id="properties" location="ref:cgProperties" /> 
-			<threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="1200" 
+		<propertyPlaceholder id="properties" location="ref:cgProperties" /> 
+		<!-- <threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="1200" 
 			maxPoolSize="1200" maxQueueSize="10" /> <threadPool id="smpp-frontend" poolSize="1200" 
 			maxPoolSize="1200" threadName="smpp-frontend" camelContextId="com.ericsson.raso.cac.smppfe" 
 			/> -->
@@ -102,7 +102,8 @@
 					<setHeader headerName="Accept">
 						<constant>application/json</constant>
 					</setHeader>
-					<camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to>
+					<camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to>
+					<!-- <camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to> -->
 					<camel:unmarshal ref="gsonAuthAccResponse" />
 				</camel:when>
 				<camel:when>
@@ -118,8 +119,8 @@
 					<setHeader headerName="Accept">
 						<constant>application/json</constant>
 					</setHeader>
-					<!-- <camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to> -->
-					<camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to>
+					<camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to>
+					<!-- <camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to> -->
 					<camel:unmarshal ref="gsonSmResultNotifyResponse" />
 				</camel:when>
 				<camel:doCatch>
