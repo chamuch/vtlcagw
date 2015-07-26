@@ -247,7 +247,9 @@ public class ChargeAmountProcessor implements Processor {
 	    		otherPartyIdAvp.addSubAvp(new OtherPartyIdNatureAvp(0));
 	    		
 	    		scapCcr.addAvp(otherPartyIdAvp);
-	    		scapCcr.addSubscriptionId(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
+	    		//26-JUL-2015: With this it is coming as Avp-443 inside 443
+	    		//scapCcr.addSubscriptionId(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
+	    		scapCcr.addAvp(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
 	    		LogService.appLog.debug("SubscriptionId added: " + aParty + ", type: " + aPartyType);
                 
 	    	} else {
@@ -270,7 +272,9 @@ public class ChargeAmountProcessor implements Processor {
 	    		otherPartyIdAvp.addSubAvp(new OtherPartyIdNatureAvp(0));
 
 	    		scapCcr.addAvp(otherPartyIdAvp);
-	    		scapCcr.addSubscriptionId(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
+	    		//26-JUL-2015: With this it is coming as Avp-443 inside 443
+	    		//scapCcr.addSubscriptionId(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
+	    		scapCcr.addAvp(mmsDccChargeRequest.getAvp(SubscriptionIdAvp.AVP_CODE));
                 LogService.appLog.debug("SubscriptionId added: " + bParty + ", type: " + bPartyType);
 	    	}
 	    	
