@@ -139,8 +139,8 @@ public class AuthAcc extends SmppPdu {
 			this.moMscNoa = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read()); LogService.appLog.debug("Read moMscNoa: " + this.moMscNoa);
 			this.moMscNpi = (Byte) SmppParameter.getInstance(Type.BYTE, (byte) parser.read()); LogService.appLog.debug("Read moMscNpi: " + this.moMscNpi);
 			this.moMscAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read moMscAddress: " + this.moMscAddress);
-			this.sourceAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read sourceAddress: " + this.moMscAddress);
-			this.destinationAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read sourceAddress: " + this.moMscAddress);
+			this.sourceAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read sourceAddress: " + this.sourceAddress);
+			this.destinationAddress = CDecimalString.readString(parser); LogService.appLog.debug("Read destinationAddress: " + this.destinationAddress);
             this.moMtFlag = WinMoMtFlag.valueOf(parser.read()); LogService.appLog.debug("Read moMtFlag: " + this.moMtFlag);
 			this.smId = CHexString.readString(parser); LogService.appLog.debug("Read smId: " + this.smId);
 			this.smLength = (Integer) SmppParameter.getInstance(Type.INTEGER, parser.readInt()); LogService.appLog.debug("Read smLength: " + this.smLength);
