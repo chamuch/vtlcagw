@@ -79,14 +79,18 @@ public class ReadHelper implements Runnable {
                     // process only if we read anything from the socket..
                     if (windowSize > 0) {
                         // adjust the sliding window
+                        LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window adjusted with incoming window size: " + windowSize);
                         slidingWindow.push(currentWindow);
                         DataInputStream parser = new DataInputStream(slidingWindow.getConsumingStream());
+                        LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window new size: " + parser.available());
                         
                         // process the burst...
                         do {
-                            if (parser.available() > 4) { // to ensure we have enough bytes to atleast decode PDU length...
+                            int currentSlidingReminaing = parser.available();
+                            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window current remaining size: " + parser.available());
+                            if (currentSlidingReminaing > 4) { // to ensure we have enough bytes to atleast decode PDU length...
                                 int pduLength = parser.readInt();
-                                LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes");
+                                LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes & sliding window curr_size: " + parser.available());
                                 if ( (pduLength - 4) <= parser.available() ){
                                     LogService.appLog.debug("Sliding Window has (" + pduLength + ") bytes to read & process");
                                     
