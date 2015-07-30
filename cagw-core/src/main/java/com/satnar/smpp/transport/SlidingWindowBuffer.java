@@ -18,7 +18,7 @@ public class SlidingWindowBuffer {
     public synchronized void push(byte[] payload) throws SmppTransportException {
         try {
             // check for previous sliding window remaining...
-            if (this.consuming != null || parser != null) {
+            if (parser != null) {
                 int burstWindow = this.parser.available();
                 LogService.appLog.debug("Previous remaining window size: " + burstWindow);
                 if (burstWindow > 0) {
