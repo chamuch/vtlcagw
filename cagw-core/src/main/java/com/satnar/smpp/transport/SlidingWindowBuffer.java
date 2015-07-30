@@ -28,10 +28,14 @@ public class SlidingWindowBuffer {
                     this.slidingWindow = null;
                 }
             }
-            this.parser.close();
-            this.consuming.close();
-            this.parser = null;
-            this.consuming = null;
+            if (this.parser != null) {
+                this.parser.close();
+                this.parser = null;
+            }
+            if (this.consuming != null) {
+                this.consuming.close();
+                this.consuming = null;
+            }
             
             this.incoming = new ByteArrayOutputStream();
             if (slidingWindow != null && slidingWindow.length > 0) {
@@ -51,6 +55,7 @@ public class SlidingWindowBuffer {
             
             
         } catch (IOException e) {
+            LogService.appLog.error("sliding window push failed. Check exception: " + e, e);
             throw new SmppTransportException("Cannot accept incoming stream. Size: " + payload.length);
         }
     }
