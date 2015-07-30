@@ -86,7 +86,9 @@ public class AuthAcc extends SmppPdu {
 			encoder.write(this.moMscNoa.encode());
 			encoder.write(this.moMscNpi.encode());
 			encoder.write(this.moMscAddress.encode());
-			encoder.write(this.moMtFlag.getValue().encode());
+			encoder.write(this.sourceAddress.encode());
+			encoder.write(this.destinationAddress.encode());
+            encoder.write(this.moMtFlag.getValue().encode());
 			encoder.write(this.smId.encode());
 			encoder.writeInt(this.smLength.getValue());
 			encoder.writeInt(this.serviceId.getValue());
