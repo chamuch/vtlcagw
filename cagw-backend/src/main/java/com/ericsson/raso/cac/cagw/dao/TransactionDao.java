@@ -32,28 +32,11 @@ public class TransactionDao {
 	public void persistSmsCharging(Transaction txnInfo) throws PersistenceException {
 		try {
 			if(cluster != null && session != null) {
-				
-				/*25-JUL-2015: As per mail from Per's number normalization
-                 * destination : if length < 7 digits no change else keep it as international format
-                 * the below logic is from occ code snippet
-                 */
-                if(txnInfo.getDestinationAddress() != null
-                		&& txnInfo.getDestinationAddress().length() >= 7){
-                	String otherPartyData = txnInfo.getDestinationAddress();
-                    if (otherPartyData.matches("0")) {
-                        if (otherPartyData.matches("^[0][1-9].*")) {
-                        	otherPartyData = otherPartyData.replaceAll("^0","0084");
-                            txnInfo.setDestinationAddress(otherPartyData);
-                        }
-                        else {
-                            otherPartyData = "00"+otherPartyData;
-                            txnInfo.setDestinationAddress(otherPartyData);
-                        }
-                    }else{
-                    	otherPartyData = "00"+otherPartyData;
-                        txnInfo.setDestinationAddress(otherPartyData);
-                    }
-                }
+			    String otherPartyData = getUpdatedDestinationNumber(txnInfo.getDestinationAddress());
+			    
+			    if(otherPartyData != null){
+			    	txnInfo.setDestinationAddress(otherPartyData);
+			    }
 			    
 			    Insert insert = QueryBuilder.insertInto(connection.getKeyspace(), TRANSACTION_TABLE)
 			                                .value("transactionTime", txnInfo.getTransactionTime())
@@ -127,15 +110,20 @@ public class TransactionDao {
 	
 	public Transaction fetchSmsCharging (String messageId, String sourceAddress, String destinationAddress) throws PersistenceException {
         try {
+        	
             if(cluster != null && session != null) {
+            	String otherPartyData = getUpdatedDestinationNumber(destinationAddress);//30-JUL-2015: For number normalization
+            	
+            	LogService.appLog.info("fetchSmsCharging for messageId:"+messageId+": sourceAddress:"+ sourceAddress+ ": destinationAddress:"+otherPartyData);
+            	
                 Select select = QueryBuilder.select().all().from(connection.getKeyspace(), TRANSACTION_TABLE);
                                                 select.where((eq("messageId", messageId)))
                                                 .and(eq("sourceAddress", sourceAddress))
-                                                .and(eq("destinationAddress", destinationAddress));
+                                                .and(eq("destinationAddress", otherPartyData));
                                                 select.allowFiltering();
 
                 List<Row> results = session.execute(select).all();
-                LogService.stackTraceLog.info("TransactionDao-deleteSmsCharging:Success !! Query Returned: " + results.size());
+                LogService.stackTraceLog.info("TransactionDao-fetchSmsCharging:Success !! Query Returned: " + results.size());
                 if (results.size() == 0)
                     return null;
                 
@@ -148,7 +136,8 @@ public class TransactionDao {
                 tx.setMessageId(firstMatch.getString("messageId"));
                 tx.setChargingSessionId(firstMatch.getString("chargingSessionId"));
                 tx.setSourceAddress(firstMatch.getString("sourceAddress"));
-                tx.setDestinationAddress(firstMatch.getString("destinationAddress"));
+                //tx.setDestinationAddress(firstMatch.getString("destinationAddress"));
+                tx.setDestinationAddress(destinationAddress);
                 tx.setChargedParty(firstMatch.getString("chargedParty"));
                 tx.setAccountId(firstMatch.getString("accountId"));
                 tx.setAmount(firstMatch.getString("amount"));
@@ -166,6 +155,28 @@ public class TransactionDao {
         }   
     }
     
-	
+	/*25-JUL-2015: As per mail from Per's number normalization
+     * destination : if length < 7 digits no change else keep it as international format
+     * the below logic is from occ code snippet
+     */
+	private String getUpdatedDestinationNumber(String destinationAddress){
+		
+		String otherPartyData = destinationAddress;
+				
+        if(otherPartyData != null
+        		&& otherPartyData.length() >= 7){
+            if (otherPartyData.matches("0")) {
+                if (otherPartyData.matches("^[0][1-9].*")) {
+                	otherPartyData = otherPartyData.replaceAll("^0","0084");
+                }
+                else {
+                    otherPartyData = "00"+otherPartyData;
+                }
+            }else{
+            	otherPartyData = "00"+otherPartyData;
+            }
+        }
+        return otherPartyData;
+	}
 
 }
