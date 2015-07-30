@@ -81,17 +81,18 @@ public class ReadHelper implements Runnable {
                         // adjust the sliding window
                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window adjusted with incoming window size: " + windowSize);
                         slidingWindow.push(currentWindow);
-                        DataInputStream parser = new DataInputStream(slidingWindow.getConsumingStream());
+                        DataInputStream parser = slidingWindow.getParser();
                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window new size: " + parser.available());
                         
                         // process the burst...
                         do {
                             int currentSlidingReminaing = parser.available();
-                            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window current remaining size: " + parser.available());
+                            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window current remaining size: " + currentSlidingReminaing);
                             if (currentSlidingReminaing > 4) { // to ensure we have enough bytes to atleast decode PDU length...
                                 int pduLength = parser.readInt();
-                                LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes & sliding window curr_size: " + parser.available());
-                                if ( (pduLength - 4) <= parser.available() ){
+                                currentSlidingReminaing = parser.available();
+                                LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes & sliding window curr_size: " + currentSlidingReminaing);
+                                if ((pduLength>0) && (pduLength - 4) <= currentSlidingReminaing ){
                                     LogService.appLog.debug("Sliding Window has (" + pduLength + ") bytes to read & process");
                                     
                                     byte[] pduPayload = new byte[pduLength - 4];

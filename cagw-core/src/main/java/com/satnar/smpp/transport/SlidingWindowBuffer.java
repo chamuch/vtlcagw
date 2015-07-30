@@ -2,6 +2,7 @@ package com.satnar.smpp.transport;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -12,21 +13,25 @@ public class SlidingWindowBuffer {
     private byte[] slidingWindow = null;
     private ByteArrayOutputStream incoming = null;
     private ByteArrayInputStream consuming = null;
+    private DataInputStream parser = null;
     
     public synchronized void push(byte[] payload) throws SmppTransportException {
         try {
             // check for previous sliding window remaining...
-            if (this.consuming != null) {
-                int burstWindow = this.consuming.available();
+            if (this.consuming != null || parser != null) {
+                int burstWindow = this.parser.available();
                 LogService.appLog.debug("Previous remaining window size: " + burstWindow);
                 if (burstWindow > 0) {
                     this.slidingWindow = new byte[burstWindow];
-                    this.consuming.read(this.slidingWindow);
+                    this.parser.read(this.slidingWindow);
                 } else {
                     this.slidingWindow = null;
                 }
             }
-            
+            this.parser.close();
+            this.consuming.close();
+            this.parser = null;
+            this.consuming = null;
             
             this.incoming = new ByteArrayOutputStream();
             if (slidingWindow != null && slidingWindow.length > 0) {
@@ -42,6 +47,7 @@ public class SlidingWindowBuffer {
             this.incoming = null;
             
             this.consuming = new ByteArrayInputStream(consolidatedWindow);
+            this.parser = new DataInputStream(this.consuming);
             
             
         } catch (IOException e) {
@@ -49,14 +55,18 @@ public class SlidingWindowBuffer {
         }
     }
     
-    public InputStream getConsumingStream() {
-        return this.consuming;
+    public DataInputStream getParser() {
+        return this.parser;
     }
 
-    public boolean canRead() {
-        if (this.consuming == null)
+    public boolean canRead() throws IOException {
+        LogService.appLog.debug("Check parser availablity: " + (this.parser != null));
+        if (this.parser == null)
             return false;
-        return (this.consuming.available() > 0);
+        
+        int parserReadable = this.parser.available();
+        LogService.appLog.debug("Sliding Window can still read: " + parserReadable );
+        return (parserReadable > 0);
     }
     
 }
