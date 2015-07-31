@@ -24,7 +24,8 @@ import com.satnar.common.LogService;
 import com.satnar.smpp.CommandStatus;
 
 public class SmsRefundProcessor implements Processor {
-
+	
+	private static final int DA_TYPE_MONETARY = 1;
 	@Override
 	public void process(Exchange exchange) throws Exception {
 	    SmResultNotify smppRequest = null;
@@ -98,6 +99,10 @@ public class SmsRefundProcessor implements Processor {
 	            dauInfo.setDedicatedAccountID(Integer.parseInt(accounts[i]));
 	            dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
 	            dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
+	            
+	            if(accountTypes[i].equals("1")){//Monetary DA
+	            	ubdRequest.setTransactionCurrency("VND");
+	            }
 	            dasToUpdate.add(dauInfo); 
                 LogService.appLog.debug("Updating request with " + dauInfo.toString());
 		        //}
@@ -106,7 +111,7 @@ public class SmsRefundProcessor implements Processor {
 		        ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
 		        LogService.appLog.debug("Hav atleast 1 DA to add to the request.");
 		    }
-		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + ubdRequest.toString());
+		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request1:" + ubdRequest.toString());
 		    sbLog = null;
 		    
 		    boolean refundResult = false;
@@ -125,7 +130,13 @@ public class SmsRefundProcessor implements Processor {
                 LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
 		        exchange.getOut().setBody(smppResponse);
 		        return;
- 	        }  
+ 	        }  catch(Exception genE){
+ 	        	LogService.appLog.debug("SmsRefundProcessor-process:Encountered exception !!",genE);
+		        smppResponse = this.getRefundFailedSmppResponse(smppRequest);
+                LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
+		        exchange.getOut().setBody(smppResponse);
+		        return;
+ 	        }
 		    
 		    //now delete txn and move to archive now
 		    this.moveToArchive(txn, smppRequest.getFinalState().getValue(), refundResult, System.currentTimeMillis());
