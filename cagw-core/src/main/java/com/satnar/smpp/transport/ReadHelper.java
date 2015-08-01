@@ -62,11 +62,12 @@ public class ReadHelper implements Runnable {
                     synchronized (readBuffer) {
                         windowSize =  this.smppConnection.read(readBuffer);
                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Incoming Packet Size: " + windowSize);
-                        LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Read (" + windowSize + ") bytes with payload: " + prettyPrint(currentWindow));
                         // check the incoming packet size...
                         if (windowSize > 0) {
                             currentWindow = new byte[windowSize];
                             readBuffer.get(currentWindow); readBuffer.clear();
+                            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Read (" + windowSize + ") bytes with payload: " + prettyPrint(currentWindow));
+                            
                         } else { // else, lets wait 0.5 sec (this can be optimized later)
                             try {
                                 Thread.sleep(500);

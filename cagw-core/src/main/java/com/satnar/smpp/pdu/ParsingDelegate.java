@@ -32,6 +32,8 @@ public class ParsingDelegate implements Callable<Void> {
     private byte[] raw = null;
     private String esmeLabel = null;
     private ChannelMode channelMode = null;
+    private long creationTime = System.currentTimeMillis();
+    private long executionStartTime = 0;
     
     public ParsingDelegate(CamelContext context) {
         producerTemplate = context.createProducerTemplate();
@@ -44,6 +46,7 @@ public class ParsingDelegate implements Callable<Void> {
     }
 
     public Void call() throws Exception {
+        executionStartTime = System.currentTimeMillis();
     	LogService.appLog.debug("ParsingDeligate-call:Entered..");
         ByteArrayInputStream rawStream = new ByteArrayInputStream(raw);
         DataInputStream parser = new DataInputStream(rawStream);
@@ -65,18 +68,22 @@ public class ParsingDelegate implements Callable<Void> {
                 case GENERIC_NACK:
                     LogService.appLog.debug(String.format("Session: %s - GNACK Received and delegated", this.esmeLabel));
                     EsmeHelper.handleGNack(rawPdu);
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
                 case BIND_RECEIVER_RESP:
                     LogService.appLog.debug(String.format("Session: %s - BIND_RECEIVER_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleBindReceiverResponse(rawPdu);
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
                 case BIND_TRANSCEIVER_RESP:
                     LogService.appLog.debug(String.format("Session: %s - BIND_TRANSCEIVER_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleBindTransceiverResponse(rawPdu);
-                    return null;
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                   return null;
                 case BIND_TRANSMITTER_RESP:
                     LogService.appLog.debug(String.format("Session: %s - BIND_TRANSMITTER_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleBindTransmitterResponse(rawPdu);
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
                 case DELIVER_SM:
                     LogService.appLog.debug(String.format("Session: %s - DELIVER_SM Received and delegated", this.esmeLabel));
@@ -85,14 +92,17 @@ public class ParsingDelegate implements Callable<Void> {
                         com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     } else
                         EsmeHelper.sendDeliverSmThrottled(rawPdu);
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
                 case ENQUIRE_LINK:
                     LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK Received and delegated", this.esmeLabel));
                     EsmeHelper.handleEnquireLinkRequest(rawPdu, this.esmeLabel, this.channelMode);
-                    return null;
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                   return null;
                 case ENQUIRE_LINK_RESP:
                     LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK_RESP Received and delegated", this.esmeLabel));
                     EsmeHelper.handleEnquireLinkResponse(rawPdu);
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
                 default:
                     LogService.appLog.debug(String.format("Session: %s - UNKNOWN/EXTENDED Received and delegated", this.esmeLabel));
@@ -104,6 +114,7 @@ public class ParsingDelegate implements Callable<Void> {
                             pdu.getCommandSequence().getValue()));
                     SmppPdu response = null;
                     if (com.satnar.common.SpringHelper.getTraffiControl().authorizeIngress()){
+                        long backendDelegationTime = System.currentTimeMillis();
                         LogService.alarm(AlarmCode.SMS_THROTTLE_ABATE, this.esmeLabel);
                         LogService.appLog.info(String.format("Session: %s - Watergate approved ingress!!:CommandId: %s, Sequence: %s", this.esmeLabel, pdu.getCommandId(), 
                                 pdu.getCommandSequence().getValue()));
@@ -160,15 +171,20 @@ public class ParsingDelegate implements Callable<Void> {
                             
                             LogService.alarm(AlarmCode.SMS_UNKNOWN_PDU, this.esmeLabel, pdu.getCommandId(), pdu.getCommandSequence());
                             com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
+                            this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                             return null;
                         }
 
                         // this will update on all exgress
+                        long backendCompleteTime = System.currentTimeMillis();
+                        LogService.stackTraceLog.info(String.format("Session: %s - Backend TAT: %s for Command: %s & Sequence: %s", this.esmeLabel, (backendCompleteTime - backendDelegationTime), pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                     } else {
                         LogService.alarm(AlarmCode.SMS_THROTTLE_REJECT, this.esmeLabel);
                         LogService.stackTraceLog.info(String.format("Session: %s - Throttling ingress for Command: %s & Sequence: %s", this.esmeLabel, pdu.getCommandId(), pdu.getCommandSequence().getValue()));
                         EsmeHelper.sendThrottledResponse(pdu, this.channelMode);
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        return null;
                     }
                     
                     if ((commandId & EsmeHelper.REQUEST_MASK) == EsmeHelper.REQUEST_MASK) {                         
@@ -183,7 +199,7 @@ public class ParsingDelegate implements Callable<Void> {
                         }
                         
                     }
-                    
+                    this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
             }
         } else {
@@ -198,8 +214,14 @@ public class ParsingDelegate implements Callable<Void> {
             String sessionId = StackMap.getEsmeLabel("" + seq.getValue());
             Esme session = StackMap.getStack(sessionId);
             session.sendPdu(pdu, this.channelMode);
+            this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
             return null;
         }
+    }
+    
+    private void printStats(long endTime, String session, CommandId commandId, long sequence) {
+        LogService.stackTraceLog.info(String.format("Session: %s - Time in queue: %s & Time in actual execution: %s, for Command: %s & Sequence: %s", 
+                    this.esmeLabel, (this.executionStartTime - this.creationTime), (endTime - this.executionStartTime), commandId, sequence));
     }
     
 	
