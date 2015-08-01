@@ -159,24 +159,23 @@ public class TransactionDao {
      * destination : if length < 7 digits no change else keep it as international format
      * the below logic is from occ code snippet
      */
-	public String getUpdatedDestinationNumber(String destinationAddress){
-		
+	public String getUpdatedDestinationNumber(String destinationAddress){		
 		String otherPartyData = destinationAddress;
 				
-        if(otherPartyData != null
-        		&& otherPartyData.length() >= 7){
-            if (otherPartyData.matches("0")) {
-                if (otherPartyData.matches("^[0][1-9].*")) {
-                	otherPartyData = otherPartyData.replaceAll("^0","0084");
-                }
-                else {
-                    otherPartyData = "00"+otherPartyData;
-                }
-            }else{
-            	otherPartyData = "00"+otherPartyData;
-            }
-        }
-        return otherPartyData;
+		if(otherPartyData != null
+				&& otherPartyData.length() >= 7){
+		    if (otherPartyData.matches("0")) {
+		        if (otherPartyData.matches("^[0][1-9].*")) {
+		        	otherPartyData = otherPartyData.replaceAll("^0","0084");
+		        }
+		        else {
+		            otherPartyData = "00"+otherPartyData;
+		        }
+		    }else{
+		    	otherPartyData = "00"+otherPartyData;
+		    }
+		}
+		return otherPartyData;
 	}
 
 }
