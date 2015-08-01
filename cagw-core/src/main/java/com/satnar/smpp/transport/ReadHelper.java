@@ -31,7 +31,7 @@ public class ReadHelper implements Runnable {
         
         this.processorPool = new ThreadPoolExecutor((this.threadPoolSize/4),    // initial pool size
                 this.threadPoolSize,                                            // max pool size
-                30000,                                                          // keep alive time
+                300,                                                          // keep alive time
                 TimeUnit.MILLISECONDS,                                          // keep alive time unit (set to 30 secs)
                 new LinkedBlockingQueue<Runnable>((this.threadPoolSize/2)));    // wait queue size
     }
