@@ -29,7 +29,7 @@ public class ReadHelper implements Runnable {
         this.smppConnection = connection;
         this.threadPoolSize = this.smppConnection.getThreadPoolSize();
         
-        this.processorPool = new ThreadPoolExecutor((this.threadPoolSize/3),    // initial pool size
+        this.processorPool = new ThreadPoolExecutor((this.threadPoolSize),    // initial pool size
                 this.threadPoolSize,                                            // max pool size
                 300,                                                          // keep alive time
                 TimeUnit.MILLISECONDS,                                          // keep alive time unit (set to 30 secs)
