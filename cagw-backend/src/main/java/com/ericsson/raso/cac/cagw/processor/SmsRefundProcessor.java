@@ -25,7 +25,7 @@ import com.satnar.smpp.CommandStatus;
 
 public class SmsRefundProcessor implements Processor {
 	
-	private static final int DA_TYPE_MONETARY = 1;
+	private static final String TRANSACTION_TYPE = "SMS Refund";
 	@Override
 	public void process(Exchange exchange) throws Exception {
 	    SmResultNotify smppRequest = null;
@@ -45,9 +45,11 @@ public class SmsRefundProcessor implements Processor {
 		    }
 		    
 		    Transaction txn = null;
+		    TransactionDao txnDao = null;
 		    try {
-		            // check for data to refund		    
-		        txn = new TransactionDao().fetchSmsCharging(smppRequest.getSmId().getString(), 
+		            // check for data to refund		
+		    	txnDao = new TransactionDao();
+		        txn = txnDao.fetchSmsCharging(smppRequest.getSmId().getString(), 
 		            smppRequest.getSourceAddress().getString(), 
 		            smppRequest.getDestinationAddress().getString());
 		    } catch (PersistenceException e) {
@@ -73,9 +75,11 @@ public class SmsRefundProcessor implements Processor {
 		    ubdRequest.setSubscriberNumber(txn.getChargedParty());
 		    ubdRequest.setSubscriberNumberNAI(1);
 		    ubdRequest.setSiteId("1");
-//		    ubdRequest.setNegotiatedCapabilities(805646916);
-		    ubdRequest.setTransactionCode(smppRequest.getDestinationAddress().getString());
-		    
+		    //ubdRequest.setNegotiatedCapabilities(805646916);
+		    //ubdRequest.setTransactionCode(smppRequest.getDestinationAddress().getString ());
+		    //01-AUG-2015: to apply number normalization for destination number
+		    ubdRequest.setTransactionCode(txnDao.getUpdatedDestinationNumber(smppRequest.getDestinationAddress().getString()));
+		    ubdRequest.setTransactionType(TRANSACTION_TYPE);
 		    StringBuilder sbLog = new StringBuilder("");
 		    sbLog.append("SubscriberNumber:");sbLog.append(ubdRequest.getSubscriberNumber());
 		    
@@ -100,7 +104,8 @@ public class SmsRefundProcessor implements Processor {
 	            dauInfo.setDedicatedAccountUnitType(Integer.parseInt(accountTypes[i]));
 	            dauInfo.setAdjustmentAmountRelative("-" + amounts[i]);
 	            
-	            if(accountTypes[i].equals("1")){//Monetary DA
+	            //if(accountTypes[i].equals("1")){//Monetary DA
+	            if(Integer.parseInt(accountTypes[i]) == 1){
 	            	ubdRequest.setTransactionCurrency("VND");
 	            }
 	            dasToUpdate.add(dauInfo); 
@@ -111,7 +116,7 @@ public class SmsRefundProcessor implements Processor {
 		        ubdRequest.setDedicatedAccountUpdateInformation(dasToUpdate);
 		        LogService.appLog.debug("Hav atleast 1 DA to add to the request.");
 		    }
-		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request1:" + ubdRequest.toString());
+		    LogService.appLog.debug("SmsRefundProcessor-process:AIR request:" + ubdRequest.toString());
 		    sbLog = null;
 		    
 		    boolean refundResult = false;
@@ -130,14 +135,7 @@ public class SmsRefundProcessor implements Processor {
                 LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
 		        exchange.getOut().setBody(smppResponse);
 		        return;
- 	        }  catch(Exception genE){
- 	        	LogService.appLog.debug("SmsRefundProcessor-process:Encountered exception !!",genE);
-		        smppResponse = this.getRefundFailedSmppResponse(smppRequest);
-                LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
-		        exchange.getOut().setBody(smppResponse);
-		        return;
- 	        }
-		    
+ 	        }		    
 		    //now delete txn and move to archive now
 		    this.moveToArchive(txn, smppRequest.getFinalState().getValue(), refundResult, System.currentTimeMillis());
 		    LogService.appLog.info("Transaction archived for : " + smppRequest.getSmId().getString());
