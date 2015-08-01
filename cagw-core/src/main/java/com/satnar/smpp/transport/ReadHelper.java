@@ -13,6 +13,8 @@ import com.satnar.common.LogService;
 import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.Esme;
+import com.satnar.smpp.codec.SmppParameter;
+import com.satnar.smpp.codec.SmppParameter.Type;
 import com.satnar.smpp.pdu.ParsingDelegate;
 
 public class ReadHelper implements Runnable { 
@@ -93,7 +95,7 @@ public class ReadHelper implements Runnable {
                                 int pduLength = parser.readInt();
                                 currentSlidingReminaing = parser.available();
                                 LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes & sliding window curr_size: " + currentSlidingReminaing);
-                                if ((pduLength>0) && (pduLength - 4) <= currentSlidingReminaing ){
+                                if ((pduLength>0) && (pduLength - 4) <= currentSlidingReminaing ) {
                                     LogService.appLog.debug("Sliding Window has (" + pduLength + ") bytes to read & process");
                                     
                                     byte[] pduPayload = new byte[pduLength - 4];
@@ -117,6 +119,7 @@ public class ReadHelper implements Runnable {
                                     }
                                 } else {
                                     LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - allow the sliding window to handle the rest of the burst in the next incoming packet");
+                                    slidingWindow.rewind(SmppParameter.getInstance(Type.INTEGER, pduLength).encode());
                                     break; // allow the sliding window to handle the rest of the burst in the next incoming packet
                                 }
                             }

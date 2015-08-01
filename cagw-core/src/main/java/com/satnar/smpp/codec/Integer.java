@@ -15,7 +15,10 @@ public class Integer extends SmppParameter {
 
     @Override
     public byte[] encode() {
-        throw new IllegalStateException("Not implemented for this type!!");
+        return new byte[] {(byte)(0xff & (value >> 24)), 
+                (byte)(0xff & (value >> 16)),
+                (byte)(0xff & (value >>  8)),
+                (byte)(0xff & value)};
     }
 
     @Override

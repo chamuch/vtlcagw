@@ -15,6 +15,45 @@ public class SlidingWindowBuffer {
     private ByteArrayInputStream consuming = null;
     private DataInputStream parser = null;
     
+    public synchronized void rewind(byte[] rewind) throws SmppTransportException {
+        try {
+            ByteArrayOutputStream baosRaw = new ByteArrayOutputStream();
+            baosRaw.write(rewind);
+            
+            if (this.parser != null) {
+                int burstWindow = this.parser.available();
+                LogService.appLog.debug("Previous remaining window size: " + burstWindow);
+                if (burstWindow > 0) {
+                    byte[] tempRemaining = new byte[burstWindow];
+                    this.parser.read(tempRemaining);
+                    baosRaw.write(tempRemaining);
+                } 
+            }
+            
+            this.slidingWindow = baosRaw.toByteArray();
+            LogService.appLog.debug("New Adjusted Rewind window size: " + this.slidingWindow.length);
+            baosRaw.close();
+            baosRaw = null;
+            
+            if (this.parser != null) {
+                this.parser.close();
+                this.parser = null;
+            }
+            
+            if (this.consuming != null) {
+                this.consuming.close();
+                this.consuming = null;
+            }
+            
+            this.consuming = new ByteArrayInputStream(this.slidingWindow);
+            this.parser = new DataInputStream(this.consuming);
+            LogService.appLog.debug("Sliding Window ready. Check buffer: " + this.parser.available());
+        } catch (IOException e) {
+            LogService.appLog.error("sliding window rewind failed. Check exception: " + e, e);
+            throw new SmppTransportException("Cannot rewind. Size: " + rewind.length);
+        }
+    }
+    
     public synchronized void push(byte[] payload) throws SmppTransportException {
         try {
             // check for previous sliding window remaining...
