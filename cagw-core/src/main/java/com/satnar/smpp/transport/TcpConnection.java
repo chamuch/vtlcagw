@@ -47,10 +47,10 @@ public class TcpConnection extends Connection {
     public TcpConnection(Properties connectionConfig, ChannelMode channelMode) {
         this.config = connectionConfig;
         
-        requestBuffer = ByteBuffer.allocate(4096);
+        requestBuffer = ByteBuffer.allocate(1024);
         requestBuffer.order(ByteOrder.BIG_ENDIAN);
         
-        responseBuffer = ByteBuffer.allocate(1024);
+        responseBuffer = ByteBuffer.allocate(4096);
         responseBuffer.order(ByteOrder.BIG_ENDIAN);
         
         this.mode = channelMode;
