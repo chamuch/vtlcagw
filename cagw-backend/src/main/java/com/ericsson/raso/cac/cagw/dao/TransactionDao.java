@@ -112,14 +112,14 @@ public class TransactionDao {
         try {
         	
             if(cluster != null && session != null) {
-            	String otherPartyData = getUpdatedDestinationNumber(destinationAddress);//30-JUL-2015: For number normalization
+            	//String otherPartyData = getUpdatedDestinationNumber(destinationAddress);//30-JUL-2015: For number normalization
             	
-            	LogService.appLog.info("fetchSmsCharging for messageId:"+messageId+": sourceAddress:"+ sourceAddress+ ": destinationAddress:"+otherPartyData);
+            	LogService.appLog.info("fetchSmsCharging for messageId:"+messageId+": sourceAddress:"+ sourceAddress+ ": destinationAddress:"+destinationAddress);
             	
                 Select select = QueryBuilder.select().all().from(connection.getKeyspace(), TRANSACTION_TABLE);
                                                 select.where((eq("messageId", messageId)))
                                                 .and(eq("sourceAddress", sourceAddress))
-                                                .and(eq("destinationAddress", otherPartyData));
+                                                .and(eq("destinationAddress", destinationAddress));
                                                 select.allowFiltering();
 
                 List<Row> results = session.execute(select).all();

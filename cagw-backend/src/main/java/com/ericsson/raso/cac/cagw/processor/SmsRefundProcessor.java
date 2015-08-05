@@ -49,9 +49,11 @@ public class SmsRefundProcessor implements Processor {
 		    try {
 		            // check for data to refund		
 		    	txnDao = new TransactionDao();
+		    	String destinationAddress = txnDao.getUpdatedDestinationNumber(smppRequest.getDestinationAddress().getString());//30-JUL-2015: For number normalization
+		    	
 		        txn = txnDao.fetchSmsCharging(smppRequest.getSmId().getString(), 
 		            smppRequest.getSourceAddress().getString(), 
-		            smppRequest.getDestinationAddress().getString());
+		            destinationAddress);
 		    } catch (PersistenceException e) {
                 smppResponse = this.getRefundFailedSmppResponse(smppRequest);
                 LogService.stackTraceLog.info("Response >> " + smppResponse.toString());
