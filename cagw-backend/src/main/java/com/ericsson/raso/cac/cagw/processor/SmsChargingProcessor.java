@@ -56,12 +56,16 @@ public class SmsChargingProcessor implements Processor {
 	    AuthAcc smppRequest = exchange.getIn().getBody(AuthAcc.class);
         LogService.stackTraceLog.info("Request>> " + smppRequest.toString());
         
+        long occStartTime = 0;
+        long occEndTime = 0;
         try{
 			LogService.appLog.debug("Preparing SCAP Request for Auth ACC Request# " + smppRequest.getSmId().getString());
 	        Ccr scapRequest = this.getScapRequest(smppRequest);
 	        
 	        LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC: " + scapRequest.toString());
+	        occStartTime = System.currentTimeMillis(); 
 	        Cca scapResponse = scapRequest.send();
+	        occEndTime = System.currentTimeMillis();
 	        LogService.stackTraceLog.info("Received SCAP CCA Response from OCC: " + scapResponse.toString());
 	        
 	        LogService.appLog.debug("Preparing Auth ACC Response for Request# " + smppRequest.getSmId().getString());
@@ -76,7 +80,7 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
 	        
 	        long exitTime = System.currentTimeMillis();
-	        LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime));
+	        LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (occEndTime-occStartTime));
 	        exchange.getOut().setBody(smppResponse);
 		}catch (Exception genE){//Added for troubleshooting
 			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE); 
@@ -84,7 +88,7 @@ public class SmsChargingProcessor implements Processor {
             LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
 
             long exitTime = System.currentTimeMillis();
-            LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime));
+            LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (((occEndTime==0)?exitTime:occEndTime)-occStartTime));
             exchange.getOut().setBody(smppResponse);
 		}
 	}
