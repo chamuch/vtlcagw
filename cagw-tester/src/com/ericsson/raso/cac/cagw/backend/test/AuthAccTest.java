@@ -35,7 +35,7 @@ import com.satnar.smpp.codec.SmppParameter.Type;
 public class AuthAccTest {
     
     private static AtomicInteger smId = new AtomicInteger(0x10000000);
-    private static ExecutorService threadPool = new ThreadPoolExecutor(100, 200, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100));
+    private static ExecutorService threadPool = new ThreadPoolExecutor(100, 400, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(600));
     
     static URL url = null;
     
