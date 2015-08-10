@@ -80,7 +80,7 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
 	        
 	        long exitTime = System.currentTimeMillis();
-	        LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (occEndTime-occStartTime));
+	        LogService.stackTraceLog.info("Request# " + smppRequest.getSmId().getString() + " - Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (occEndTime-occStartTime));
 	        exchange.getOut().setBody(smppResponse);
 		}catch (Exception genE){//Added for troubleshooting
 			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE); 
@@ -88,7 +88,7 @@ public class SmsChargingProcessor implements Processor {
             LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
 
             long exitTime = System.currentTimeMillis();
-            LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (((occEndTime==0)?exitTime:occEndTime)-occStartTime));
+            LogService.stackTraceLog.info("Request# " + smppRequest.getSmId().getString() + " - Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (((occEndTime==0)?exitTime:occEndTime)-occStartTime));
             exchange.getOut().setBody(smppResponse);
 		}
 	}
