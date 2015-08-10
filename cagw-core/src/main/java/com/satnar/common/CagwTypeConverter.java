@@ -15,6 +15,10 @@ public class CagwTypeConverter {
     
     private static Gson gson = new Gson();
     
+    static {
+        System.out.println(">>>>>>>>>>>> CagwTypeConvertor - Am I getting scanned or not?!!??!!");
+    }
+    
     @Converter
     @FallbackConverter
     public static AuthAcc convertToAuthAcc(Class<AuthAcc> type, String gsonPayload, Exchange exchange) {
