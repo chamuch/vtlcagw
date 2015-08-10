@@ -59,7 +59,9 @@ public class AuthAccTest {
         }
         
         long testStartTime = System.currentTimeMillis(); 
+        System.out.print("Spawning requests.");
         for (int i=0; i < repetitions; i++) {
+            System.out.print(".");
             threadPool.submit(new Callable<Void>() {
                 public Void call() {
                     postSmsCharge(url.toString());
@@ -67,6 +69,8 @@ public class AuthAccTest {
                 }
             });
         }
+        System.out.println();
+        System.out.print("Awaiting completion...");
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(2, TimeUnit.HOURS);
@@ -76,7 +80,7 @@ public class AuthAccTest {
         }
         long testEndTime = System.currentTimeMillis();
         
-        System.out.println("Test Run time: " + (testEndTime - testStartTime) + ", Average TPS: " + repetitions/(testEndTime - testStartTime));
+        System.out.println("DONE\n\nTest Run time: " + (testEndTime - testStartTime) + ", Average TPS: " + repetitions/(testEndTime - testStartTime));
         
         
         //msisdn:841669005768
