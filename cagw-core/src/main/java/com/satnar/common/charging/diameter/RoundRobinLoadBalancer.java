@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.satnar.common.LogService;
 
 public class RoundRobinLoadBalancer implements LoadBalancer {
@@ -48,8 +45,8 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 
 		int target = counter.getAndIncrement();
 		while (target >= size) {
-			counter.set(0); // reset counter
-			target = counter.getAndIncrement();
+			counter.set(1); // reset counter
+			target = 0;
 		}
 
 		LogService.appLog.debug("Route selected: " + pool.get(target));
@@ -66,8 +63,8 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 
 		int target = counter.getAndIncrement();
 		while (target >= size) {
-			counter.set(0); // reset counter
-			target = counter.getAndIncrement();
+			counter.set(1); // reset counter
+			target = 0;
 		}
 
         LogService.appLog.debug("Route selected: " + pool.get(target));

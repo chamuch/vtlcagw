@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpResponse;
@@ -29,6 +35,7 @@ import com.satnar.smpp.codec.SmppParameter.Type;
 public class AuthAccTest {
     
     private static AtomicInteger smId = new AtomicInteger(0x10000000);
+    private static ExecutorService threadPool = new ThreadPoolExecutor(100, 200, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100));
     
     static URL url = null;
     
@@ -51,14 +58,26 @@ public class AuthAccTest {
             System.out.println("Repetitions not valid. Check: " + args[1]);
         }
         
+        long testStartTime = System.currentTimeMillis(); 
         for (int i=0; i < repetitions; i++) {
-            new Thread(new Runnable() {
-                public void run() {
+            threadPool.submit(new Callable<Void>() {
+                public Void call() {
                     postSmsCharge(url.toString());
+                    return null;
                 }
-            }).start();
-            
+            });
         }
+        threadPool.shutdown();
+        try {
+            threadPool.awaitTermination(2, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        long testEndTime = System.currentTimeMillis();
+        
+        System.out.println("Test Run time: " + (testEndTime - testStartTime) + ", Average TPS: " + repetitions/(testEndTime - testStartTime));
+        
         
         //msisdn:841669005768
         
