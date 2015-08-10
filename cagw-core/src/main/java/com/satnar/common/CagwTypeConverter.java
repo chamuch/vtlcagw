@@ -19,28 +19,36 @@ public class CagwTypeConverter {
     @FallbackConverter
     public static AuthAcc convertToAuthAcc(Class<AuthAcc> type, String gsonPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling AuthAcc...");
-        return gson.fromJson(gsonPayload, AuthAcc.class);
+        AuthAcc result = gson.fromJson(gsonPayload, AuthAcc.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", gsonPayload, result));
+        return result;
     }
     
     @Converter
     @FallbackConverter
     public static AuthAccResponse convertToAuthAccResp(Class<AuthAccResponse> type, String gsonPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling AuthAccResponse...");
-        return gson.fromJson(gsonPayload, AuthAccResponse.class);
+        AuthAccResponse result = gson.fromJson(gsonPayload, AuthAccResponse.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", gsonPayload, result));
+        return result;
     }
     
     @Converter
     @FallbackConverter
     public static SmResultNotify convertToSmResultNotify(Class<SmResultNotify> type, String gsonPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling SmResultNotify...");
-        return gson.fromJson(gsonPayload, SmResultNotify.class);
+        SmResultNotify result = gson.fromJson(gsonPayload, SmResultNotify.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", gsonPayload, result));
+        return result;
     }
     
     @Converter
     @FallbackConverter
     public static SmResultNotifyResponse convertToSmResultNotifyResp(Class<SmResultNotifyResponse> type, String gsonPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling SmResultNotifyResponse...");
-        return gson.fromJson(gsonPayload, SmResultNotifyResponse.class);
+        SmResultNotifyResponse result = gson.fromJson(gsonPayload, SmResultNotifyResponse.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", gsonPayload, result));
+        return result;
     }
     
 
@@ -48,28 +56,36 @@ public class CagwTypeConverter {
     @FallbackConverter
     public static String convertAuthAcc(Class<AuthAcc> type, AuthAcc pojoPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - marshalling AuthAcc...");
-        return gson.toJson(pojoPayload, AuthAcc.class);
+        String result = gson.toJson(pojoPayload, AuthAcc.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", result, pojoPayload));
+        return result;
     }
     
     @Converter
     @FallbackConverter
     public static String convertAuthAccResp(Class<AuthAccResponse> type, AuthAccResponse pojoPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - marshalling AuthAccResponse...");
-        return gson.toJson(pojoPayload, AuthAccResponse.class);
+        String result = gson.toJson(pojoPayload, AuthAccResponse.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", result, pojoPayload));
+        return result;
     }
     
     @Converter
     @FallbackConverter
     public static String convertToSmResultNotify(Class<SmResultNotify> type, SmResultNotify pojoPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - marshalling SmResultNotify...");
-        return gson.toJson(pojoPayload, SmResultNotify.class);
+        String result = gson.toJson(pojoPayload, SmResultNotify.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", result, pojoPayload));
+        return result;
     }
     
     @Converter
     @FallbackConverter
     public static String convertToSmResultNotifyResp(Class<SmResultNotifyResponse> type, SmResultNotifyResponse pojoPayload, Exchange exchange) {
         System.out.println(">>>>>>>>>>>> CagwTypeConvertor - marshalling SmResultNotifyResponse...");
-        return gson.toJson(pojoPayload, SmResultNotifyResponse.class);
+        String result = gson.toJson(pojoPayload, SmResultNotifyResponse.class);
+        System.out.println(String.format(">>>>>>>>>>>> CagwTypeConvertor - unmarshalling ||JSON: %s||PDU: %s||", result, pojoPayload));
+        return result;
     }
     
     
