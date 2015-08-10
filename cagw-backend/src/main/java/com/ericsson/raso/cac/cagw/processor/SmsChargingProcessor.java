@@ -52,7 +52,8 @@ public class SmsChargingProcessor implements Processor {
     
 	@Override
 	public void process(Exchange exchange) throws Exception {
-	    AuthAcc smppRequest = (AuthAcc) exchange.getIn().getBody();
+	    long entryTime = System.currentTimeMillis();
+	    AuthAcc smppRequest = exchange.getIn().getBody(AuthAcc.class);
         LogService.stackTraceLog.info("Request>> " + smppRequest.toString());
         
         try{
@@ -73,11 +74,17 @@ public class SmsChargingProcessor implements Processor {
 	        ConcurrencyControl.enqueueExecution(new PersistSmsChargeTransaction(smsChargingStatus));
 	        
 	        LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
+	        
+	        long exitTime = System.currentTimeMillis();
+	        LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime));
 	        exchange.getOut().setBody(smppResponse);
 		}catch (Exception genE){//Added for troubleshooting
 			LogService.appLog.debug("SmsChargingProcessor-process:Encountered exception.",genE); 
 			AuthAccResponse smppResponse = this.getUnknownFailureSmppResponse(smppRequest);
             LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
+
+            long exitTime = System.currentTimeMillis();
+            LogService.stackTraceLog.info("Processing Time: " + (exitTime - entryTime));
             exchange.getOut().setBody(smppResponse);
 		}
 	}
