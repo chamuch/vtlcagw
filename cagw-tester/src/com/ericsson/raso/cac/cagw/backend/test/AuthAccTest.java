@@ -80,7 +80,7 @@ public class AuthAccTest {
         }
         long testEndTime = System.currentTimeMillis();
         
-        System.out.println("DONE\n\nTest Run time: " + (testEndTime - testStartTime) + ", Average TPS: " + repetitions/(testEndTime - testStartTime));
+        System.out.println("DONE\n\nTest Run time: " + (testEndTime - testStartTime) + ", Average TPS: " + ((float)((repetitions*1000)/(testEndTime - testStartTime))));
         
         
         //msisdn:841669005768
