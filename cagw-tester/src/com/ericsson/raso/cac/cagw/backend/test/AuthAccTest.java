@@ -30,6 +30,8 @@ public class AuthAccTest {
     
     private static AtomicInteger smId = new AtomicInteger(0x10000000);
     
+    static URL url = null;
+    
     public static void main(String[] args) {
         if (args.length != 2) {
             System.out.println("Usage: java AuthAccTest <cagw-url> <number of repetition>");
@@ -37,7 +39,7 @@ public class AuthAccTest {
         }
         
         try {
-            URL url = new URL(args[0]);
+            url = new URL(args[0]);
         } catch (Exception e) {
             System.out.println("URL not valid. Check: " + args[0]);
         }
@@ -50,7 +52,12 @@ public class AuthAccTest {
         }
         
         for (int i=0; i < repetitions; i++) {
-            postSmsCharge(args[0]);
+            new Thread(new Runnable() {
+                public void run() {
+                    postSmsCharge(url.toString());
+                }
+            }).start();
+            
         }
         
         //msisdn:841669005768
