@@ -82,12 +82,13 @@
 	<camel:camelContext id="com.ericsson.raso.cac.smppfe"
 		xmlns="http://camel.apache.org/schema/spring">
 		<propertyPlaceholder id="properties" location="ref:cgProperties" /> 
-		<!-- <threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="1200" 
-			maxPoolSize="1200" maxQueueSize="10" /> <threadPool id="smpp-frontend" poolSize="1200" 
-			maxPoolSize="1200" threadName="smpp-frontend" camelContextId="com.ericsson.raso.cac.smppfe" 
-			/> -->
+		<camel:threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="100" 
+			maxPoolSize="100" maxQueueSize="10" /> 
+		<camel:threadPool id="cagw-backend" poolSize="200"
+			maxPoolSize="500"  maxQueueSize="10" threadName="cagw-backend" camelContextId="com.ericsson.raso.cac.smppfe" 
+			/>
 		<camel:route id="cagw-smppfe-backend">
-			<camel:from uri="seda:cagw-backend?timeout=120000" />
+			<camel:from uri="seda:cagw-backend?waitForTaskToComplete=Never&amp;timeout=0&amp;concurrentConsumers=200" />
 			<camel:doTry>
 				<camel:when>
 					<camel:simple>${header.fe} == 'auth_acc'</camel:simple>
