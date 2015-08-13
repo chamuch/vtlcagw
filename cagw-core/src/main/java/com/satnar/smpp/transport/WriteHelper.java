@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import com.satnar.common.LogService;
 import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.Esme;
+import com.satnar.smpp.client.EsmeHelper;
 import com.satnar.smpp.codec.SmppCodecException;
 import com.satnar.smpp.pdu.SmppPdu;
 
@@ -36,7 +37,7 @@ public class WriteHelper {
         try {
             ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
             byte[] serialized = payload.encode();
-            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + prettyPrint(serialized));
+            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + EsmeHelper.prettyPrint(serialized));
             synchronized (writeBuffer) {
                 writeBuffer.clear();
                 writeBuffer.put(serialized);
@@ -57,15 +58,6 @@ public class WriteHelper {
         }
     }
     
-    private String prettyPrint(byte[] serialized) {
-        StringBuilder sbPrettyPrint = new StringBuilder();
-        for (byte atom: serialized) {
-            sbPrettyPrint.append(Integer.toHexString((0xff&atom)));
-            sbPrettyPrint.append(" ");
-        }
-        return sbPrettyPrint.toString();
-    }
-
     public void writeLazy(SmppPdu payload) throws SmppCodecException, SmppTransportException  {
         if (this.smppConnection.getConnectionState() == SmppSessionState.CLOSED ||
                 this.smppConnection.getConnectionState() == SmppSessionState.UNBOUND)
@@ -73,7 +65,7 @@ public class WriteHelper {
         
         try {
             byte[] serialized = payload.encode();
-            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - buffering payload: " + prettyPrint(serialized));
+            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - buffering payload: " + EsmeHelper.prettyPrint(serialized));
             this.lazyWriteBuffer.write(serialized);
             
             

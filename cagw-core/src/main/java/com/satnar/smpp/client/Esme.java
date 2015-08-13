@@ -201,20 +201,20 @@ public class Esme {
                 this.trxReader = null;
                 LogService.appLog.info(this.getEsmeLabel() + " - Cleanup transport resources");
                
-                label = this.getEsmeLabel();
-                StackMap.removeSession(label);
                 if(this.trxChannel != null) this.trxChannel.disconnect();
                 this.trxChannel = null;
-                
-                LogService.stackTraceLog.info(this.getEsmeLabel() + " Esme-stop:Transiever is successful!!");
+
+                label = this.getEsmeLabel();
+                StackMap.removeSession(label);
+                LogService.appLog.info(this.getEsmeLabel() + " Esme-stop:Transiever is successful!!");
             } else {
                 if (this.txChannel.getConnectionState() == SmppSessionState.BOUND_TX) {
-                    LogService.appLog.info(this.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.warn(this.getEsmeLabel() + " - TX Mode in valid BOUND state... Unbinding");
                     this.unbindTx();
                 }
                 
                 if (this.rxChannel.getConnectionState() == SmppSessionState.BOUND_RX) {
-                    LogService.appLog.info(this.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
+                    LogService.appLog.warn(this.getEsmeLabel() + " - RX Mode in valid BOUND state... Unbinding");
                     this.unbindRx();
                 }
                 
@@ -227,26 +227,26 @@ public class Esme {
                 this.txReader = null;
                 this.rxReader = null;
                 
-//                label = this.txChannel.getEsmeLabel();
-//                StackMap.removeSession(label);
-//                if(this.txChannel != null) this.txChannel.disconnect();
-//                this.txChannel = null;
+                if(this.txChannel != null) this.txChannel.disconnect();
+                //this.txChannel = null;
+                LogService.appLog.info(this.getEsmeLabel() + "Esme-stop:Transmitter is successful!!");
                 
-                LogService.stackTraceLog.info(this.getEsmeLabel() + "Esme-stop:Transmitter is successful!!");
                 if(this.rxChannel != null) this.rxChannel.disconnect();
-                this.rxChannel = null;
-                
-                LogService.stackTraceLog.info(this.getEsmeLabel() + "Esme-stop:Receiver is successful!!");
+                //this.rxChannel = null;
+                LogService.appLog.info(this.getEsmeLabel() + "Esme-stop:Receiver is successful!!");
+
+                label = this.txChannel.getEsmeLabel();
+                StackMap.removeSession(label);
             }
         } catch (SmppTransportException e) {
-            // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug(this.getEsmeLabel() + "Esme-stop:Unable to stop!:",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - Esme-stop:Unable to stop!: " + e.getMessage(), e);
             StackMap.removeSession(label);
         } catch (SmppServiceException e) {
-            // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug(this.getEsmeLabel() + "Esme-stop:Unable to stop!:",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - Esme-stop:Unable to stop!: " + e.getMessage(), e);
             StackMap.removeSession(label);
         }
+
+        LogService.appLog.info(this.getEsmeLabel() + " ESME Shutdown and cleaned up!!");
     }
     
     public void sendPdu(SmppPdu pdu, ChannelMode mode) throws SmppCodecException {
@@ -597,28 +597,27 @@ public class Esme {
             StackMap.addSession(this.getEsmeLabel(), this);
             LogService.appLog.debug("Added Session to StackMap with key: " + this.getEsmeLabel());
        } catch (SmppCodecException e) {
-            // TODO Log for troubleshooting
-    	   LogService.stackTraceLog.debug("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);
+            LogService.appLog.error("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);
             this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + bindRx.getCommandSequence().getValue());
             throw new SmppServiceException("Unable to request Bind RX!", e);
         } catch (SmppTransportException e) {
-            // TODO Log for troubleshooting
-        	LogService.stackTraceLog.debug("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);        	
+            LogService.appLog.error("Esme-bindReceiver:Encountered exception:AddressRange:"+this.addressRange+"CommandSequence:"+bindRx.getCommandSequence().getValue(),e);        	
             this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + bindRx.getCommandSequence().getValue());
             throw new SmppServiceException("Unable to request Bind RX!", e);
         }
 
-        while (this.rxChannel.getConnectionState() != SmppSessionState.BOUND_RX || 
-                this.rxChannel.getConnectionState() != SmppSessionState.CLOSED) {
+        do {
         	try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				//Nothing can be done
 			}
-            continue;
-        }
+            if (this.rxChannel == null)
+                break;
+        } while ( this.rxChannel.getConnectionState() != SmppSessionState.BOUND_RX || 
+                this.rxChannel.getConnectionState() != SmppSessionState.CLOSED);
         StackMap.removeMessageIndex("" + bindRx.getCommandSequence().getValue());
         
         LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now BOUND_RX");

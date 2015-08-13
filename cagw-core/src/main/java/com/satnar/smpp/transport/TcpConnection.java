@@ -71,57 +71,45 @@ public class TcpConnection extends Connection {
             while (!this.connection.finishConnect())
                 continue;
             this.setConnectionState(SmppSessionState.OPEN);
-            LogService.stackTraceLog.info("TcpConnection-connect:Connected successfully. Address:"+this.address);
+            LogService.appLog.info("TcpConnection-connect:Connected successfully. Address:"+this.address);
             
             LogService.alarm(AlarmCode.SMS_CONNECTED, this.label, this.address);
             
         } catch (AlreadyConnectedException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Already Connected!!",e);
+            LogService.appLog.error("TcpConnection-connect:Illegal Transport State - Already Connected!!",e);
             throw new SmppTransportException("Illegal Transport State - Already Connected!!", e);
         } catch (NoConnectionPendingException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - No Connection Pending!!",e);
+            LogService.appLog.error("TcpConnection-connect:Illegal Transport State - No Connection Pending!!",e);
             throw new SmppTransportException("Illegal Transport State - No Connection Pending!!", e);
         } catch (ConnectionPendingException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect: Illegal Transport State - Async Connection Pending!!",e);
+            LogService.appLog.error("TcpConnection-connect: Illegal Transport State - Async Connection Pending!!",e);
             throw new SmppTransportException("Illegal Transport State - Async Connection Pending!!", e);
         } catch (ClosedByInterruptException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Concurrent Interrupt Closed this Socket!!",e);
+            LogService.appLog.error("TcpConnection-connect:Illegal Transport State - Concurrent Interrupt Closed this Socket!!",e);
             throw new SmppTransportException("Illegal Transport State - Concurrent Interrupt Closed this Socket!!", e);
         } catch (AsynchronousCloseException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Concurrent Close Attempted!!",e);
+            LogService.appLog.error("TcpConnection-connect:Illegal Transport State - Concurrent Close Attempted!!",e);
             throw new SmppTransportException("Illegal Transport State - Concurrent Close Attempted!!", e);
         } catch (ClosedChannelException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Illegal Transport State - Socket Already CLosed!!",e);
+            LogService.appLog.error("TcpConnection-connect:Illegal Transport State - Socket Already CLosed!!",e);
             throw new SmppTransportException("Illegal Transport State - Socket Already CLosed!!", e);
         } catch (UnresolvedAddressException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Unresolved Address!!",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Unresolved Address!!",e);
             throw new SmppTransportException("Transport Failure - Unresolved Address!!", e);
         } catch (UnsupportedAddressTypeException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Unsupported Address Type!!",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Unsupported Address Type!!",e);
             throw new SmppTransportException("Transport Failure - Unsupported Address Type!!", e);
         } catch (IllegalArgumentException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Port is not in valid range for TCP Stack!!",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Port is not in valid range for TCP Stack!!",e);
             throw new SmppTransportException("Transport Failure - Port is not in valid range for TCP Stack!!", e);
         } catch (SecurityException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Security Sandbox Rejects Access to this EndPoint!!",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Security Sandbox Rejects Access to this EndPoint!!",e);
             throw new SmppTransportException("Transport Failure - Security Sandbox Rejects Access to this EndPoint!!", e);
         } catch (IOException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Localised in TCP Stack",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Localised in TCP Stack",e);
             throw new SmppTransportException("Transport Failure - Localised in TCP Stack", e);
         } catch (Exception e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Unforeseen Realtime Exception!!",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Unforeseen Realtime Exception!!",e);
             throw new SmppTransportException("Transport Failure - Unforeseen Realtime Exception!!", e);
         }
         
@@ -129,16 +117,21 @@ public class TcpConnection extends Connection {
     
     @Override
     public void disconnect() throws SmppTransportException {
+        LogService.appLog.debug(String.format("Esme: %s - disconnecting... Check State: %s", this.label, this.getConnectionState()));
         try {
             switch (this.getConnectionState()) {
                 case UNBOUND:
                 case INIT_IDLE:
                 case OPEN:
-                    if (this.connection != null && this.connection.isConnected()) this.connection.close();
+                    if (this.connection != null && this.connection.isConnected()) {
+                        LogService.appLog.debug(String.format("Esme: %s - Found valid connection... Closing now!", this.label));
+                        this.connection.close();
+                    }
                     break;
                 case BOUND_RX:
                 case BOUND_TRX:
                 case BOUND_TX:
+                    LogService.appLog.debug(String.format("Esme: %s - Found bound_state... Recommend Unbind to avoid SMSC problems!", this.label));
                     throw new SmppTransportException("Unbind First");
                 case CLOSED:
                     break;
@@ -147,9 +140,10 @@ public class TcpConnection extends Connection {
             this.requestBuffer.clear();
             this.responseBuffer.clear();
             this.setConnectionState(SmppSessionState.CLOSED);
+            LogService.appLog.debug(String.format("Esme: %s - disconnected... Check State: %s", this.label, this.getConnectionState()));
+                
         } catch (IOException e) {
-            // TODO: Logger
-        	LogService.stackTraceLog.debug("TcpConnection-connect:Transport Failure - Localised in TCP Stack or Memory Buffers",e);
+            LogService.appLog.error("TcpConnection-connect:Transport Failure - Localised in TCP Stack or Memory Buffers",e);
             throw new SmppTransportException("Transport Failure - Localised in TCP Stack or Memory Buffers", e);
         }
     }

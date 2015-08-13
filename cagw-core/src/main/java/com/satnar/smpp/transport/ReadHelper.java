@@ -13,6 +13,7 @@ import com.satnar.common.LogService;
 import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.Esme;
+import com.satnar.smpp.client.EsmeHelper;
 import com.satnar.smpp.codec.SmppParameter;
 import com.satnar.smpp.codec.SmppParameter.Type;
 import com.satnar.smpp.pdu.ParsingDelegate;
@@ -29,11 +30,11 @@ public class ReadHelper implements Runnable {
         this.smppConnection = connection;
         this.threadPoolSize = this.smppConnection.getThreadPoolSize();
         
-        this.processorPool = new ThreadPoolExecutor((this.threadPoolSize),    // initial pool size
+        this.processorPool = new ThreadPoolExecutor((this.threadPoolSize),      // initial pool size
                 this.threadPoolSize,                                            // max pool size
-                300,                                                          // keep alive time
+                30000,                                                          // keep alive time
                 TimeUnit.MILLISECONDS,                                          // keep alive time unit (set to 30 secs)
-                new LinkedBlockingQueue<Runnable>((this.threadPoolSize)));    // wait queue size
+                new LinkedBlockingQueue<Runnable>((this.threadPoolSize * 2)));  // wait queue size
     }
     
     public void run() {
@@ -68,7 +69,7 @@ public class ReadHelper implements Runnable {
                         if (windowSize > 0) {
                             currentWindow = new byte[windowSize];
                             readBuffer.get(currentWindow); readBuffer.clear();
-                            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Read (" + windowSize + ") bytes with payload: " + prettyPrint(currentWindow));
+                            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Read (" + windowSize + ") bytes with payload: " + EsmeHelper.prettyPrint(currentWindow));
                             
                         } else { // else, lets wait 0.5 sec (this can be optimized later)
                             try {
@@ -104,13 +105,13 @@ public class ReadHelper implements Runnable {
                                     
                                     // delgate to pdu facade now
                                     try {
-                                        LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + prettyPrint(pduPayload));
+                                        LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + EsmeHelper.prettyPrint(pduPayload));
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_ABATE, this.smppConnection.getEsmeLabel());
                                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
-                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + prettyPrint(pduPayload) + ", Reason: ", e);
+                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + EsmeHelper.prettyPrint(pduPayload) + ", Reason: ", e);
                                         int commandId = parser.readInt();
                                         parser.readInt(); // skip the status
                                         int sequence = parser.readInt();
@@ -160,14 +161,7 @@ public class ReadHelper implements Runnable {
     }
     
     
-    private String prettyPrint(byte[] serialized) {
-        StringBuilder sbPrettyPrint = new StringBuilder();
-        for (byte atom: serialized) {
-            sbPrettyPrint.append(Integer.toHexString( (0xff&atom)));
-            sbPrettyPrint.append(" ");
-        }
-        return sbPrettyPrint.toString();
-    }
+    
     
     
 }

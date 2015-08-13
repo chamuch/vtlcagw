@@ -15,7 +15,7 @@ public class CagwTypeConverter {
     private static Gson gson = new Gson();
     
     static {
-        System.out.println(">>>>>>>>>>>> CagwTypeConvertor - Static - Am I getting scanned or not?!!??!!");
+        System.out.println(">>>>>>>>>>>> CagwTypeConvertor - Static - Am I getting scanned or not?!!??!!"); 
     }
     
     public CagwTypeConverter() {

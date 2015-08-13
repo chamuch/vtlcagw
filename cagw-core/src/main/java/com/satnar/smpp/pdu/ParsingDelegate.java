@@ -72,7 +72,8 @@ public class ParsingDelegate implements Callable<Void> {
                     return null;
                 case BIND_RECEIVER_RESP:
                     LogService.appLog.debug(String.format("Session: %s - BIND_RECEIVER_RESP Received and delegated", this.esmeLabel));
-                    EsmeHelper.handleBindReceiverResponse(rawPdu);
+                    LogService.stackTraceLog.info(String.format("Session: %s - BIND_RECEIVER_RESP Received, payload: %s", this.esmeLabel, EsmeHelper.prettyPrint(rawPdu)));
+                    EsmeHelper.handleBindReceiverResponse(rawPdu, esmeLabel);
                     this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                     return null;
                 case BIND_TRANSCEIVER_RESP:

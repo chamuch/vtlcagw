@@ -272,12 +272,11 @@ public abstract class EsmeHelper {
         }
     }
     
-    public static void handleBindReceiverResponse(byte[] rawPdu) {
+    public static void handleBindReceiverResponse(byte[] rawPdu, String sessionId) {
         try {
             SmppPdu bindRxRespPdu = new BindReceiverResponse();
             bindRxRespPdu.decode(rawPdu);
             
-            String sessionId = StackMap.getEsmeLabel("" + bindRxRespPdu.getCommandSequence().getValue());
             Esme session = StackMap.getStack(sessionId);
             StackMap.removeMessageIndex("" + bindRxRespPdu.getCommandSequence().getValue());
 
@@ -413,6 +412,14 @@ public abstract class EsmeHelper {
     }
 
 
+    public static String prettyPrint(byte[] serialized) {
+        StringBuilder sbPrettyPrint = new StringBuilder();
+        for (byte atom: serialized) {
+            sbPrettyPrint.append(Integer.toHexString( (0xff&atom)));
+            sbPrettyPrint.append(" ");
+        }
+        return sbPrettyPrint.toString();
+    }
    
     
     
