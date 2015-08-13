@@ -85,7 +85,7 @@
 
 	<httpj:engine-factory bus="cagwBackendEngine">
 		<httpj:engine port="9090">
-			<httpj:threadingParameters minThreads="50"
+			<httpj:threadingParameters minThreads="100"
 				maxThreads="500" />
 			<httpj:sessionSupport>false</httpj:sessionSupport>
 			<httpj:reuseAddress>true</httpj:reuseAddress>
@@ -111,8 +111,10 @@
 					<camel:simple>${header.fe} == 'auth_acc'</camel:simple>
 					<camel:unmarshal ref="gsonAuthAcc" />
 					<camel:log message="From Backend :${body}" />
+					<!-- <camel:bean
+						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" /> -->
 					<camel:bean
-						beanType="com.ericsson.raso.cac.cagw.processor.BackendFacadeProcessor" />
+						beanType="com.ericsson.raso.cac.cagw.processor.SmsChargingProcessor" />	
 					<camel:marshal ref="gsonAuthAccResponse" />
 				</camel:when>
 				<camel:when>
