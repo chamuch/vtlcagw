@@ -612,6 +612,11 @@ public class Esme {
 
         while (this.rxChannel.getConnectionState() != SmppSessionState.BOUND_RX || 
                 this.rxChannel.getConnectionState() != SmppSessionState.CLOSED) {
+        	try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				//Nothing can be done
+			}
             continue;
         }
         StackMap.removeMessageIndex("" + bindRx.getCommandSequence().getValue());
