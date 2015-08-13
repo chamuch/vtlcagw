@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ConcurrencyControl {
     
-    private static ExecutorService threadPool = new ThreadPoolExecutor(100, 200, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100));
+    private static ExecutorService threadPool = new ThreadPoolExecutor(150, 150, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(220));
     
     public static void enqueueExecution(Callable<Void> asyncThreadWorker) {
         threadPool.submit(asyncThreadWorker);
