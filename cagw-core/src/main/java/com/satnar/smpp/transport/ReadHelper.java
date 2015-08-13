@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import com.satnar.common.LogService;
 import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.StackMap;
+import com.satnar.smpp.client.ChannelMode;
 import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.client.EsmeHelper;
 import com.satnar.smpp.codec.SmppParameter;
@@ -115,8 +116,9 @@ public class ReadHelper implements Runnable {
                                         int commandId = parser.readInt();
                                         parser.readInt(); // skip the status
                                         int sequence = parser.readInt();
+                                        EsmeHelper.sendThrottledResponse(commandId, sequence, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_DROP, this.smppConnection.getEsmeLabel(), commandId, sequence);
-                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Threadpool congested. Cannot handle PDU with commandId: " + commandId + " & sequence: " + sequence);
+                                        LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Threadpool congested. PDU Throttled (gnack_resp) with commandId: " + commandId + " & sequence: " + sequence);
                                     }
                                 } else {
                                     LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - allow the sliding window to handle the rest of the burst in the next incoming packet");

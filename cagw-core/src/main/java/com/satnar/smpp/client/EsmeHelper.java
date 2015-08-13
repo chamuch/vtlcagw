@@ -1,5 +1,9 @@
 package com.satnar.smpp.client;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
 import com.satnar.common.LogService;
 import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandSequence;
@@ -407,6 +411,25 @@ public abstract class EsmeHelper {
             session.sendPdu(pdu, mode);
         } catch (SmppCodecException e) {
             LogService.stackTraceLog.debug("EsmeHelper-sendThrottledResponse:Encountered exception",e);
+        }
+        return;
+    }
+    
+    public static void sendThrottledResponse(int commandId, int sequence, String esmeLabel, ChannelMode mode) {
+        try {
+            CommandSequence commandSequence = CommandSequence.getInstance();
+            commandSequence.setValue(sequence);
+            
+            SmppPdu pdu = new GNack();
+            pdu.setCommandId(CommandId.valueOf(commandId));
+            pdu.setCommandStatus(CommandStatus.ESME_RTHROTTLED);
+            pdu.setCommandSequence(commandSequence);
+            
+            Esme session = StackMap.getStack(esmeLabel);
+            
+            session.sendPdu(pdu, mode);
+        } catch (SmppCodecException e) {
+            LogService.appLog.error("EsmeHelper-sendThrottledResponse: Unable to send ThrottledResponse!", e);
         }
         return;
     }
