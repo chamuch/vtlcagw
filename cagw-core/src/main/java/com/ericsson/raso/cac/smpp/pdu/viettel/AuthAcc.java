@@ -39,8 +39,6 @@ public class AuthAcc extends SmppPdu {
 	
 	private int myCommandLength = 0;
 	
-	
-	
 	public AuthAcc() {
 		super.setCommandId(CommandId.AUTH_ACC);
 		super.setCommandStatus(CommandStatus.ESME_ROK);
@@ -96,7 +94,7 @@ public class AuthAcc extends SmppPdu {
 			encoder.close();
 			encoder = null;
 			
-			LogService.appLog.info("AuthAcc-encode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
+			LogService.appLog.debug("AuthAcc-encode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
 		} catch (IOException e) {
             // TODO Log for troubleshooting
 			LogService.appLog.debug("AuthAcc-encode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
@@ -109,7 +107,7 @@ public class AuthAcc extends SmppPdu {
 	@Override
 	public void decode(byte[] payload) throws SmppCodecException {
 		try {
-			LogService.appLog.info("AuthAcc-decode:Entered");
+			LogService.appLog.debug("AuthAcc-decode:Entered");
 			ByteArrayInputStream buffer = new ByteArrayInputStream(payload);
 			DataInputStream parser = new DataInputStream(buffer);
 			
@@ -153,7 +151,7 @@ public class AuthAcc extends SmppPdu {
 			parser.close();
 			parser = null;
 			
-			LogService.appLog.info("AuthAcc-decode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
+			LogService.appLog.debug("AuthAcc-decode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
 		} catch (IOException e) {
 			LogService.appLog.debug("AuthAcc-decode:Failed to deserialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
             throw new SmppCodecException("Failed to serialize pdu", e);

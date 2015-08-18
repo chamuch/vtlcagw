@@ -47,7 +47,7 @@ public class AuthAccResponse extends SmppPdu {
 			encoder.close();
 			encoder = null;
 			
-			LogService.appLog.info("AuthAccResponse-encode:Success");
+			LogService.appLog.debug("AuthAccResponse-encode:Success");
 		} catch (IOException e) {
             // TODO Log for troubleshooting
 			LogService.appLog.debug("AuthAccResponse-encode:Failed to serialize pdu",e);
