@@ -81,7 +81,7 @@ public class WriteHelper {
                 }
             }
             
-            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
+            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 //TODO: Log - socket seems to be broken.

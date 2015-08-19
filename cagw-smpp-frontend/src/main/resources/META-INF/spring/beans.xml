@@ -69,31 +69,29 @@
 		<property name="unmarshalType"
 			value="com.ericsson.raso.cac.smpp.pdu.viettel.SmResultNotifyResponse" />
 	</bean>
-
-	<!-- For Http communication with backend -->
+	<!-- For Http communication with backend -->		
 	<bean id="http4" class="org.apache.camel.component.http4.HttpComponent">
 		<property name="camelContext" ref="com.ericsson.raso.cac.smppfe" />
-		<property name="maxTotalConnections" value="500" />
-		<property name="connectionsPerRoute" value="500" />
-		<property name="connectionTimeToLive" value="120000" />
+		<property name="maxTotalConnections" value="600" />
+		<property name="connectionsPerRoute" value="600" />
 	</bean>
 
 	<!-- Routing request to cagw-backend over REST -->
 	<camel:camelContext id="com.ericsson.raso.cac.smppfe"
 		xmlns="http://camel.apache.org/schema/spring">
-		<propertyPlaceholder id="properties" location="ref:cgProperties" /> 
-		<camel:threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="100" 
+		<!-- <propertyPlaceholder id="properties" location="ref:cgProperties" />  -->
+		<camel:threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="1200" 
 			maxPoolSize="1200" maxQueueSize="10" /> 
-		<camel:threadPool id="cagw-backend" poolSize="200"
+		<camel:threadPool id="cagw-backend" poolSize="1200"
 			maxPoolSize="1200"  threadName="cagw-backend" camelContextId="com.ericsson.raso.cac.smppfe" 
 			/>
 		<camel:route id="cagw-smppfe-backend">
-			<camel:from uri="seda:cagw-backend?concurrentConsumers=500" />
+			<camel:from uri="seda:cagw-backend?limitConcurrentConsumers&amp;concurrentConsumers=600" />
 			<camel:doTry>
+				<camel:choice>
 				<camel:when>
 					<camel:simple>${header.fe} == 'auth_acc'</camel:simple>
-					<camel:marshal ref="gsonAuthAcc" />
-					<camel:log message="From smppfe :${body}" />
+					<camel:marshal ref="gsonAuthAcc" />			
 					<setHeader headerName="CamelHttpMethod">
 						<constant>POST</constant>
 					</setHeader>
@@ -103,14 +101,15 @@
 					<setHeader headerName="Accept">
 						<constant>application/json</constant>
 					</setHeader>
-					<camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to>
-					<!-- <camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to> -->
+					<!-- <camel:log message="Before http4 hadover" /> -->	
+					<!-- <camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to> -->
+					<camel:to uri="http4://192.168.5.164:9090/cagw-backend/CgWeb/process"></camel:to>
 					<camel:unmarshal ref="gsonAuthAccResponse" />
 				</camel:when>
 				<camel:when>
 					<camel:simple>${header.fe} == 'sm_result'</camel:simple>
 					<camel:marshal ref="gsonSmResultNotify" />
-					<camel:log message="From Smpp Frontend :${body}" />
+					<!-- <camel:log message="From Smpp Frontend :${body}" /> -->
 					<setHeader headerName="CamelHttpMethod">
 						<constant>POST</constant>
 					</setHeader>
@@ -120,16 +119,18 @@
 					<setHeader headerName="Accept">
 						<constant>application/json</constant>
 					</setHeader>
-					<camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to>
-					<!-- <camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to> -->
+					<!-- <camel:to uri="{{Smpp_Cagw_BackendUrl}}"></camel:to> -->
+					<camel:to uri="http4://192.168.5.164:9090/cagw-backend/CgWeb/process"></camel:to>
+					<!-- <camel:to uri="http4://192.168.5.164:9090/cagw-backend/CgWeb/process"></camel:to> -->
 					<camel:unmarshal ref="gsonSmResultNotifyResponse" />
 				</camel:when>
+				</camel:choice>
 				<camel:doCatch>
 					<camel:exception>java.lang.Exception</camel:exception>
-					<camel:log message="From Smpp Frontend Exception: ${exception.stacktrace}" />
-				</camel:doCatch>
+					<!-- <camel:log message="From Smpp Frontend Exception: ${exception.stacktrace}" /> --> 
+				</camel:doCatch>				
 				<camel:doFinally>
-					<camel:log message="Leave Smpp Frontend:${body}" />
+					<!-- <camel:log message="Leave Smpp Frontend:${body}" /> -->
 				</camel:doFinally>
 			</camel:doTry>
 		</camel:route>

@@ -106,7 +106,7 @@ public class ReadHelper implements Runnable {
                                     
                                     // delgate to pdu facade now
                                     try {
-                                        LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + EsmeHelper.prettyPrint(pduPayload));
+                                        LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + EsmeHelper.prettyPrint(pduPayload));
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_ABATE, this.smppConnection.getEsmeLabel());
