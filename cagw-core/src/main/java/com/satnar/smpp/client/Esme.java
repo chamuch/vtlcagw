@@ -867,8 +867,11 @@ public class Esme {
         
         if (this.rxChannel != null)
             return this.rxChannel.getEsmeLabel();
-        else
+        
+        if (this.rxChannel != null)
             return this.txChannel.getEsmeLabel();
+        
+        return "Already Shutdown ESME";
     }
 
     @Override
