@@ -53,7 +53,7 @@ public class SmppSession implements SmartLifecycle {
 	            Esme smppSession = new Esme(smppSessionProperties);
 	            
 	            // to avoid bad network or connection issues in preventing the init logic to block forever, the smpp stack start will now happen in backend
-	            new Thread(new BackgroundStackStart(smppSession)).start();
+	            new Thread(new BackgroundStackStart(smppSession, smppSection)).start();
                 
 	            
 	            LogService.appLog.debug("SmppSession-start:Async init started for SMPP Session with: " + smppSection);
