@@ -10,6 +10,9 @@
 	<section id="DB_PROP" description="cagw backend url">
 		<property key="cassandraAddress" value="192.168.5.136,192.168.5.142" />
 		<property key="keySpaceName" value="cagw_keyspace" />
+		<property key="poolSize" value="150" />
+		<property key="keepAlive" value="cagw_keyspace" />
+		<property key="queueSize" value="cagw_keyspace" />
 	</section>
     
 	<section id="GLOBAL" description="SMPP sections">
@@ -40,6 +43,7 @@
 		<property key="isEnquireLinkEnabled" value="true" />
 		<property key="enquireLinkPeriod" value="30000" />
 		<property key="threadPoolSize" value="20" />
+		<property key="networkIdleWait" value="500" />
 		<property key="canUseTrx" value="false" />
 		<property key="tx.tcpAddress" value="10.49.8.18" />
 		<property key="tx.tcpPort" value="2775" />
@@ -53,6 +57,7 @@
 		<property key="trx.tcpPort" value="2775" />
 		<property key="trx.esmeLabel" value="SMSC1-SCPV01" />
 		<property key="trx.lazyWriteWait" value="500" />
+		
 	</section>
 	<section id="Esme_Props_Test2" description="esmeTest2">
 		<property key="username" value="smppClient1" />

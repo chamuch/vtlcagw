@@ -24,12 +24,14 @@ public class ReadHelper implements Runnable {
     private boolean         canRun         = true;
     private Connection      smppConnection = null;
     private int             threadPoolSize = 0;
+    private int             networkIdleWait = 0;
     private ExecutorService processorPool  = null;   
     
     
     public ReadHelper(Connection connection) {
         this.smppConnection = connection;
         this.threadPoolSize = this.smppConnection.getThreadPoolSize();
+        this.networkIdleWait = this.smppConnection.getNetworkIdleWaitTime();
         
         this.processorPool = new ThreadPoolExecutor((this.threadPoolSize),      // initial pool size
                 this.threadPoolSize,                                            // max pool size
@@ -72,9 +74,9 @@ public class ReadHelper implements Runnable {
                             readBuffer.get(currentWindow); readBuffer.clear();
                             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Read (" + windowSize + ") bytes with payload: " + EsmeHelper.prettyPrint(currentWindow));
                             
-                        } else { // else, lets wait 0.5 sec (this can be optimized later)
+                        } else { // else
                             try {
-                                Thread.sleep(500);
+                                Thread.sleep(this.networkIdleWait);
                             } catch (InterruptedException e) {
                                 // do nothing
                             } // end of catch

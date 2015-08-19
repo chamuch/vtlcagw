@@ -31,6 +31,7 @@ public abstract class Connection {
 	
 	public abstract void setMode(ChannelMode mode);
 	
+    public abstract int getNetworkIdleWaitTime();
 	
 
     public SmppSessionState getConnectionState() {
@@ -43,6 +44,7 @@ public abstract class Connection {
         else
             throw new SmppTransportException("Illegal State Transition for Connection to promote!!");
     }
+
 	
 	
 	

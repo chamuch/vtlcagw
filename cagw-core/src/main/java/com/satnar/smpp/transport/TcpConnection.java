@@ -29,20 +29,22 @@ public class TcpConnection extends Connection {
     private static final String ESME_LABEL       = "esmeLabel";
     private static final String LAZY_WRITE_WAIT  = "lazyWriteWait";
     private static final String THREAD_POOL_SIZE = "threadPoolSize";
+    private static final String NETWORK_IDLE_WAIT = "networkIdleWaitTime";
     
-    private Properties          config           = null;
+    private Properties          config              = null;
     
-    private String              label            = null;
-    private String              address          = null;
-    private int                 port             = 0;
-    private int                 lazyWriteWait    = 0;
-    private int                 threadPoolSize   = 0;
+    private String              label               = null;
+    private String              address             = null;
+    private int                 port                = 0;
+    private int                 lazyWriteWait       = 0;
+    private int                 threadPoolSize      = 0;
+    private int                 networkIdleWaitTime = 0;
     
-    private SocketChannel       connection       = null;
-    private ByteBuffer          requestBuffer    = null;
-    private ByteBuffer          responseBuffer   = null;
-    private ChannelMode         mode             = null;
-    private boolean             isShutdownMode   = false;
+    private SocketChannel       connection          = null;
+    private ByteBuffer          requestBuffer       = null;
+    private ByteBuffer          responseBuffer      = null;
+    private ChannelMode         mode                = null;
+    private boolean             isShutdownMode      = false;
     
     public TcpConnection(Properties connectionConfig, ChannelMode channelMode) {
         this.config = connectionConfig;
@@ -271,6 +273,17 @@ public class TcpConnection extends Connection {
             throw new SmppTransportException("'tcpPort' was defined but not integer!! Found: " + param);
         }
         
+        // check the network idle wait time...
+        param = this.config.getProperty(NETWORK_IDLE_WAIT);
+        if (param == null || param.equalsIgnoreCase(""))
+            throw new SmppTransportException("'networkIdleWaitTime' was not defined or empty!!");
+        
+        try {
+            this.networkIdleWaitTime = Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+            throw new SmppTransportException("'networkIdleWaitTime' was defined but not integer!! Found: " + param);
+        }
+        
         // check the address...
         param = this.config.getProperty(TCP_ADDRESS);
         if (param == null || param.equalsIgnoreCase("")) {
@@ -345,6 +358,13 @@ public class TcpConnection extends Connection {
         
         return 400; // absolute fallback
     }
+    
+    @Override
+    public int getNetworkIdleWaitTime() {
+        return this.networkIdleWaitTime;
+    }
+
+
     
     public Properties getConfig() {
         return config;

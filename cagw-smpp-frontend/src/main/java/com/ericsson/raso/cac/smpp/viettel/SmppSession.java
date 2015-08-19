@@ -1,7 +1,5 @@
 package com.ericsson.raso.cac.smpp.viettel;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import com.satnar.common.LogService;
