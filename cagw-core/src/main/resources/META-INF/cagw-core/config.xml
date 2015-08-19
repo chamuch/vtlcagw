@@ -15,6 +15,8 @@
 	<section id="GLOBAL" description="SMPP sections">
     	<!--<property key="smppSectionsList" value="Esme_Props_Smsc1,Esme_Props_Smsc2,Esme_Props_Smsc3,Esme_Props_Smsc4,Esme_Props_Smsc5,Esme_Props_Smsc6,Esme_Props_Smsc7,Esme_Props_Smsc8,Esme_Props_Smsc18,Esme_Props_Smsc19,Esme_Props_Smsc20,Esme_Props_Smsc21" />-->
 		<property key="smppSectionsList" value="Esme_Props_Test1" />
+		<property key="monitorInterval" value="30000" />
+		<property key="monitorInitialWait" value="120000" />
     </section>
 	
 	<section id="GLOBAL_Alarms" description="Alarms">
@@ -23,9 +25,7 @@
 		<property key="communityString" value="Ericsson/RASO/CAC" />
 		<property key="timestampFormat" value="yyyy-MM-dd HH:mm:ss" />
 		<property key="nodeName" value="sms-fe1" />
-		<property key="applicationTrapOid" value="1.3.6.1.4.1.193.255.2.1.0.1" />
-		<property key="monitorInterval" value="30000" />
-		<property key="monitorInitialWait" value="120000" />
+		<property key="applicationTrapOid" value="1.3.6.1.4.1.193.255.2.1.0.1" />		
 	</section>
 	
 	<section id="Esme_Props_Test1" description="esmeTest1">
