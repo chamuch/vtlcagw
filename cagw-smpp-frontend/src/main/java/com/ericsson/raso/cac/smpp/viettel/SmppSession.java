@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.context.SmartLifecycle;
-
-import com.ericsson.raso.cac.config.ConfigService;
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
 import com.satnar.common.alarmlog.AlarmCode;
+import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.Esme;
+import com.satnar.smpp.client.EsmeHelper;
 import com.satnar.smpp.client.SmppServiceException;
 
 public class SmppSession {
@@ -19,8 +18,9 @@ public class SmppSession {
     private static final String GLOBAL = "GLOBAL";
     
 	//private Esme smppSession = null;
-    private Map<String, Esme> smppSessions = new HashMap<String, Esme>();
+    private String[] smppSessions = null;
 	private State state = null;
+    private SessionWatchdog sessionWatchdog = null;
 	
 	public SmppSession(Properties esmeConfig) {
 		LogService.appLog.debug("SmppSession:Constructor changed...");
@@ -41,11 +41,15 @@ public class SmppSession {
 	        if (param == null || param.equals(""))
 	            throw new SmppServiceException(cfgSmppSessionList + " was not defined in " + GLOBAL + " section in the config.xml");
 	        
-	        String[] smppSessionList = param.split(",");
-	        LogService.appLog.debug("SmppSessionList..:"+smppSessionList.length);
-	        for (String smppSection: smppSessionList) {
+	        this.smppSessions = param.split(",");
+	        LogService.appLog.debug("SmppSessionList..:" + smppSessions.length);
+	        for (String smppSection: smppSessions) {
 	        	LogService.appLog.debug("SmppSession-start:Init SMPP Session with: " + smppSection);
 	            Properties smppSessionProperties = SpringHelper.getConfig().getProperties(smppSection);
+	            if (smppSessionProperties == null) {
+	                LogService.appLog.error("Found ESME Session: " + smppSection + " but is not configured!");
+	                break;
+	            }
 	            Esme smppSession = new Esme(smppSessionProperties);
 	            
 	            // to avoid bad network or connection issues in preventing the init logic to block forever, the smpp stack start will now happen in backend
@@ -53,10 +57,13 @@ public class SmppSession {
                 
 	            
 	            LogService.appLog.debug("SmppSession-start:Async init started for SMPP Session with: " + smppSection);
-	            this.smppSessions.put(smppSection, smppSession);
 	        }
-            LogService.appLog.error("SmppSession-start:All stacks are triggered to init!!");
-	        
+	        LogService.appLog.info("SmppSession-start:All stacks are triggered to init!!");
+            
+	        this.sessionWatchdog = new SessionWatchdog(smppSessions);
+	        LogService.appLog.info("SmppSession-start:Watchdog started!!");
+            
+            
 	        this.state = State.RUNNING;
 	    } catch (SmppServiceException e) {
 	        // TODO Log this to troubleshoot. putting the stack to SHUTDOWN mode...
@@ -66,8 +73,11 @@ public class SmppSession {
 	}
 
 	public void stopStackSessions() {
-	    for (Esme smppSession: this.smppSessions.values())
-	        smppSession.stop();
+	    for (String smppSession: this.smppSessions) {
+	        Esme session = StackMap.getStack(smppSession);
+	        if (session != null && EsmeHelper.checkSessionState(smppSession))
+	            session.stop();
+	    }
 	    LogService.appLog.info("SmppSession-stop: All stacks are stopped.");
 	}
 

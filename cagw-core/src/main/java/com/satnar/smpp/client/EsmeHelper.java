@@ -1,9 +1,5 @@
 package com.satnar.smpp.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-
 import com.satnar.common.LogService;
 import com.satnar.smpp.CommandId;
 import com.satnar.smpp.CommandSequence;
@@ -37,6 +33,26 @@ public abstract class EsmeHelper {
     public static final int        REQUEST_MASK       = 0x00000000;
     public static final int        RESPONSE_MASK      = 0x80000000;
     
+    
+    public static boolean checkSessionState(String esmeLabel) {
+        Esme session = StackMap.getStack(esmeLabel);
+        if (session == null) {
+            LogService.appLog.warn("SmppSession: " + esmeLabel + " was not started!");
+            return false;
+        } else if (session.isCanUseTrx()) {
+            if (session.getTrxChannel() == null || session.getTrxChannel().getConnectionState() != SmppSessionState.BOUND_TRX) {
+                LogService.appLog.warn("SmppSession: " + esmeLabel + " was found down!");
+                return false;
+            }
+        } else if (session.getRxChannel() == null || session.getRxChannel().getConnectionState() != SmppSessionState.BOUND_RX) {
+            //TODO: in the final project, must refactor to handle ESME in tx_only, rx_only, tx_rx_pair, trx_mode so a seamless matrix handling is clean
+            LogService.appLog.warn("SmppSession: " + esmeLabel + " was found down!");
+            StackMap.removeSession(esmeLabel);
+            session = null; System.gc(); // just a wishful thinking ;)
+            return false;
+        }
+        return true;
+    }
     
     public static SmppPdu getBindTransceiver(String username, 
                                              String password, 
