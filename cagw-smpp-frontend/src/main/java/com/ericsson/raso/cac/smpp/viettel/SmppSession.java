@@ -2,6 +2,8 @@ package com.ericsson.raso.cac.smpp.viettel;
 
 import java.util.Properties;
 
+import org.springframework.context.SmartLifecycle;
+
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
 import com.satnar.common.alarmlog.AlarmCode;
@@ -10,7 +12,7 @@ import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.client.EsmeHelper;
 import com.satnar.smpp.client.SmppServiceException;
 
-public class SmppSession {
+public class SmppSession implements SmartLifecycle {
     
     private static final String cfgSmppSessionList = "smppSectionsList";
     private static final String GLOBAL = "GLOBAL";
@@ -86,6 +88,44 @@ public class SmppSession {
         this.stopStackSessions();
         LogService.alarm(AlarmCode.SYSTEM_SHUTDOWN, (Object)null);
         super.finalize();
+    }
+
+
+    @Override
+    public boolean isRunning() {
+        return (this.state == State.RUNNING);
+    }
+
+
+    @Override
+    public void start() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void stop() {
+        this.startStackSessions();
+        
+    }
+
+
+    @Override
+    public int getPhase() {
+        return 1;
+    }
+
+
+    @Override
+    public boolean isAutoStartup() {
+        return true;
+    }
+
+
+    @Override
+    public void stop(Runnable arg0) {
+        this.stopStackSessions();
     }
 
 
