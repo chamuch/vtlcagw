@@ -99,15 +99,14 @@ public class SmppSession implements SmartLifecycle {
 
     @Override
     public void start() {
-        // TODO Auto-generated method stub
+        this.startStackSessions();
         
     }
 
 
     @Override
     public void stop() {
-        this.startStackSessions();
-        
+        this.stopStackSessions();
     }
 
 
