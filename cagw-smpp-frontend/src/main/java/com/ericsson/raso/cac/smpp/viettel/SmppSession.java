@@ -29,7 +29,7 @@ public class SmppSession implements SmartLifecycle {
 		LogService.alarm(AlarmCode.SYSTEM_START_UP, (Object)null);
 		
 		//14-Jul-2015: init from bean is behaving as singleton
-		this.startStackSessions();
+		//this.startStackSessions();
 	}
 
 
