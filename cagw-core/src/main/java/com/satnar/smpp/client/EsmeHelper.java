@@ -48,7 +48,7 @@ public abstract class EsmeHelper {
             //TODO: in the final project, must refactor to handle ESME in tx_only, rx_only, tx_rx_pair, trx_mode so a seamless matrix handling is clean
             LogService.appLog.warn("SmppSession: " + esmeLabel + " was found down!");
             StackMap.removeSession(esmeLabel);
-            session = null; System.gc(); // just a wishful thinking ;)
+            session = null; 
             return false;
         }
         return true;
