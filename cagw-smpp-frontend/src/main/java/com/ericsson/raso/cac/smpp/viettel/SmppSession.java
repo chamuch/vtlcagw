@@ -99,6 +99,7 @@ public class SmppSession implements SmartLifecycle {
 
     @Override
     public void start() {
+    	LogService.appLog.info("SMS Service - Start Init");
         this.startStackSessions();
         
     }
@@ -106,6 +107,7 @@ public class SmppSession implements SmartLifecycle {
 
     @Override
     public void stop() {
+    	LogService.appLog.info("SMS Service - Stop Init");
         this.stopStackSessions();
     }
 
