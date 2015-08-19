@@ -340,8 +340,7 @@ public class ChargeAmountProcessor implements Processor {
            
             LogService.stackTraceLog.debug("ChargeAmountProcessor-getScapRequest:final construction:"+scapCcr.toString());
 	    } catch (AvpDataException e) {
-	    	//TODO: Log for troubleshooting
-	    	LogService.stackTraceLog.debug("ChargeAmountProcessor-getScapRequest:Direct Debit Use Failed!",e);
+	    	LogService.appLog.error("ChargeAmountProcessor-getScapRequest:Direct Debit Use Failed!",e);
 	    	throw new ServiceLogicException("Direct Debit Use Failed!", e);
 	    }
 	    LogService.appLog.info("Exiting from DIRECT_DEBIT ChargeAmountProcessor");

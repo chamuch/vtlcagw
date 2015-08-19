@@ -59,7 +59,6 @@ public enum OptionalParameterTag {
     static {
         for (OptionalParameterTag optional: OptionalParameterTag.values())
             lookup.put(optional.tag, optional);
-        //TODO: Log to asset hashtable is loaded
         LogService.appLog.info("SMPP-OptionalParameterTag: Hashtable loaded successfully !!");
     }
     

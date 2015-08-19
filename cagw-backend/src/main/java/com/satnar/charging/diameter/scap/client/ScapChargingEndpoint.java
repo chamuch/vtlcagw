@@ -62,11 +62,9 @@ public class ScapChargingEndpoint implements IScapCharging {
             
             LogService.appLog.debug("ScapChargingEndpoint:Start:Completed..");
         } catch (IOException e) {
-            // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("ScapChargingEndpoint-start:Unable to start the SCAP Stack:TcpAddress"+this.ownTcpAddress,e);
             throw new ChargingStackLifeCycleException("Unable to start the SCAP Stack with given config!!", e);
         } catch (DiameterConfigException e) {
-            // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("ScapChargingEndpoint-start:Unable to start the SCAP Stack:TcpAddress"+this.ownTcpAddress,e);
             throw new ChargingStackLifeCycleException("Unable to start the SCAP Stack with given config!!", e);
         }

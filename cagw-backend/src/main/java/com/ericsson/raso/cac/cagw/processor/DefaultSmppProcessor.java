@@ -7,7 +7,6 @@ public class DefaultSmppProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		// TODO Auto-generated method stub
 		System.out.println("We have entered into DefaultSmppProcessor");
 		
 	}

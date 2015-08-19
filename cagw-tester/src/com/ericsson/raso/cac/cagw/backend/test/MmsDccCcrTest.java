@@ -76,7 +76,6 @@ public class MmsDccCcrTest {
     }
 
     private static DccServiceEndpoint getDiameter() {
-        // TODO Auto-generated method stub
         return null;
     }
 

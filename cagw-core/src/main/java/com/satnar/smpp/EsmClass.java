@@ -52,7 +52,6 @@ public enum EsmClass implements Parameter {
                 lookup.put(esmClass.esmClassType, esmClass);
             }
         }
-        //TODO: Log to assert hastable loaded
         LogService.appLog.info("SMPP-EsmClass: Hashtable loaded successfully !!");
     }
     

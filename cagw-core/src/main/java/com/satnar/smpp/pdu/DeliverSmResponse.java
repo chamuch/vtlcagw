@@ -64,8 +64,7 @@ public class DeliverSmResponse extends SmppPdu {
             encoder = null;
             return baosSerialized.toByteArray();
         } catch (IOException e) {
-            // TODO Log for troubleshooting
-        	LogService.appLog.debug("DeliverSmResponse-encode: Failed to serialize pdu. ",e);
+            LogService.appLog.debug("DeliverSmResponse-encode: Failed to serialize pdu. ",e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
     }
@@ -82,8 +81,7 @@ public class DeliverSmResponse extends SmppPdu {
             super.setCommandSequence(sequence);
             //TODO: system_id
         } catch (IOException e) {
-            //TODO: Log situation
-        	LogService.appLog.debug("DeliverSmResponse-decode: Decode Failure with underlying streams!! ",e);
+            LogService.appLog.error("DeliverSmResponse-decode: Decode Failure with underlying streams!! ", e);
             throw new SmppCodecException("Decode Failure with underlying streams!!", e);
         }
         

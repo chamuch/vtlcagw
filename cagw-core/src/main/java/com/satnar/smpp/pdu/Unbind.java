@@ -59,8 +59,7 @@ public class Unbind extends SmppPdu {
             writeBuffer = null;
             return baosBuffer.toByteArray();
         } catch (IOException e) {
-            // TODO Log for troubleshooting
-        	LogService.appLog.debug("BindTranceceiver-encode: Failed to serialize pdu.");
+        	LogService.appLog.error("BindTranceceiver-encode: Failed to serialize pdu.");
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
     }

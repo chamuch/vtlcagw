@@ -73,8 +73,7 @@ public class SmResultNotify extends SmppPdu {
 			encoder = null;
 			LogService.appLog.info("SmResultNotify-encode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
 		} catch (IOException e) {
-            // TODO Log for troubleshooting
-			LogService.appLog.debug("SmResultNotify-encode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
+            LogService.appLog.error("SmResultNotify-encode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
 		
@@ -111,8 +110,7 @@ public class SmResultNotify extends SmppPdu {
 			parser = null;
 			LogService.appLog.info("SmResultNotify-decode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
 		} catch (IOException e) {
-            // TODO Log for troubleshooting
-			LogService.appLog.debug("SmResultNotify-decode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
+            LogService.appLog.error("SmResultNotify-decode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
 	}

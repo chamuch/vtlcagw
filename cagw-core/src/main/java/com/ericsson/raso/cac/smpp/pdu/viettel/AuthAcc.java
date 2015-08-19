@@ -96,7 +96,6 @@ public class AuthAcc extends SmppPdu {
 			
 			LogService.appLog.debug("AuthAcc-encode:Success:SMId:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId);
 		} catch (IOException e) {
-            // TODO Log for troubleshooting
 			LogService.appLog.debug("AuthAcc-encode:Failed to serialize pdu:"+this.smId+":SMSCAddress:"+this.smscAddress+":ServiceId:"+this.serviceId,e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }

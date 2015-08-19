@@ -73,8 +73,7 @@ public class CDecimalString extends SmppParameter {
 	    	buffer.close();
 	    	buffer = null;
 	    } catch (IOException e) {
-	    	//TODO: log only.. no need to complicate the error handling
-	    	LogService.appLog.debug("CDecimalString-readString: Encountered exception",e);
+	    	LogService.appLog.error("CDecimalString-readString: Encountered exception", e);
 	    }
 	    
 	    CDecimalString output = (CDecimalString) SmppParameter.getInstance(Type.C_DECIMAL_STRING);

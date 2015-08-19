@@ -63,8 +63,7 @@ public class BindTransceiverResponse extends SmppPdu {
             //TODO: system_id
             //TODO: sc_interface_version
         } catch (IOException e) {
-            //TODO: Log situation
-        	LogService.appLog.debug("BindReceiverResponse-decode:Encountered exception:",e);
+            LogService.appLog.error("BindReceiverResponse-decode:Encountered exception:",e);
             throw new SmppCodecException("Decode Failure with underlying streams!!", e);
         }
         

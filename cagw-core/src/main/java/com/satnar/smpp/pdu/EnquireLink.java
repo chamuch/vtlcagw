@@ -47,8 +47,7 @@ public class EnquireLink extends SmppPdu {
             encoder = null;
             return baosSerialized.toByteArray();
         } catch (IOException e) {
-            //TODO: Log for troubleshooting
-        	LogService.appLog.debug("EnquireLink-encode: Failed to serialize pdu. ",e);
+            LogService.appLog.error("EnquireLink-encode: Failed to serialize pdu. ", e);
             throw new SmppCodecException("Failed to serialize pdu!!", e);
         }
     }
@@ -69,8 +68,7 @@ public class EnquireLink extends SmppPdu {
             commandLength.setValue(16);
             this.setCommandLength(commandLength);
         } catch (IOException e) {
-            //TODO: log for troubleshooting. Ideally wont happen
-        	LogService.appLog.debug("EnquireLink-decode: Failed to decode pdu. ",e);
+            LogService.appLog.error("EnquireLink-decode: Failed to decode pdu. ",e);
             throw new SmppCodecException("Failed to decode pdu!!", e);
         }
         

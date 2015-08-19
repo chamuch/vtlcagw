@@ -128,7 +128,6 @@ public class SmsScapEdrConsumer {
 		                    txnHelper.updateSmsCharging(txn);
 		                    System.out.println("Updating sms charging for messageId:"+txn.getMessageId()+":transaction time:"+txn.getTransactionTime() + ":transactionId:"+txn.getTransactionId());
 		                } else {
-		                    //TODO: delete the transaction...	                	
 		                    txn.setChargeStatus(true);
 		                    txnHelper.deleteSmsCharging(txn);
 		                    System.out.println("Updating sms charging for messageId:"+txn.getMessageId()+":transaction time:"+txn.getTransactionTime() + ":transactionId:"+txn.getTransactionId());

@@ -58,11 +58,9 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
             LogService.appLog.debug("Check for configured apps supported: " + this.dccStack.getDiameterStack().ownPeerInfo.getApplications());
             
         } catch (IOException e) {
-            // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("DccServiceEndpoint-start:Unable to start the DCC Stack: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress,e);
             throw new ChargingStackLifeCycleException("Unable to start the DCC Stack with given config!!", e);
         } catch (DiameterConfigException e) {
-            // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("DccServiceEndpoint-start:Unable to start the DCC Stack: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress,e);
             throw new ChargingStackLifeCycleException("Unable to start the DCC Stack with given config!!", e);
         }
@@ -117,7 +115,6 @@ public class DccServiceEndpoint implements DiameterServiceEndpoint {
                 
             LogService.stackTraceLog.debug("DccServiceEndpoint-prepareStack:Success: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress);
         } catch (ApplicationAlreadyInUseException e) {
-            // TODO log for troubleshooting
         	LogService.stackTraceLog.debug("DccServiceEndpoint-start:Unable to start the DCC Stack: originRealm:"+this.originRealm+":TcpAddress:"+this.ownTcpAddress,e);
             throw new ChargingStackLifeCycleException("Unable to start the DCC Stack with given config!!", e);
         }

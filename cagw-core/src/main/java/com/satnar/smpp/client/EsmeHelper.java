@@ -230,8 +230,7 @@ public abstract class EsmeHelper {
             }
             
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
-        	LogService.stackTraceLog.debug("EsmeHelper-handleGNack:Encountered exception",e);
+            LogService.appLog.error("EsmeHelper-handleGNack:Encountered exception", e);
         }
         
     }
@@ -257,10 +256,8 @@ public abstract class EsmeHelper {
             
 
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindTransceiverResponse:Encountered exception",e);
         } catch (SmppTransportException e) {
-            // TODO just log... ideall will not happen;
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindTransceiverResponse:Encountered exception",e);
         }
     }
@@ -284,10 +281,8 @@ public abstract class EsmeHelper {
             
 
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindTransmitterResponse:Encountered exception",e);
         } catch (SmppTransportException e) {
-            // TODO just log... ideall will not happen;
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindTransmitterResponse:Encountered exception",e);
         }
     }
@@ -310,10 +305,8 @@ public abstract class EsmeHelper {
             
 
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindReceiverResponse:Encountered exception",e);
         } catch (SmppTransportException e) {
-            // TODO just log... ideall will not happen;
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindReceiverResponse:Encountered exception",e);
         }
     }
@@ -336,8 +329,7 @@ public abstract class EsmeHelper {
            
 
        } catch (SmppCodecException e) {
-           //TODO: Log this... Cant throw exceptions.... just drop the PDU...
-    	   LogService.stackTraceLog.debug("EsmeHelper-handleDeliverSmRequest:Encountered exception",e);
+           LogService.appLog.error("EsmeHelper-handleDeliverSmRequest:Encountered exception", e);
        }
         
     }
@@ -362,8 +354,7 @@ public abstract class EsmeHelper {
             session.sendPdu(enquireLinkResponsePdu, channelMode);
             LogService.appLog.debug("Sent EnquireLink Response: " + esmeLabel);
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
-        	LogService.stackTraceLog.debug("EsmeHelper-handleEnquireLinkRequest:Encountered exception",e);
+            LogService.appLog.error("EsmeHelper-handleEnquireLinkRequest:Encountered exception", e);
         } catch(Exception e){
         	LogService.stackTraceLog.debug("EsmeHelper-handleEnquireLinkRequest:Encountered gen exception",e);
         }
@@ -380,14 +371,12 @@ public abstract class EsmeHelper {
             StackMap.removeMessageIndex("" + enquireLinkPdu.getCommandSequence().getValue());
 
             if (enquireLinkPdu.getCommandStatus() != CommandStatus.ESME_ROK) {
-                //TODO: log this... we shutdown the stack
-            	LogService.stackTraceLog.debug("EsmeHelper-handleEnquireLinkResponse: Response is not OK..");
+                LogService.appLog.error("EsmeHelper-handleEnquireLinkResponse: Response is not OK..");
                 session.stop();
             }
             
         } catch (SmppCodecException e) {
-            //TODO: Log this... Cant throw exceptions.... just drop the PDU...
-        	LogService.stackTraceLog.debug("EsmeHelper-handleEnquireLinkResponse:Encountered exception",e);
+            LogService.appLog.error("EsmeHelper-handleEnquireLinkResponse:Encountered exception",e);
         }
     }
 

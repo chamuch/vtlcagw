@@ -57,8 +57,7 @@ public class GNack extends SmppPdu {
             writeBuffer = null;
             return baosBuffer.toByteArray();
         } catch (IOException e) {
-            // TODO Log for troubleshooting
-        	LogService.appLog.debug("GNack-encode: Failed to serialize pdu. ",e);
+            LogService.appLog.error("GNack-encode: Failed to serialize pdu. ",e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
     }

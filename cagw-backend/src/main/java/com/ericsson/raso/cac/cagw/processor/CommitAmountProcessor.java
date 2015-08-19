@@ -7,7 +7,6 @@ public class CommitAmountProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		// TODO Auto-generated method stub
 		System.out.println("Entered into CommitAmountProcessor");
 		
 	}

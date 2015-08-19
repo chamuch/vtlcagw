@@ -50,8 +50,7 @@ public class DccService implements SmartLifecycle {
             this.state = State.RUNNING;
             LogService.alarm(AlarmCode.SYSTEM_START_UP, (Object) null);
         } catch (ChargingStackLifeCycleException e) {
-            // TODO Log this to troubleshoot. putting the stack to SHUTDOWN mode...
-        	LogService.appLog.debug("DccService-start:Encountered Excception.Putting the stack to SHUTDOWN mode..",e);
+            LogService.appLog.error("DccService-start:Encountered Excception.Putting the stack to SHUTDOWN mode..",e);
             this.state = State.SHUTDOWN;
         }
     }

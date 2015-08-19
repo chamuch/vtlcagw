@@ -85,7 +85,6 @@ public class BindTransmitter extends SmppPdu {
             writeBuffer = null;
             return baosBuffer.toByteArray();
         } catch (IOException e) {
-            // TODO Log for troubleshooting
         	LogService.appLog.debug("BindTransmitter-encode: Failed to serialize pdu. AddressRange:"+this.addressRange,e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
@@ -139,12 +138,10 @@ public class BindTransmitter extends SmppPdu {
         
         // check
         if (this.systemType == null) {
-            // TODO: Just Log - this is not mandatory
-        	LogService.appLog.info("BindTransmitter-validate: SystemType is null AddressNpi:"+this.addressNpi);
+            LogService.appLog.warn("BindTransmitter-validate: SystemType is null AddressNpi:"+this.addressNpi);
         }
         if (this.systemType.getLength() == 0x00000001) {
-            // TODO: Just Log - this is not mandatory
-        	LogService.appLog.info("BindTransmitter-validate: SystemType is empty AddressNpi:"+this.addressNpi);
+            LogService.appLog.warn("BindTransmitter-validate: SystemType is empty AddressNpi:"+this.addressNpi);
         }
         
     }

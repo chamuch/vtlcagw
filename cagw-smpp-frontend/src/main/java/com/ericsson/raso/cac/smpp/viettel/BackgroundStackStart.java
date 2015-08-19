@@ -14,12 +14,12 @@ public class BackgroundStackStart implements Runnable {
 
     @Override
     public void run() {
-        LogService.appLog.debug("Attempting to start smpp session in async mode. Stack: " + session.getUsername() + "@" + session.getSystemType());
+        LogService.appLog.debug("Attempting to start smpp session in async mode. Stack: " + session.getEsmeLabel());
         try {
             session.start();
-            LogService.appLog.debug("Successful start smpp session in async mode. Stack: " + session.getUsername() + "@" + session.getSystemType());
+            LogService.appLog.debug("Successful start smpp session in async mode. Stack: " + session.getEsmeLabel());
         } catch (SmppServiceException e) {
-            LogService.appLog.error("Session failed to start. Stack: " + session.getUsername() + "@" + session.getSystemType());
+            LogService.appLog.error("Session failed to start. Stack: " + session.getEsmeLabel(), e);
         }
         
     }

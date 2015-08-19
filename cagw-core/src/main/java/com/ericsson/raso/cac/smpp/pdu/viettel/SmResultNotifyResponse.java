@@ -46,8 +46,7 @@ public class SmResultNotifyResponse extends SmppPdu {
 			encoder = null;
 			LogService.appLog.info("SmResultNotifyResponse-encode:Success");
 		} catch (IOException e) {
-            // TODO Log for troubleshooting
-			LogService.appLog.debug("SmResultNotifyResponse-encode:Failed to serialize pdu",e);
+            LogService.appLog.error("SmResultNotifyResponse-encode:Failed to serialize pdu",e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }
 		

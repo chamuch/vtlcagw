@@ -170,28 +170,22 @@ public class TcpConnection extends Connection {
             writeBuffer.clear();
             LogService.appLog.debug(this.getEsmeLabel() + " - Successfully transmitted writeBuffer Window Size: " + windowSize);
         } catch (ClosedByInterruptException e) {
-            //TODO - Log for troubleshooting;
-            LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-write:Socket closed by interruption!!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket closed by interruption!!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket closed by interruption!!", e);
         } catch (AsynchronousCloseException e) {
-            //TODO - Log for troubleshooting;
-            LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-write:Socket is in closing phase!!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket is in closing phase!!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket is in closing phase!!", e);
         } catch (ClosedChannelException e) {
-            //TODO - Log for troubleshooting;
-        	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-write:Socket already closed!!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket already closed!!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket already closed!!", e);
         } catch (NotYetConnectedException e) {
-            //TODO - Log for troubleshooting;
-            LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-write:Socket not yet ready for transmission!!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket not yet ready for transmission!!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket not yet ready for transmission!!", e);
         } catch (IOException e) {
-            //TODO - Log for troubleshooting;
-        	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-write:Failed transmitting the payload!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Failed transmitting the payload!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Failed transmitting the payload!", e);
         } catch (Exception e) {
-            //TODO - Log for troubleshooting;
-            LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-write:Unknown error!!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Unknown error!!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Unknown error!!", e);
         } 
         
@@ -206,12 +200,10 @@ public class TcpConnection extends Connection {
             readBuffer.flip();
             return packetSize;
         } catch(NotYetConnectedException e) {
-            //TODO - Log for troubleshooting;
-        	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-read:Socket not yet ready for reception!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-read:Socket not yet ready for reception!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket not yet ready for reception!", e);
         } catch(IOException e) {
-            //TODO - Log for troubleshooting;
-        	LogService.stackTraceLog.debug(this.getEsmeLabel() + " - TcpConnection-read:Failed receiving the payload!",e);
+            LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-read:Failed receiving the payload!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Failed receiving the payload!", e);
         }
     }

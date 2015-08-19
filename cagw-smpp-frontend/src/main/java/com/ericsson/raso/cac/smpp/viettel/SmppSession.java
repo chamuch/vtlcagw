@@ -66,7 +66,6 @@ public class SmppSession implements SmartLifecycle {
             
 	        this.state = State.RUNNING;
 	    } catch (SmppServiceException e) {
-	        // TODO Log this to troubleshoot. putting the stack to SHUTDOWN mode...
 	        LogService.appLog.error("SmppSession-start:Encounterd exception. putting the stack to SHUTDOWN mode!!",e);
 	        this.state = State.SHUTDOWN;
 	    }
@@ -78,6 +77,7 @@ public class SmppSession implements SmartLifecycle {
 	        if (session != null && EsmeHelper.checkSessionState(smppSession))
 	            session.stop();
 	    }
+	    this.state = State.SHUTDOWN;
 	    LogService.appLog.info("SmppSession-stop: All stacks are stopped.");
 	}
 

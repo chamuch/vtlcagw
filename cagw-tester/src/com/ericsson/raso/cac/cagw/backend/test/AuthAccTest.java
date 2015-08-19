@@ -75,7 +75,6 @@ public class AuthAccTest {
         try {
             threadPool.awaitTermination(2, TimeUnit.HOURS);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         long testEndTime = System.currentTimeMillis();

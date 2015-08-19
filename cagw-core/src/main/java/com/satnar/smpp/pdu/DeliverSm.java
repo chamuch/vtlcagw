@@ -108,7 +108,6 @@ public class DeliverSm extends SmppPdu {
             writeBuffer = null;
             return baosBuffer.toByteArray();
         } catch (IOException e) {
-            // TODO Log for troubleshooting
         	LogService.appLog.debug("DeliverSm-encode: Failed to serialize pdu. ",e);
             throw new SmppCodecException("Failed to serialize pdu", e);
         }

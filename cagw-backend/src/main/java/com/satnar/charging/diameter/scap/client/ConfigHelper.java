@@ -30,12 +30,8 @@ public abstract class ConfigHelper {
     private static final String SEND_MESSAGE_LIMIT = "sendMessageLimit";
     private static final String SUPPORTED_VENDOR = "supportedVendor";
     
-    public ConfigHelper() {
-        // TODO Auto-generated constructor stub
-    }
     
     
-    //TODO: move the config validation and init method here
     public static void validateAndInitializeConfig(ScapChargingEndpoint endpoint, Properties config) throws ChargingStackLifeCycleException {
         String param = null;
         

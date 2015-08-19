@@ -78,7 +78,6 @@ public class DiameterLoadBalancerPool implements LoadBalancerPool {
 
 	@Override
 	public Peer getPeerById(String hostId) {
-		// TODO Auto-generated method stub
 		return hostRouteMap.get(hostId);
 	}
 

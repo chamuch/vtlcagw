@@ -64,8 +64,7 @@ public class COctetString extends SmppParameter {
 	    	buffer.close();
 	    	buffer = null;
 	    } catch (IOException e) {
-	    	//TODO: log only.. no need to complicate the error handling
-	    	LogService.appLog.debug("COctetString-readString: Encountered exception",e);
+	    	LogService.appLog.error("COctetString-readString: Encountered exception", e);
 	    }
 	    
 	    COctetString output = (COctetString) SmppParameter.getInstance(Type.C_OCTET_STRING);

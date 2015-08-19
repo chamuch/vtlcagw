@@ -32,12 +32,10 @@ public enum Usecase {
         try {
             return (Processor) processor.newInstance();
         } catch (InstantiationException e) {
-            // TODO Log to troubleshoot
-        	LogService.appLog.debug("Usecase-getProcessor:Unable to get instance",e);
+            LogService.appLog.error("Usecase-getProcessor:Unable to get instance",e);
             return null;
         } catch (IllegalAccessException e) {
-            // TODO Log to troubleshoot
-        	LogService.appLog.debug("Usecase-getProcessor:Unable to get processir instance",e);
+            LogService.appLog.error("Usecase-getProcessor:Unable to get processir instance",e);
             return null;
         }
     }

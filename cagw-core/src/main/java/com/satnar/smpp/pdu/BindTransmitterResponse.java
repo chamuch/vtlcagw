@@ -63,8 +63,7 @@ public class BindTransmitterResponse extends SmppPdu {
             //TODO: system_id
             //TODO: sc_interface_version
         } catch (IOException e) {
-            //TODO: Log situation
-        	LogService.appLog.debug("BindTransmitterResponse-decode:Failure with underlying streams!!Encountered exception:",e);
+            LogService.appLog.error("BindTransmitterResponse-decode:Failure with underlying streams!!Encountered exception:", e);
             throw new SmppCodecException("Decode Failure with underlying streams!!", e);
         }
         

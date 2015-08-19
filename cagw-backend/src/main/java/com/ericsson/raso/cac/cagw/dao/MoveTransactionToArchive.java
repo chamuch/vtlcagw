@@ -22,10 +22,8 @@ public class MoveTransactionToArchive implements Callable<Void> {
             
             TransactionDao txnPersistenceHelper = new TransactionDao();
             txnPersistenceHelper.deleteSmsCharging(this.transactionData);
-            //TODO: Log success
             LogService.appLog.info("MoveTransactionToArchive: Success!!");
         } catch (PersistenceException e) {
-            // TODO Just log this... nothing can be done in a zombie thread ;)
         	LogService.appLog.debug("MoveTransactionToArchive: Encountered exception.",e);
         }
         return null;

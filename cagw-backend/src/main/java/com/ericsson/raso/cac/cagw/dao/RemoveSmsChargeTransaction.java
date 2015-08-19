@@ -17,10 +17,8 @@ public class RemoveSmsChargeTransaction implements Callable<Void> {
         try {
             TransactionDao txnPersistenceHelper = new TransactionDao();
             txnPersistenceHelper.deleteSmsCharging(this.transactionData);
-            //TODO: Log success
             LogService.appLog.info("RemoveSmsChargeTransaction: Success!!");
         } catch (PersistenceException e) {
-            // TODO Just log this... nothing can be done in a zombie thread ;)
         	LogService.appLog.debug("RemoveSmsChargeTransaction: Encountered exception.",e);
         }
         return null;

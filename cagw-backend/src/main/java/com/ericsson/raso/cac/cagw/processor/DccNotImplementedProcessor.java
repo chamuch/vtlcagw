@@ -25,8 +25,7 @@ public class DccNotImplementedProcessor implements Processor {
 	        
 	        LogService.appLog.debug("DccNotImplementedProcessor-process:Unsupported:"+dccRequest.getCCRequestType());
 		} catch (Exception e) {
-            //TODO: Log for troubleshooting
-			LogService.stackTraceLog.debug("DccNotImplementedProcessor-Unforeseen Failure for Unhandled Raquest!!:",e);
+            LogService.appLog.error("DccNotImplementedProcessor-Unforeseen Failure for Unhandled Raquest!!:", e);
             throw new ServiceLogicException("Unforeseen Failure for Unhandled Raquest!!", e);
 		}
 		
