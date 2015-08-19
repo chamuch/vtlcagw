@@ -44,16 +44,19 @@ public class Esme {
     private static final String    CAN_USE_TRX          = "canUseTrx";
     private static final String    THREADPOOL_SIZE      = "threadPoolSize";
     
+    private static final String    TX_NETWORK_IDLE_WAIT = "tx.networkIdleWaitTime";
     private static final String    TX_TCP_ADDRESS       = "tx.tcpAddress";
     private static final String    TX_TCP_PORT          = "tx.tcpPort";
     private static final String    TX_ESME_LABEL        = "tx.esmeLabel";
     private static final String    TX_LAZY_WRITE_WAIT   = "tx.lazyWriteWait";
     
+    private static final String    RX_NETWORK_IDLE_WAIT = "rx.networkIdleWaitTime";
     private static final String    RX_TCP_ADDRESS       = "rx.tcpAddress";
     private static final String    RX_TCP_PORT          = "rx.tcpPort";
     private static final String    RX_ESME_LABEL        = "rx.esmeLabel";
     private static final String    RX_LAZY_WRITE_WAIT   = "rx.lazyWriteWait";
     
+    private static final String    TRX_NETWORK_IDLE_WAIT = "trx.networkIdleWaitTime";
     private static final String    TRX_TCP_ADDRESS      = "trx.tcpAddress";
     private static final String    TRX_TCP_PORT         = "trx.tcpPort";
     private static final String    TRX_ESME_LABEL       = "trx.esmeLabel";
@@ -392,12 +395,20 @@ public class Esme {
         if (this.canUseTrx) {
             this.trxConfig = new Properties();
             
-            // get tcpAddress
-            param = this.config.getProperty(TRX_TCP_ADDRESS);
+            // get networkIdleWaitTime
+            param = this.config.getProperty(TRX_NETWORK_IDLE_WAIT);
             if (param == null || param.equalsIgnoreCase("")) {
-                throw new SmppServiceException("'trx.tcpAddress' is not defined when TRX is enabled!!");
+                throw new SmppServiceException("'trx.networkIdleWaitTime' is not defined when TRX is enabled!!");
             } else {
-                this.trxConfig.setProperty("tcpAddress", param);
+                this.trxConfig.setProperty("networkIdleWaitTime", param);
+            }
+            
+         // get tcpPort
+            param = this.config.getProperty(TRX_TCP_PORT);
+            if (param == null || param.equalsIgnoreCase("")) {
+                throw new SmppServiceException("'trx.tcpPort' is not defined when TRX is enabled!!");
+            } else {
+                this.trxConfig.setProperty("tcpPort", param);
             }
             
             // get tcpPort
@@ -428,6 +439,14 @@ public class Esme {
             this.rxConfig = new Properties();
             
             // first txConfig...
+            
+            // get networkIdleWaitTime
+            param = this.config.getProperty(TX_NETWORK_IDLE_WAIT);
+            if (param == null || param.equalsIgnoreCase("")) {
+                throw new SmppServiceException("'tx.networkIdleWaitTime' is not defined when TRX is disabled!!");
+            } else {
+                this.txConfig.setProperty("networkIdleWaitTime", param);
+            }
             // get tcpAddress
             param = this.config.getProperty(TX_TCP_ADDRESS);
             if (param == null || param.equalsIgnoreCase("")) {
@@ -461,6 +480,13 @@ public class Esme {
             }
             
             // then rxConfig...
+            // get networkIdleWaitTime
+            param = this.config.getProperty(RX_NETWORK_IDLE_WAIT);
+            if (param == null || param.equalsIgnoreCase("")) {
+                throw new SmppServiceException("'rx.networkIdleWaitTime' is not defined when TRX is disabled!!");
+            } else {
+                this.rxConfig.setProperty("networkIdleWaitTime", param);
+            }            
             // get tcpAddress
             param = this.config.getProperty(RX_TCP_ADDRESS);
             if (param == null || param.equalsIgnoreCase("")) {
