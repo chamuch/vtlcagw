@@ -25,7 +25,9 @@
 
 	<!-- ESME Instances - One instance for each SMSC -->
 
-	<bean id="esmeSmsc1" class="com.ericsson.raso.cac.smpp.viettel.SmppSession">
+	<bean id="esmeSmsc1"
+		class="com.ericsson.raso.cac.smpp.viettel.SmppSession"
+		scope="singleton">
 		<constructor-arg name="esmeConfig" value="#{cfg.getProperties('GLOBAL')}" />
 	</bean>
 
