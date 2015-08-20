@@ -74,8 +74,8 @@
 	<!-- For Http communication with backend -->		
 	<bean id="http4" class="org.apache.camel.component.http4.HttpComponent">
 		<property name="camelContext" ref="com.ericsson.raso.cac.smppfe" />
-		<property name="maxTotalConnections" value="600" />
-		<property name="connectionsPerRoute" value="600" />
+		<property name="maxTotalConnections" value="850" />
+		<property name="connectionsPerRoute" value="850" />
 	</bean>
 
 	<!-- Routing request to cagw-backend over REST -->
