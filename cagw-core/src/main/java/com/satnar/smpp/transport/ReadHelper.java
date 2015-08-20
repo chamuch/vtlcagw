@@ -131,6 +131,7 @@ public class ReadHelper implements Runnable {
                         } while (slidingWindow.canRead()); // sliding window loop
                          
                     } // end of if block - processing only if we have data to process
+                    else { LogService.appLog.error("windowSize was '0'");}
                     
                 } catch (IOException e) {
                     LogService.appLog.error("Broken Pipe or Buffer!! Better to shutdown this stack", e);
