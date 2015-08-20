@@ -258,10 +258,10 @@ public class Esme {
             if (pdu.getCommandId() == CommandId.EXTENDED || pdu.getCommandId() == CommandId.ENQUIRE_LINK_RESP ) {
                 if (mode == ChannelMode.TX) {
                     LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
-                    this.txWriter.writeLazy(pdu);
+                    this.txWriter.writeImmediate(pdu);
                 } else {
                     LogService.appLog.debug(this.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
-                    this.rxWriter.writeLazy(pdu);
+                    this.rxWriter.writeImmediate(pdu);
                 }
                 return;
             }
