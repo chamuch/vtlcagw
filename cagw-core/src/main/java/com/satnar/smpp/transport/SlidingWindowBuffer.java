@@ -104,12 +104,14 @@ public class SlidingWindowBuffer {
     }
 
     public boolean canRead() throws IOException {
-        LogService.appLog.debug("Check parser availablity: " + (this.parser != null));
+        if (LogService.appLog.isDebugEnabled())
+            LogService.appLog.debug("Check parser availablity: " + (this.parser != null));
         if (this.parser == null)
             return false;
         
         int parserReadable = this.parser.available();
-        LogService.appLog.debug("Sliding Window can still read: " + parserReadable );
+        if (LogService.appLog.isDebugEnabled())
+            LogService.appLog.debug("Sliding Window can still read: " + parserReadable );
         return (parserReadable > 0);
     }
     

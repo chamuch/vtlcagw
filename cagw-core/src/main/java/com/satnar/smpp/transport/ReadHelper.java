@@ -129,7 +129,7 @@ public class ReadHelper implements Runnable {
                                 }
                             }
                         } while (slidingWindow.canRead()); // sliding window loop
-                        
+                         
                     } // end of if block - processing only if we have data to process
                     
                 } catch (IOException e) {
