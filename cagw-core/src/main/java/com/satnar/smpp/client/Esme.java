@@ -255,7 +255,7 @@ public class Esme {
             }
             
             LogService.appLog.debug(this.getEsmeLabel() + " - Command ID: " + pdu.getCommandId());
-            if (pdu.getCommandId() == CommandId.EXTENDED || pdu.getCommandId() == CommandId.ENQUIRE_LINK_RESP ) {
+            if (pdu.getCommandId() == CommandId.ENQUIRE_LINK || pdu.getCommandId() == CommandId.ENQUIRE_LINK_RESP ) {
                 if (mode == ChannelMode.TX) {
                     LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                     this.txWriter.writeImmediate(pdu);

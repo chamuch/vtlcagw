@@ -25,7 +25,7 @@ public class LazyWriteBuffer {
         
         try {
             lazyBuffer.write(payload);
-            LogService.appLog.info(String.format("Session: %s - Buffering payload for size: %s, current lazy buffer size: ", this.lazyBuffer.size(), payload.length));
+            LogService.appLog.info(String.format("Session: %s - Buffering payload for size: %s, current lazy buffer size: %s", this.esmeLabel, this.lazyBuffer.size(), payload.length));
         } catch (IOException e) {
             LogService.appLog.error(String.format("Session: %s - Unable to buffer lazy write payload for size: %s", this.esmeLabel, payload.length));
         }
@@ -33,37 +33,44 @@ public class LazyWriteBuffer {
     
     public boolean readyToTransmit() {
         if (this.lazyBuffer == null) {
-            LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!! Not ready to transmit", this.esmeLabel));
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!! Not ready to transmit", this.esmeLabel));
             return false;
         }
         
         if (this.lazyBuffer.size() > 1000) {
-            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return true;
         } else {
-            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Not Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Not Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return false;
         }
     }
     
     public boolean hasContent() {
         if (this.lazyBuffer == null) {
-            LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!!", this.esmeLabel));
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!!", this.esmeLabel));
             return false;
         }
         
         if (this.lazyBuffer.size() > 0) {
-            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return true;
         } else {
-            LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Not Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Not Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return false;
         }
     }
     
     public byte[] flush() {
         if (this.lazyBuffer == null) {
-            LogService.appLog.debug("Lazy Buffer has no content!! Flushing empty payload");
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug("Lazy Buffer has no content!! Flushing empty payload");
             return new byte[] {};
         }
         
@@ -71,7 +78,7 @@ public class LazyWriteBuffer {
         try {
             this.lazyBuffer.close();
         } catch (IOException e) {
-            LogService.appLog.info("Error while cleaning up the lazy buffer!! Can be ignored!!");
+            LogService.appLog.warn("Error while cleaning up the lazy buffer!! Can be ignored!!");
         }
         this.lazyBuffer = new ByteArrayOutputStream();
         

@@ -74,13 +74,7 @@ public class ReadHelper implements Runnable {
                             readBuffer.get(currentWindow); readBuffer.clear();
                             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Read (" + windowSize + ") bytes with payload: " + EsmeHelper.prettyPrint(currentWindow));
                             
-                        } else { // else
-                            try {
-                                Thread.sleep(this.networkIdleWait);
-                            } catch (InterruptedException e) {
-                                // do nothing
-                            } // end of catch
-                        } // end of window size
+                        }
                     } // end of sync block on read buffer
                     
                     // process only if we read anything from the socket..
@@ -94,13 +88,13 @@ public class ReadHelper implements Runnable {
                         // process the burst...
                         do {
                             int currentSlidingReminaing = parser.available();
-                            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window current remaining size: " + currentSlidingReminaing);
+                            LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - Sliding window current remaining size: " + currentSlidingReminaing);
                             if (currentSlidingReminaing > 4) { // to ensure we have enough bytes to atleast decode PDU length...
                                 int pduLength = parser.readInt();
                                 currentSlidingReminaing = parser.available();
-                                LogService.appLog.debug("Next PDU to process needs (" + pduLength + ") bytes & sliding window curr_size: " + currentSlidingReminaing);
+                                LogService.appLog.info("Next PDU to process needs (" + pduLength + ") bytes & sliding window curr_size: " + currentSlidingReminaing);
                                 if ((pduLength>0) && (pduLength - 4) <= currentSlidingReminaing ) {
-                                    LogService.appLog.debug("Sliding Window has (" + pduLength + ") bytes to read & process");
+                                    LogService.appLog.info("Sliding Window has (" + pduLength + ") bytes to read & process");
                                     
                                     byte[] pduPayload = new byte[pduLength - 4];
                                     parser.read(pduPayload);
@@ -131,8 +125,14 @@ public class ReadHelper implements Runnable {
                         } while (slidingWindow.canRead()); // sliding window loop
                          
                     } // end of if block - processing only if we have data to process
-                    else { LogService.appLog.error("windowSize was '0'");}
-                    
+                    else { // else
+                        LogService.appLog.error("windowSize was '0'");
+                        try {
+                            Thread.sleep(this.networkIdleWait);
+                        } catch (InterruptedException e) {
+                            // do nothing
+                        } // end of catch
+                    } // end of window size
                 } catch (IOException e) {
                     LogService.appLog.error("Broken Pipe or Buffer!! Better to shutdown this stack", e);
                     Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());

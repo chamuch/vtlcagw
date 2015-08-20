@@ -58,6 +58,10 @@ public class SessionWatchdog {
         LogService.appLog.info("Watchdog successfully started!!");
     }
     
+    public void stop() {
+        this.watchdogSchedule.cancel();
+    }
+    
     
     class SessionWatchdogTask extends TimerTask {
         private String[] smppSessions = null;
