@@ -123,7 +123,7 @@ public class ReadHelper implements Runnable {
                                     break; // allow the sliding window to handle the rest of the burst in the next incoming packet
                                 }
                             }
-                        } while (parser.available() > 4); // sliding window loop
+                        } while (currentSlidingReminaing > 4); // sliding window loop
                          
                     } // end of if block - processing only if we have data to process
                     else { // else
