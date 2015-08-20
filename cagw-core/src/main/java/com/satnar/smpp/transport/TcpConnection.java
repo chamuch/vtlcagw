@@ -211,14 +211,14 @@ public class TcpConnection extends Connection {
 
 
     @Override
-    public ByteBuffer getRequestBuffer() {
+    public ByteBuffer getSendBuffer() {
         return this.requestBuffer;
     }
 
 
 
     @Override
-    public ByteBuffer getResponseBuffer() {
+    public ByteBuffer getReceiveBuffer() {
         return this.responseBuffer;
     }
 

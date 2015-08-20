@@ -22,7 +22,7 @@ public class SlidingWindowBuffer {
             
             if (this.parser != null) {
                 int burstWindow = this.parser.available();
-                LogService.appLog.debug("Previous remaining window size: " + burstWindow);
+                LogService.appLog.info("Previous Remaining Sliding Window size: " + burstWindow);
                 if (burstWindow > 0) {
                     byte[] tempRemaining = new byte[burstWindow];
                     this.parser.read(tempRemaining);
@@ -31,7 +31,7 @@ public class SlidingWindowBuffer {
             }
             
             this.slidingWindow = baosRaw.toByteArray();
-            LogService.appLog.debug("New Adjusted Rewind window size: " + this.slidingWindow.length);
+            LogService.appLog.info("New Rewinded Sliding Window size: " + this.slidingWindow.length);
             baosRaw.close();
             baosRaw = null;
             
@@ -47,7 +47,7 @@ public class SlidingWindowBuffer {
             
             this.consuming = new ByteArrayInputStream(this.slidingWindow);
             this.parser = new DataInputStream(this.consuming);
-            LogService.appLog.debug("Sliding Window ready. Check buffer: " + this.parser.available());
+            LogService.appLog.info("Sliding Window ready. Check buffer: " + this.parser.available());
         } catch (IOException e) {
             LogService.appLog.error("sliding window rewind failed. Check exception: " + e, e);
             throw new SmppTransportException("Cannot rewind. Size: " + rewind.length);
@@ -59,7 +59,7 @@ public class SlidingWindowBuffer {
             // check for previous sliding window remaining...
             if (parser != null) {
                 int burstWindow = this.parser.available();
-                LogService.appLog.debug("Previous remaining window size: " + burstWindow);
+                LogService.appLog.info("Previous remaining window size: " + burstWindow);
                 if (burstWindow > 0) {
                     this.slidingWindow = new byte[burstWindow];
                     this.parser.read(this.slidingWindow);
@@ -78,11 +78,11 @@ public class SlidingWindowBuffer {
             
             this.incoming = new ByteArrayOutputStream();
             if (slidingWindow != null && slidingWindow.length > 0) {
-                LogService.appLog.debug("Existing Sliding Window: " + this.slidingWindow.length + ", Incoming Window: " + payload.length);
+                LogService.appLog.info("Existing Sliding Window: " + this.slidingWindow.length + ", Incoming Window: " + payload.length);
                 this.incoming.write(this.slidingWindow);                
                 this.incoming.write(payload);
             } else {
-                LogService.appLog.debug("No Existing Sliding Window: 0, Incoming Window: " + payload.length);
+                LogService.appLog.info("No Existing Sliding Window: 0, Incoming Window: " + payload.length);
                 this.incoming.write(payload);
             }
             byte[] consolidatedWindow = this.incoming.toByteArray();
@@ -103,16 +103,7 @@ public class SlidingWindowBuffer {
         return this.parser;
     }
 
-    public boolean canRead() throws IOException {
-        if (LogService.appLog.isDebugEnabled())
-            LogService.appLog.debug("Check parser availablity: " + (this.parser != null));
-        if (this.parser == null)
-            return false;
-        
-        int parserReadable = this.parser.available();
-        if (LogService.appLog.isDebugEnabled())
-            LogService.appLog.debug("Sliding Window can still read: " + parserReadable );
-        return (parserReadable > 0);
-    }
+    
+    
     
 }

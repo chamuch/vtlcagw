@@ -13,9 +13,9 @@ public abstract class Connection {
 	
 	public abstract void disconnect() throws SmppTransportException;
 	
-	public abstract ByteBuffer getRequestBuffer();
+	public abstract ByteBuffer getSendBuffer();
 	
-	public abstract ByteBuffer getResponseBuffer();
+	public abstract ByteBuffer getReceiveBuffer();
 	
 	public abstract void write(ByteBuffer writeBuffer) throws SmppTransportException;
 	

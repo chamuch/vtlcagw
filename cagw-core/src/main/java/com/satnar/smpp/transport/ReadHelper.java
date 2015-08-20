@@ -60,7 +60,7 @@ public class ReadHelper implements Runnable {
                     break;
                 }
                 
-                ByteBuffer readBuffer = this.smppConnection.getResponseBuffer();
+                ByteBuffer readBuffer = this.smppConnection.getReceiveBuffer();
                 
                 int windowSize = 0;
                 try {
@@ -86,8 +86,9 @@ public class ReadHelper implements Runnable {
                         LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - Sliding window new size: " + parser.available());
                         
                         // process the burst...
+                        int currentSlidingReminaing = 0;
                         do {
-                            int currentSlidingReminaing = parser.available();
+                            currentSlidingReminaing = parser.available();
                             LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - Sliding window current remaining size: " + currentSlidingReminaing);
                             if (currentSlidingReminaing > 4) { // to ensure we have enough bytes to atleast decode PDU length...
                                 int pduLength = parser.readInt();
@@ -122,7 +123,7 @@ public class ReadHelper implements Runnable {
                                     break; // allow the sliding window to handle the rest of the burst in the next incoming packet
                                 }
                             }
-                        } while (slidingWindow.canRead()); // sliding window loop
+                        } while (parser.available() > 4); // sliding window loop
                          
                     } // end of if block - processing only if we have data to process
                     else { // else

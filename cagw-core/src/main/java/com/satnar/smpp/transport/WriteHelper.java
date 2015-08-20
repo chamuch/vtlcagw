@@ -35,7 +35,7 @@ public class WriteHelper {
             throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
         
         try {
-            ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
+            ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
             byte[] serialized = payload.encode();
             LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + EsmeHelper.prettyPrint(serialized));
             synchronized (writeBuffer) {
@@ -70,7 +70,7 @@ public class WriteHelper {
             
             
             if (this.lazyWriteBuffer.readyToTransmit()) {
-                ByteBuffer writeBuffer = this.smppConnection.getRequestBuffer();
+                ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
                 synchronized (writeBuffer) {
                     writeBuffer.clear();
                     writeBuffer.put(this.lazyWriteBuffer.flush());
@@ -124,7 +124,7 @@ public class WriteHelper {
                     LogService.appLog.debug(String.format("Session: %s - LazyWriter check connection state: %s, valid for write!!", 
                             this.connection.getEsmeLabel(), this.connection.getConnectionState()));
                     if (this.lazyWriteBuffer.hasContent()) {
-                        ByteBuffer writeBuffer = this.connection.getRequestBuffer();
+                        ByteBuffer writeBuffer = this.connection.getSendBuffer();
                         synchronized (writeBuffer) {
                             writeBuffer.clear();
                             writeBuffer.put(this.lazyWriteBuffer.flush());
