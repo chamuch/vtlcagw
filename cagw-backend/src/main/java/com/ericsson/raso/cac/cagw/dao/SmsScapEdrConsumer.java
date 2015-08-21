@@ -15,10 +15,13 @@ public class SmsScapEdrConsumer {
     private static final String DA_PREFIX = "DA";
     
     public static void main(String[] args) {
-        if (args.length < 3) {
-           System.out.println("Usage: java SmsScapEdrConsumer <fully_qualified_path_to_input_file> <cassandra_ip_address_csv_list> <keyspace_name>");        	
+        if (args.length < 4) {
+           System.out.println("Usage: java SmsScapEdrConsumer <fully_qualified_path_to_input_file> <cassandra_ip_address_csv_list> <keyspace_name> <number_of_workers>");  
+           System.exit(1);
         }
         
+        
+                
         processInputFile(args[0], args[1], args[2]);
     }
 
@@ -79,6 +82,7 @@ public class SmsScapEdrConsumer {
                 	
                 	try {
                         new File(csvPath + ".failed").createNewFile();
+                        System.exit(-2);
                     } catch (IOException e1) {
                         System.out.println("Unable to create Failed File for:"+csvPath);
                     }

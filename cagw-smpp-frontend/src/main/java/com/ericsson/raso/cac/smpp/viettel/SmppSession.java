@@ -61,6 +61,7 @@ public class SmppSession implements SmartLifecycle {
 	        LogService.appLog.info("SmppSession-start:All stacks are triggered to init!!");
             
 	        this.sessionWatchdog = new SessionWatchdog(smppSessions);
+	        this.sessionWatchdog.start();
 	        LogService.appLog.info("SmppSession-start:Watchdog started!!");
             
             
@@ -77,6 +78,8 @@ public class SmppSession implements SmartLifecycle {
 	        if (session != null && EsmeHelper.checkSessionState(smppSession))
 	            session.stop();
 	    }
+	    
+	    this.sessionWatchdog.stop();
 	    this.state = State.SHUTDOWN;
 	    LogService.appLog.info("SmppSession-stop: All stacks are stopped.");
 	}

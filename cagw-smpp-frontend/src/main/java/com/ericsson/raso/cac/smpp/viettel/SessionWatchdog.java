@@ -5,10 +5,7 @@ import java.util.TimerTask;
 
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
-import com.satnar.smpp.StackMap;
-import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.client.EsmeHelper;
-import com.satnar.smpp.transport.SmppSessionState;
 
 public class SessionWatchdog {
 
@@ -20,7 +17,6 @@ public class SessionWatchdog {
     private int monitorInteval = 0;
     private int monitorInitialWait = 0;
     private Timer watchdogSchedule = null;
-    private TimerTask watchdogTask = null;
     
     public SessionWatchdog(String[] smppSessionList) {
         this.smppSessions = smppSessionList;
