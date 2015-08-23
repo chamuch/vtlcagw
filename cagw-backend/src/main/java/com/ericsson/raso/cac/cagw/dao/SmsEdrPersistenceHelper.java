@@ -13,17 +13,16 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
 public class SmsEdrPersistenceHelper {
-    private static final String TRANSACTION_TABLE = "transaction";
         
-    private Cluster cluster = null;
-    private Session session = null;
-    private ExecutorService threadPool = null;
-    private String keyspace = null;
-    
-    private static List<Future<Transaction>> fetchTasks = new ArrayList<Future<Transaction>>();
-    private static List<Future<Boolean>> updateTasks = new ArrayList<Future<Boolean>>();
-    private static List<Future<Boolean>> deleteTasks = new ArrayList<Future<Boolean>>();
-    
+    private Cluster                          cluster     = null;
+    private Session                          session     = null;
+    private ExecutorService                  threadPool  = null;
+    private String                           keyspace    = null;
+
+    private static List<Future<Transaction>> fetchTasks  = new ArrayList<Future<Transaction>>();
+    private static List<Future<Boolean>>     updateTasks = new ArrayList<Future<Boolean>>();
+    private static List<Future<Boolean>>     deleteTasks = new ArrayList<Future<Boolean>>();
+
     public SmsEdrPersistenceHelper(String cassandraAddresses, String keyspace, int poolSize) {
         
         Cluster.Builder builder = Cluster.builder();
@@ -31,6 +30,7 @@ public class SmsEdrPersistenceHelper {
         for (String nodeAddress: addresses) {
             builder = builder.addContactPoint(nodeAddress);
         }
+        
         this.cluster = builder.build();
         this.keyspace = keyspace;
         this.session = this.cluster.connect(this.keyspace);
@@ -66,6 +66,11 @@ public class SmsEdrPersistenceHelper {
                     System.out.println("Fetch Transaction has failed during execution!!");
                     return null;
                 }
+            }
+            
+            if (fetch.isCancelled()) {
+                fetchTasks.remove(fetch);
+                return null;
             }
         }
         return null;
@@ -118,6 +123,7 @@ public class SmsEdrPersistenceHelper {
     public boolean anyDeletePending() {
         return (deleteTasks.size() > 0);
     }
+
     
     
 }

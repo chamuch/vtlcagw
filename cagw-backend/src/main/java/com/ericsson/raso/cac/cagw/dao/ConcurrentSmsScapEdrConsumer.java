@@ -1,9 +1,7 @@
 package com.ericsson.raso.cac.cagw.dao;
 
-import java.awt.font.NumericShaper;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,10 +10,6 @@ import java.util.List;
 public class ConcurrentSmsScapEdrConsumer {
     
     private static final String COMMA = ",";
-    private static final String PIPE = "|";
-    private static final String ACCT_DELIM = "/";
-    private static final String SEMI_COLON = ";";
-    private static final String DA_PREFIX = "DA";
     
     private static List<SmsEdrPersistenceHelper> workers = null;
     private static int workerIndex = 0;
@@ -51,14 +45,13 @@ public class ConcurrentSmsScapEdrConsumer {
         BufferedReader textReader = null;
         int totalCount = 0;
         int successCount = 0;
-        int failureCount = 0;
         
         try {
         	System.out.println("Processing started for file:"+csvPath);
             fileInput = new FileReader(csvPath);
             textReader = new BufferedReader(fileInput);            
-            TransactionDao txnHelper = new TransactionDao();
             
+            String[] fields = null;
             while(true) {            	
                 recordEntry = textReader.readLine();
                 if (recordEntry == null) {
@@ -70,56 +63,48 @@ public class ConcurrentSmsScapEdrConsumer {
                 totalCount++;
                 if (recordEntry.equals("") || recordEntry.contains(COMMA)) {
                     System.out.println("Skipping invalid entry at line: " + totalCount);
-                    failureCount++;
                     continue;
                 }
                 
                 
-                String[] fields = recordEntry.split(COMMA);
+                fields = recordEntry.split(COMMA);
                 if (fields != null) {
                     SmsEdrPersistenceHelper worker = getWorker();
                     worker.submitFetchTransaction(fields);
-                    
-                    boolean keepLooping = true;
-                    if (worker.anyFetchPending()) {
-                        while (keepLooping) {
-                            Transaction transaction = worker.fetchTransaction();
-                            if (transaction != null) {
-                                keepLooping = false;
-                                worker = getWorker();
-                                if (fields.length > 6) {
-                                    worker.submitUpdateTransaction(transaction);
-                                    if (worker.anyUpdatePending()) {
-                                        Boolean updateResult = null;
-                                        do {
-                                            updateResult = worker.getUpdateResult();
-                                        } while (updateResult == null);
-                                        
-                                        if (updateResult)
-                                            successCount++;
-                                        else
-                                            failureCount++;
-                                    }
-                                } else {
-                                    transaction.setChargeStatus(true);
-                                    worker.submitDeleteTransaction(transaction);
-                                    if (worker.anyDeletePending()) {
-                                        Boolean deleteResult = null;
-                                        do {
-                                            deleteResult = worker.getDeleteResult();
-                                        } while (deleteResult == null);
-                                        
-                                        if (deleteResult)
-                                            successCount++;
-                                        else
-                                            failureCount++;
-                                    }
-                                }
-                            }
-                        }
+                }
+            } // distributed load across workers to fetch the transaction.
+            
+            SmsEdrPersistenceHelper worker = null;
+            do {
+                worker = getWorker();
+                Transaction transaction = worker.fetchTransaction();
+                if (transaction != null) {
+                    worker = getWorker();
+                    if (fields.length > 6) { 
+                        worker.submitUpdateTransaction(transaction);
+                    } else {
+                        transaction.setChargeStatus(true);
+                        worker.submitDeleteTransaction(transaction);
                     }
-	            }	            
-            }
+                }
+            } while (worker.anyFetchPending()); //distributed load across workers to update/delete
+            
+            do {
+                worker = getWorker();
+                if (worker.getUpdateResult())
+                    successCount++;
+                
+                worker = getWorker();
+                if (worker.getDeleteResult())
+                    successCount++;
+            } while(worker.anyUpdatePending() || worker.anyDeletePending());  // gather the results
+                    
+                    
+                    
+                    
+
+	            	            
+            
         } catch(Exception genE){
         	System.out.println("Encountered exception while processing file: " + genE.getMessage());
         	try {
@@ -137,7 +122,7 @@ public class ConcurrentSmsScapEdrConsumer {
         System.out.println("=================");
         System.out.println("Total Records processed: " + totalCount);
         System.out.println("Successfully processed:  " + successCount);
-        System.out.println("Failure in processing:   " + failureCount);
+        System.out.println("Failure in processing:   " + (totalCount - successCount));
     }
     
     private static SmsEdrPersistenceHelper getWorker() {
