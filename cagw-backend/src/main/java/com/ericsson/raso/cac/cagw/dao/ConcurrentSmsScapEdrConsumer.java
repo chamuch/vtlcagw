@@ -64,7 +64,7 @@ public class ConcurrentSmsScapEdrConsumer {
                 
                 // Handle record
                 totalCount++;
-                if (recordEntry.equals("") || recordEntry.contains(COMMA)) {
+                if (recordEntry.equals("") || !recordEntry.contains(COMMA)) {
                     System.out.println("Skipping invalid entry at line: " + totalCount);
                     continue;
                 }
@@ -93,11 +93,13 @@ public class ConcurrentSmsScapEdrConsumer {
             
             do {
                 worker = getWorker();
-                if (worker.getUpdateResult())
+                Boolean result = worker.getUpdateResult();
+                if (result != null && result == true)
                     successCount++;
                 
                 worker = getWorker();
-                if (worker.getDeleteResult())
+                result = worker.getDeleteResult();
+                if (result != null && result == true)
                     successCount++;
             } while(worker.anyUpdatePending() || worker.anyDeletePending());  // gather the results
                     
