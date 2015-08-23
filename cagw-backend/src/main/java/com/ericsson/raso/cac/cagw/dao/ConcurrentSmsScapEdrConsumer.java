@@ -111,7 +111,8 @@ public class ConcurrentSmsScapEdrConsumer {
                 workers.remove(worker);
             }
             System.out.println("All workers shutdown and cleaned up!");
-	            	            
+	         
+            System.exit(0);
             
         } catch(Exception genE){
         	System.out.println("Encountered exception while processing file: " + genE.getMessage());
