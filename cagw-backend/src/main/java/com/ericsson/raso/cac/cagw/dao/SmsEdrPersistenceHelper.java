@@ -35,7 +35,7 @@ public class SmsEdrPersistenceHelper {
         this.keyspace = keyspace;
         this.session = this.cluster.connect(this.keyspace);
         
-        this.threadPool = new ThreadPoolExecutor(poolSize, poolSize, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(poolSize));
+        this.threadPool = new ThreadPoolExecutor(poolSize, poolSize, 30000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(poolSize*3));
     }
     
     public void submitFetchTransaction(String[] fields) {

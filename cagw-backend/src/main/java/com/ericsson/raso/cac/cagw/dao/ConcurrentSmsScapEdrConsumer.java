@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 public class ConcurrentSmsScapEdrConsumer {
     
@@ -15,8 +16,8 @@ public class ConcurrentSmsScapEdrConsumer {
     private static int workerIndex = 0;
     
     public static void main(String[] args) {
-        if (args.length < 4) {
-           System.out.println("Usage: java SmsScapEdrConsumer <fully_qualified_path_to_input_file> <cassandra_ip_address_csv_list> <keyspace_name> <number_of_workers>");  
+        if (args.length < 5) {
+           System.out.println("Usage: java SmsScapEdrConsumer <fully_qualified_path_to_input_file> <cassandra_ip_address_csv_list> <keyspace_name> <number_of_workers> <throttle_delay");  
            System.exit(1);
         }
         
@@ -27,11 +28,19 @@ public class ConcurrentSmsScapEdrConsumer {
             System.out.println("'number_of_workers' was not found positive integer!");
             System.exit(2);
         }
+        
+        int throttleDelay = 0;
+        try {
+            throttleDelay = Integer.parseInt(args[4]);
+        } catch (NumberFormatException e) {
+            System.out.println("'throttle_delay' was not found positive integer!");
+            System.exit(2);
+        }
                 
-        processInputFile(args[0], args[1], args[2], workerCount);
+        processInputFile(args[0], args[1], args[2], workerCount, throttleDelay);
     }
 
-    private static void processInputFile(String csvPath, String cassandraIp, String keyspace, int numberOfWorkers) {
+    private static void processInputFile(String csvPath, String cassandraIp, String keyspace, int numberOfWorkers, int throttleDelay) {
         
         workers = new ArrayList<SmsEdrPersistenceHelper>(numberOfWorkers);
         int poolSize = 800/numberOfWorkers;
@@ -73,7 +82,19 @@ public class ConcurrentSmsScapEdrConsumer {
                 fields = recordEntry.split(COMMA);
                 if (fields != null) {
                     worker = getWorker();
-                    worker.submitFetchTransaction(fields);
+                    try {
+                        worker.submitFetchTransaction(fields);
+                    } catch (RejectedExecutionException e) {
+                        Thread.sleep(throttleDelay); System.out.println("Must throttle speed now");
+                        do {
+                            try {
+                                worker.submitFetchTransaction(fields);
+                                break;
+                            } catch (RejectedExecutionException e1) {
+                                Thread.sleep(throttleDelay); System.out.println("Must throttle speed further now");
+                            }
+                        } while (true);
+                    }
                 }
             } // distributed load across workers to fetch the transaction.
             
@@ -83,10 +104,34 @@ public class ConcurrentSmsScapEdrConsumer {
                 if (transaction != null) {
                     worker = getWorker();
                     if (fields.length > 6) { 
+                        try {
                         worker.submitUpdateTransaction(transaction);
+                        } catch (RejectedExecutionException e) {
+                            Thread.sleep(throttleDelay); System.out.println("Must throttle speed now");
+                            do {
+                                try {
+                                    worker.submitUpdateTransaction(transaction);
+                                    break;
+                                } catch (RejectedExecutionException e1) {
+                                    Thread.sleep(throttleDelay); System.out.println("Must throttle speed further now");
+                                }
+                            } while (true);
+                        }
                     } else {
                         transaction.setChargeStatus(true);
-                        worker.submitDeleteTransaction(transaction);
+                        try{
+                            worker.submitDeleteTransaction(transaction);
+                        } catch (RejectedExecutionException e) {
+                            Thread.sleep(throttleDelay); System.out.println("Must throttle speed now");
+                            do {
+                                try {
+                                    worker.submitDeleteTransaction(transaction);
+                                    break;
+                                } catch (RejectedExecutionException e1) {
+                                    Thread.sleep(throttleDelay); System.out.println("Must throttle speed further now");
+                                }
+                            } while (true);
+                        }
                     }
                 }
             } while (worker.anyFetchPending()); //distributed load across workers to update/delete
