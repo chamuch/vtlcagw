@@ -105,8 +105,12 @@ public class ConcurrentSmsScapEdrConsumer {
                     
                     
                     
-                    
-
+            while (workers.size() > 0) {
+                worker = workers.get(0);
+                worker.stop();
+                workers.remove(worker);
+            }
+            System.out.println("All workers shutdown and cleaned up!");
 	            	            
             
         } catch(Exception genE){
