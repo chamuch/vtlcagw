@@ -130,6 +130,7 @@ public class ConcurrentSmsScapEdrConsumer {
         System.out.println("Total Records processed: " + totalCount);
         System.out.println("Successfully processed:  " + successCount);
         System.out.println("Failure in processing:   " + (totalCount - successCount));
+        System.exit(0);
     }
     
     private static SmsEdrPersistenceHelper getWorker() {
