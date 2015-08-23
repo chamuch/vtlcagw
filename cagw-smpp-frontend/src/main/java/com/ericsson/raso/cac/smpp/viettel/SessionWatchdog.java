@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
+import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.EsmeHelper;
 
 public class SessionWatchdog {
@@ -69,7 +70,7 @@ public class SessionWatchdog {
         @Override
         public void run() {
             LogService.appLog.info("Watchdog monitor cycle initiated...");
-            for (String smppSession: this.smppSessions) {
+            for (String smppSession: StackMap.getSmppSessions()) {
                 if (!EsmeHelper.checkSessionState(smppSession)) {
                     LogService.appLog.warn("SmppSession: " + smppSession + " was detected invalid state. Attempting (re)start...");
                     new Thread(new WatchdogSessionStart(smppSession)).start();

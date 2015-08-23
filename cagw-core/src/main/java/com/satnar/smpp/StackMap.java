@@ -2,6 +2,7 @@ package com.satnar.smpp;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import com.satnar.smpp.client.Esme;
 
@@ -36,5 +37,9 @@ public abstract class StackMap {
     
     public static String getEsmeLabel(String sequence) {
         return messageIndex.get(sequence);
+    }
+
+    public static Set<String> getSmppSessions() {
+        return stackIndex.keySet();
     }
 }
