@@ -52,6 +52,9 @@ public class ConcurrentSmsScapEdrConsumer {
             textReader = new BufferedReader(fileInput);            
             
             String[] fields = null;
+            
+            SmsEdrPersistenceHelper worker = null;
+            
             while(true) {            	
                 recordEntry = textReader.readLine();
                 if (recordEntry == null) {
@@ -69,12 +72,11 @@ public class ConcurrentSmsScapEdrConsumer {
                 
                 fields = recordEntry.split(COMMA);
                 if (fields != null) {
-                    SmsEdrPersistenceHelper worker = getWorker();
+                    worker = getWorker();
                     worker.submitFetchTransaction(fields);
                 }
             } // distributed load across workers to fetch the transaction.
             
-            SmsEdrPersistenceHelper worker = null;
             do {
                 worker = getWorker();
                 Transaction transaction = worker.fetchTransaction();
@@ -113,12 +115,9 @@ public class ConcurrentSmsScapEdrConsumer {
             } catch (IOException e1) {
             	System.out.println("Unable to create Failed File for:"+csvPath);
             }
-        } finally{
-        	System.out.println("Success Record Count: " + successCount); 
-        	fileInput = null;
-        	textReader = null;
-        	System.exit(4);
         }
+        
+        
         System.out.println("\n\nExecution Summary");
         System.out.println("=================");
         System.out.println("Total Records processed: " + totalCount);
@@ -127,6 +126,7 @@ public class ConcurrentSmsScapEdrConsumer {
     }
     
     private static SmsEdrPersistenceHelper getWorker() {
+        System.out.println("workIndex: " + workerIndex);
         if (workerIndex == workers.size())
             workerIndex = 0;
          return workers.get(workerIndex++);
