@@ -107,6 +107,7 @@ public class ConcurrentSmsScapEdrConsumer {
             
         } catch(Exception genE){
         	System.out.println("Encountered exception while processing file: " + genE.getMessage());
+        	genE.printStackTrace();
         	try {
                 new File(csvPath + ".failed").createNewFile();
             } catch (IOException e1) {
