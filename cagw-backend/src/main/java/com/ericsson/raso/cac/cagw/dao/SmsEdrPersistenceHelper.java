@@ -124,6 +124,17 @@ public class SmsEdrPersistenceHelper {
         return (deleteTasks.size() > 0);
     }
 
+    public void stop() {
+        this.threadPool.shutdown();
+        try {
+            this.threadPool.awaitTermination(2, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            System.out.println("threadpool shutdown interrupted!!");
+        }
+        this.threadPool = null;
+        
+    }
+
     
     
 }
