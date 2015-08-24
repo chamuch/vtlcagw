@@ -248,14 +248,15 @@ public class Esme {
         LogService.stackTraceLog.debug(this.getEsmeLabel() + " - Esme-sendPdu: Attempting... pdu:"+pdu);
 
         try {
-            if (this.canUseTrx) {
-                LogService.appLog.debug(this.getEsmeLabel() + " - TRX Lazy Write PDU:" + pdu.toString());
-                this.trxWriter.writeLazy(pdu);
-                return;
-            }
             
             LogService.appLog.debug(this.getEsmeLabel() + " - Command ID: " + pdu.getCommandId());
             if (pdu.getCommandId() == CommandId.ENQUIRE_LINK || pdu.getCommandId() == CommandId.ENQUIRE_LINK_RESP ) {
+                if (this.canUseTrx) {
+                    LogService.appLog.debug(this.getEsmeLabel() + " - TRX Lazy Write PDU:" + pdu.toString());
+                    this.trxWriter.writeImmediate(pdu);
+                    return;
+                }
+                
                 if (mode == ChannelMode.TX) {
                     LogService.appLog.debug(this.getEsmeLabel() + " - TX Lazy Write PDU:" + pdu.toString());
                     this.txWriter.writeImmediate(pdu);
@@ -267,6 +268,12 @@ public class Esme {
             }
             
             LogService.appLog.debug(this.getEsmeLabel() + " - Standard Command ID: " + pdu.getCommandId());
+            if (this.canUseTrx) {
+                LogService.appLog.debug(this.getEsmeLabel() + " - TRX Lazy Write PDU:" + pdu.toString());
+                this.trxWriter.writeLazy(pdu);
+                return;
+            }
+            
             if (pdu.getCommandId().isRxCompatible()) {
                 LogService.appLog.debug(this.getEsmeLabel() + " - RX Lazy Write PDU:" + pdu.toString());
                 this.rxWriter.writeLazy(pdu);
@@ -281,7 +288,7 @@ public class Esme {
             LogService.appLog.warn(this.getEsmeLabel() + " - Esme-sendPdu:Seems like the transport is broken. Stopping the stack. CommandSequence:"+pdu.getCommandSequence().getValue());
             this.stop();
         } catch (Exception e){
-        	LogService.stackTraceLog.debug("ESME-SendPDU:Encountered exception..:", e);
+        	LogService.appLog.error("ESME-SendPDU:Encountered exception..:", e);
         }
     }
     
