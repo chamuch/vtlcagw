@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import com.satnar.common.LogService;
 import com.satnar.common.alarmlog.AlarmCode;
 import com.satnar.smpp.StackMap;
-import com.satnar.smpp.client.ChannelMode;
 import com.satnar.smpp.client.Esme;
 import com.satnar.smpp.client.EsmeHelper;
 import com.satnar.smpp.codec.SmppParameter;
@@ -103,7 +102,7 @@ public class ReadHelper implements Runnable {
                                     
                                     // delgate to pdu facade now
                                     try {
-                                        LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + EsmeHelper.prettyPrint(pduPayload));
+                                        LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + EsmeHelper.prettyPrint(pduPayload));
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_ABATE, this.smppConnection.getEsmeLabel());

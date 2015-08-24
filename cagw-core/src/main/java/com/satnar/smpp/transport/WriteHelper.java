@@ -37,7 +37,7 @@ public class WriteHelper {
         try {
             ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
             byte[] serialized = payload.encode();
-            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + EsmeHelper.prettyPrint(serialized));
+            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + EsmeHelper.prettyPrint(serialized));
             synchronized (writeBuffer) {
                 writeBuffer.clear();
                 writeBuffer.put(serialized);
@@ -46,10 +46,10 @@ public class WriteHelper {
                 writeBuffer.clear();
             }
             
-            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
+            LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
-                LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
+                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                 if (!((TcpConnection)this.smppConnection).isShutdownMode())
                     session.stop();
@@ -65,7 +65,7 @@ public class WriteHelper {
         
         try {
             byte[] serialized = payload.encode();
-            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - buffering payload: " + EsmeHelper.prettyPrint(serialized));
+            LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - buffering payload: " + EsmeHelper.prettyPrint(serialized));
             this.lazyWriteBuffer.write(serialized);
             
             
@@ -77,11 +77,11 @@ public class WriteHelper {
                     writeBuffer.flip();
                     this.smppConnection.write(writeBuffer);
                     writeBuffer.clear();
-                    LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
+                    LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
                 }
             }
             
-            LogService.stackTraceLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
+            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
