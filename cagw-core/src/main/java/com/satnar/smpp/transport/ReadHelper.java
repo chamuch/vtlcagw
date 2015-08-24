@@ -106,7 +106,7 @@ public class ReadHelper implements Runnable {
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         this.processorPool.submit(switchingDelegator);
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_ABATE, this.smppConnection.getEsmeLabel());
-                                        LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
+                                        LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
                                         LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + EsmeHelper.prettyPrint(pduPayload) + ", Reason: ", e);
                                         int commandId = parser.readInt();
