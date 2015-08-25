@@ -104,7 +104,7 @@ public class ReadHelper implements Runnable {
                                     try {
                                         LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - Decoding Delgate for PDU: " + EsmeHelper.prettyPrint(pduPayload));
                                         ParsingDelegate switchingDelegator = new ParsingDelegate(pduPayload, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
-                                        this.processorPool.submit(switchingDelegator);
+                                        this.processorPool.execute(switchingDelegator);
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_ABATE, this.smppConnection.getEsmeLabel());
                                         LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
