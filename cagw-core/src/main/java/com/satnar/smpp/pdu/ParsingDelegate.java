@@ -60,10 +60,6 @@ public class ParsingDelegate implements Runnable {
             CommandId pduName = CommandId.valueOf(commandId);
             byte[] rawPdu = new byte[parser.available()];
             parser.read(rawPdu);
-            parser.close();
-            rawStream.close();
-            parser = null;
-            rawStream = null;
             
             LogService.appLog.debug("ParsingDeligate-call: Entering into handlers. pudName:"+pduName);
             
@@ -215,7 +211,6 @@ public class ParsingDelegate implements Runnable {
                         }
                         this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                         //return null;
-                        return;
                 }
             } else {
                 LogService.appLog.debug("ParsingDeligate-call:pduName is null !!");
@@ -231,8 +226,13 @@ public class ParsingDelegate implements Runnable {
                 session.sendPdu(pdu, this.channelMode);
                 this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
                 //return null;
-                return;
             }
+            
+            parser.close();
+            rawStream.close();
+            parser = null;
+            rawStream = null;
+            
         } catch (IOException e) {
             LogService.appLog.error("Read/Write Failure with PDU operations!!", e);
         } catch (CamelExecutionException e) {
