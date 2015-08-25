@@ -41,19 +41,19 @@ public class TcpConnection extends Connection {
     private int                 networkIdleWaitTime = 0;
     
     private SocketChannel       connection          = null;
-    private ByteBuffer          requestBuffer       = null;
-    private ByteBuffer          responseBuffer      = null;
+    private ByteBuffer          sendBuffer       = null;
+    private ByteBuffer          readBuffer      = null;
     private ChannelMode         mode                = null;
     private boolean             isShutdownMode      = false;
     
     public TcpConnection(Properties connectionConfig, ChannelMode channelMode) {
         this.config = connectionConfig;
         
-        requestBuffer = ByteBuffer.allocate(1024);
-        requestBuffer.order(ByteOrder.BIG_ENDIAN);
+        sendBuffer = ByteBuffer.allocate(1024);
+        sendBuffer.order(ByteOrder.BIG_ENDIAN);
         
-        responseBuffer = ByteBuffer.allocate(4096);
-        responseBuffer.order(ByteOrder.BIG_ENDIAN);
+        readBuffer = ByteBuffer.allocate(4096);
+        readBuffer.order(ByteOrder.BIG_ENDIAN);
         
         this.mode = channelMode;
         LogService.appLog.info("TcpConnection init with: " + channelMode + ", config: " + this.config);
@@ -139,8 +139,8 @@ public class TcpConnection extends Connection {
                     break;
             }
             
-            this.requestBuffer.clear();
-            this.responseBuffer.clear();
+            this.sendBuffer.clear();
+            this.readBuffer.clear();
             this.setConnectionState(SmppSessionState.CLOSED);
             LogService.appLog.debug(String.format("Esme: %s - disconnected... Check State: %s", this.label, this.getConnectionState()));
                 
@@ -153,8 +153,8 @@ public class TcpConnection extends Connection {
     @Override
     protected void finalize() throws Throwable {
         this.connection = null;
-        this.requestBuffer = null;
-        this.responseBuffer = null;
+        this.sendBuffer = null;
+        this.readBuffer = null;
         System.gc();
         super.finalize();
     }
@@ -212,14 +212,14 @@ public class TcpConnection extends Connection {
 
     @Override
     public ByteBuffer getSendBuffer() {
-        return this.requestBuffer;
+        return this.sendBuffer;
     }
 
 
 
     @Override
     public ByteBuffer getReceiveBuffer() {
-        return this.responseBuffer;
+        return this.readBuffer;
     }
 
 

@@ -57,8 +57,8 @@
 		<property key="trx.tcpPort" value="2775" />
 		<property key="trx.esmeLabel" value="SMSC1-SCPV01" />
 		<property key="trx.lazyWriteWait" value="500" />
-		
 	</section>
+	
 	<section id="Esme_Props_Test2" description="esmeTest2">
 		<property key="username" value="smppClient1" />
 		<property key="password" value="password" />

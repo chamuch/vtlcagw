@@ -3,8 +3,8 @@ package com.satnar.smpp.transport;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,7 @@ public class ReadHelper implements Runnable {
                 this.threadPoolSize,                                            // max pool size
                 30000,                                                          // keep alive time
                 TimeUnit.MILLISECONDS,                                          // keep alive time unit (set to 30 secs)
-                new LinkedBlockingQueue<Runnable>((this.threadPoolSize * 2)));  // wait queue size
+                new ArrayBlockingQueue<Runnable>((this.threadPoolSize * 2)));  // wait queue size
     }
     
     public void run() {
