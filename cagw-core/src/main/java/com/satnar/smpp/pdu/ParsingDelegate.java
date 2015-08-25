@@ -72,26 +72,26 @@ public class ParsingDelegate implements Runnable {
                     case GENERIC_NACK:
                         LogService.appLog.debug(String.format("Session: %s - GNACK Received and delegated", this.esmeLabel));
                         EsmeHelper.handleGNack(rawPdu);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case BIND_RECEIVER_RESP:
                         LogService.appLog.debug(String.format("Session: %s - BIND_RECEIVER_RESP Received and delegated", this.esmeLabel));
                         LogService.stackTraceLog.info(String.format("Session: %s - BIND_RECEIVER_RESP Received, payload: %s", this.esmeLabel, EsmeHelper.prettyPrint(rawPdu)));
                         EsmeHelper.handleBindReceiverResponse(rawPdu, esmeLabel);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case BIND_TRANSCEIVER_RESP:
                         LogService.appLog.debug(String.format("Session: %s - BIND_TRANSCEIVER_RESP Received and delegated", this.esmeLabel));
                         EsmeHelper.handleBindTransceiverResponse(rawPdu);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case BIND_TRANSMITTER_RESP:
                         LogService.appLog.debug(String.format("Session: %s - BIND_TRANSMITTER_RESP Received and delegated", this.esmeLabel));
                         EsmeHelper.handleBindTransmitterResponse(rawPdu);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case DELIVER_SM:
@@ -101,19 +101,19 @@ public class ParsingDelegate implements Runnable {
                             com.satnar.common.SpringHelper.getTraffiControl().updateExgress();
                         } else
                             EsmeHelper.sendDeliverSmThrottled(rawPdu);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case ENQUIRE_LINK:
                         LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK Received and delegated", this.esmeLabel));
                         EsmeHelper.handleEnquireLinkRequest(rawPdu, this.esmeLabel, this.channelMode);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case ENQUIRE_LINK_RESP:
                         LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK_RESP Received and delegated", this.esmeLabel));
                         EsmeHelper.handleEnquireLinkResponse(rawPdu);
-                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName, pdu.getCommandSequence().getValue());
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     default:
@@ -247,6 +247,11 @@ public class ParsingDelegate implements Runnable {
     private void printStats(long endTime, String session, CommandId commandId, long sequence) {
         LogService.stackTraceLog.info(String.format("Session: %s - Time in queue: %s & Time in actual execution: %s, for Command: %s & Sequence: %s", 
                     this.esmeLabel, (this.executionStartTime - this.creationTime), (endTime - this.executionStartTime), commandId, sequence));
+    }
+    
+    private void printStats(long endTime, String session, CommandId commandId) {
+        LogService.stackTraceLog.info(String.format("Session: %s - Time in queue: %s & Time in actual execution: %s, for Command: %s", 
+                    this.esmeLabel, (this.executionStartTime - this.creationTime), (endTime - this.executionStartTime), commandId));
     }
     
 	
