@@ -361,18 +361,19 @@ public abstract class EsmeHelper {
     }
 
 
-    public static void handleEnquireLinkResponse(byte[] rawPdu) {
+    public static void handleEnquireLinkResponse(byte[] rawPdu, String esmeLabel, ChannelMode channelMode) {
         try {
             SmppPdu enquireLinkPdu = new EnquireLinkResponse();
             enquireLinkPdu.decode(rawPdu);
             
-            String sessionId = StackMap.getEsmeLabel("" + enquireLinkPdu.getCommandSequence().getValue());
-            Esme session = StackMap.getStack(sessionId);
+            Esme session = StackMap.getStack(esmeLabel);
             StackMap.removeMessageIndex("" + enquireLinkPdu.getCommandSequence().getValue());
 
             if (enquireLinkPdu.getCommandStatus() != CommandStatus.ESME_ROK) {
                 LogService.appLog.error("EsmeHelper-handleEnquireLinkResponse: Response is not OK..");
                 session.stop();
+            } else {
+                LogService.appLog.info("Enquire Link Response ESME_ROK for Session: " + esmeLabel + ", Channel: " + channelMode);
             }
             
         } catch (SmppCodecException e) {
