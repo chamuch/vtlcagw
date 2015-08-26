@@ -200,7 +200,8 @@ public class Esme {
                 this.trxChannel = null;
 
                 label = this.getEsmeLabel();
-                StackMap.removeSession(label);
+                //25-AUG-2015: If we remove this watch dog will not pick to restart
+                //StackMap.removeSession(label);
                 LogService.appLog.info(this.getEsmeLabel() + " Esme-stop:Transiever is successful!!");
             } else {
                 if (this.txChannel.getConnectionState() == SmppSessionState.BOUND_TX) {
@@ -231,7 +232,8 @@ public class Esme {
                 LogService.appLog.info(this.getEsmeLabel() + "Esme-stop:Receiver is successful!!");
 
                 label = this.txChannel.getEsmeLabel();
-                StackMap.removeSession(label);
+              //25-AUG-2015: If we remove this watch dog will not pick to restart
+                //StackMap.removeSession(label);
             }
         } catch (SmppTransportException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - Esme-stop:Unable to stop!: " + e.getMessage(), e);
