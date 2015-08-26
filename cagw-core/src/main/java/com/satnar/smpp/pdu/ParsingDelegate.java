@@ -107,7 +107,7 @@ public class ParsingDelegate implements Runnable {
                         return;
                     case ENQUIRE_LINK_RESP:
                         LogService.appLog.debug(String.format("Session: %s - ENQUIRE_LINK_RESP Received and delegated", this.esmeLabel));
-                        EsmeHelper.handleEnquireLinkResponse(rawPdu);
+                        EsmeHelper.handleEnquireLinkResponse(rawPdu, this.esmeLabel, this.channelMode);
                         this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
