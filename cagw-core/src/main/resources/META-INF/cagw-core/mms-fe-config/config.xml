@@ -1,0 +1,48 @@
+<!DOCTYPE config SYSTEM "config.dtd">
+<config>
+
+	<section id="Cagw_EndPoint" description="cagw backend url">
+		<property key="Mmsc_Cagw_BackendUrl"
+			value="http4://192.168.5.164:9090/cagw-backend/CgWeb/process" />
+		<property key="Smpp_Cagw_BackendUrl"
+		value="http4://192.168.5.164:9090/cagw-backend/CgWeb/process" />
+	</section>
+
+	<section id="DB_PROP" description="cagw backend url">
+		<property key="cassandraAddress" value="192.168.5.136,192.168.5.142" />
+		<property key="keySpaceName" value="cagw_keyspace" />
+	</section>
+    	
+	<section id="GLOBAL_Alarms" description="Alarms">
+		<property key="managementHost" value="10.57.249.136" />
+		<property key="managementPort" value="162" />
+		<property key="communityString" value="Ericsson/RASO/CAC" />
+		<property key="timestampFormat" value="yyyy-MM-dd HH:mm:ss" />
+		<property key="nodeName" value="mms-fe1" />
+		<property key="applicationTrapOid" value="1.3.6.1.4.1.193.255.2.1.0.1" />
+	</section>
+
+	<!-- DCC : Considering 2 MMSC servers -->
+	<section id="Dcc_Props1" description="Dcc_Props1">
+		<property key="originRealm" value="viettel.com.vn" />
+		<property key="acceptUnknownPeers" value="true" />
+		<property key="accountId" value="10" />
+		<property key="authId" value="4" />
+		<property key="ownProductId" value="emmsgw01" />
+		<property key="ownFqdn" value="emmsgw01.viettel.com.vn" />
+		<property key="ownTcpPort" value="3868" />
+		<property key="ownTcpAddress" value="emmsgw01.viettel.com.vn" />
+		<property key="threadPoolSize" value="40" />
+		<property key="eventQueueSize" value="3000" />
+		<property key="sendQueueSize" value="3000" />
+		<property key="sendMessageLimit" value="1200" />
+		<property key="vendorId" value="0" />
+		<property key="messageTimeout" value="30000" />
+	</section>
+	
+	<section id="Water_Gate" description="">
+		<property key="frontend" value="mms-fe1" />
+		<property key="nodeThreshold" value="250" />
+		<property key="systemWideThreshold" value="834" />
+	</section>
+</config>

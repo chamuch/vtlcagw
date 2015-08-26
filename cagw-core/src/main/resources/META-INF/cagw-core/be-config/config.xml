@@ -1,0 +1,76 @@
+<!DOCTYPE config SYSTEM "config.dtd">
+<config>
+	<section id="DB_PROP" description="cagw backend url">
+		<property key="cassandraAddress" value="192.168.5.136,192.168.5.142" />
+		<property key="keySpaceName" value="cagw_keyspace" />
+		<property key="poolSize" value="150" />
+		<property key="keepAlive" value="30000" />
+		<property key="queueSize" value="225" />
+	</section>
+
+	<!-- SCAPv2 : Considering 2 peers for commercial test -->
+	<section id="Scap_Props_Occ" description="Scap_Props_Occ">
+		<property key="ownProductId" value="Online Charging Control" />
+		<property key="originRealm" value="ericsson.com" />
+		<property key="ownFqdn" value="emmsgw01.viettel.com.vn" />
+		<property key="ownTcpPort" value="3868" />
+		<property key="ownTcpAddress" value="10.49.8.7" />
+		<property key="peerCount" value="2" />
+		<property key="threadPoolSize" value="100" />
+		<property key="eventQueueSize" value="1200" />
+		<property key="sendQueueSize" value="1200" />
+		<property key="sendMessageLimit" value="150" />
+		<property key="supportedVendor" value="193" />
+		<property key="peer.1.address" value="aaa://10.49.5.134:3868;transport=tcp" />
+		<property key="peer.1.hostId" value="eocc02.viettel.com.vn" />
+		<property key="peer.1.realm" value="viettel.com.vn"/>
+		<property key="peer.1.siteId" value="1" />
+		<property key="peer.2.address" value="aaa://10.49.5.135:3868;transport=tcp" />
+		<property key="peer.2.hostId" value="eocc03.viettel.com.vn" />
+		<property key="peer.2.realm" value="viettel.com.vn" />
+		<property key="peer.2.siteId" value="1" />
+	</section>
+	<section id="cs-air1" description="">
+		<property key="ucipEndpointCount" value="2" />
+		<property key="ownHostName" value="emmsgw01" />
+		<property key="ownNodeType" value="1" />
+		<property key="negotiatedCapabilities" value="805646916" />
+		<property key="ucip.1.connectionTimeout" value="30000" />
+		<property key="ucip.1.replyTimeout" value="30000" />
+		<property key="ucip.1.idleTimeout" value="360000" />
+		<property key="ucip.1.idleConnectionTimeoutInterval" value="60000" />
+		<property key="ucip.1.maxConnections" value="40" />
+		<property key="ucip.1.maxTotalConnections" value="60" />
+		<property key="ucip.1.password" value="user" />
+		<property key="ucip.1.retryCount" value="1" />
+		<property key="ucip.1.staleCheckingEnabled" value="true" />
+		<property key="ucip.1.useApacheHttpClient" value="true" />
+		<property key="ucip.1.userAgent" value="UGw Server /5.0/1.0" />
+		<property key="ucip.1.username" value="user" />
+		<property key="ucip.1.soTimeout" value="120000" />
+		<property key="ucip.1.urlAddress" value="http://10.57.249.76:10011/Air" />
+		<property key="ucip.1.site" value="1" />
+		<property key="ucip.1.defaultNai" value="1" />		
+		<property key="ucip.2.connectionTimeout" value="30000" />
+		<property key="ucip.2.replyTimeout" value="30000" />
+		<property key="ucip.2.idleTimeout" value="360000" />
+		<property key="ucip.2.idleConnectionTimeoutInterval" value="60000" />
+		<property key="ucip.2.maxConnections" value="40" />
+		<property key="ucip.2.maxTotalConnections" value="60" />
+		<property key="ucip.2.password" value="user" />
+		<property key="ucip.2.retryCount" value="1" />
+		<property key="ucip.2.staleCheckingEnabled" value="true" />
+		<property key="ucip.2.useApacheHttpClient" value="true" />
+		<property key="ucip.2.userAgent" value="UGw Server /5.0/1.0" />
+		<property key="ucip.2.username" value="user" />
+		<property key="ucip.2.soTimeout" value="120000" />
+		<property key="ucip.2.urlAddress" value="http://10.57.249.77:10011/Air" />
+		<property key="ucip.2.site" value="1" />
+		<property key="ucip.2.defaultNai" value="1" />	
+	</section>	
+	<section id="Water_Gate" description="">
+		<property key="frontend" value="cagw-be1" />
+		<property key="nodeThreshold" value="250" />
+		<property key="systemWideThreshold" value="834" />
+	</section>
+</config>
