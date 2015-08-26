@@ -88,7 +88,8 @@ public class WriteHelper {
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                 session.stop();
             }
-
+        } catch (SmppCodecException e) {
+            LogService.appLog.warn(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy: Encoding failed. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
         }
     }
     
