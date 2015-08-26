@@ -8,7 +8,7 @@ public enum Usecase {
     RESERVE                 ("RESERVE",             DccNotImplementedProcessor.class),
     COMMIT                  ("COMMIT",              DccNotImplementedProcessor.class),
     DIRECT_DEBIT            ("DIRECT_DEBIT",        ChargeAmountProcessor.class),
-    REFUND                  ("REFUND",              DccNotImplementedProcessor.class),
+    REFUND                  ("REFUND",              MmsRefundProcessor.class),
     CANCEL                  ("CANCEL",              DccNotImplementedProcessor.class),
     MMS_CHARGING            ("MMS_CHARGING",        DccNotImplementedProcessor.class),
     AUTH_CC                 ("AUTH_CC",             SmsChargingProcessor.class),

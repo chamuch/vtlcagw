@@ -37,6 +37,9 @@ public class BackendFacadeProcessor implements Processor {
             if (dccRequest.getAvp(CCRequestTypeAvp.AVP_CODE).getAsInt() == CCRequestTypeAvp.EVENT_REQUEST ||
                     dccRequest.getAvp(RequestedActionAvp.AVP_CODE).getAsInt() == RequestedActionAvp.DIRECT_DEBITING) {
                 delegate = Usecase.DIRECT_DEBIT.getProcessor();
+            } else if (dccRequest.getAvp(CCRequestTypeAvp.AVP_CODE).getAsInt() == CCRequestTypeAvp.EVENT_REQUEST ||
+                    dccRequest.getAvp(RequestedActionAvp.AVP_CODE).getAsInt() == RequestedActionAvp.REFUND_ACCOUNT) {
+                delegate = Usecase.REFUND.getProcessor();
             } else {
                 delegate = new DccNotImplementedProcessor();
             }

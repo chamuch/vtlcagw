@@ -53,6 +53,14 @@ public class MmsDccCharge {
             return "Unable to get value from diameter!";
         }
     }
+    
+    public int getRequestedAction() {
+        try {
+            return this.avpList.get(436).getAsInt();
+        } catch (AvpDataException e) {
+            return -1;
+        }
+    }
 
     @Override
     public String toString() {
