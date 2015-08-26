@@ -426,7 +426,6 @@ public abstract class EsmeHelper {
             commandSequence.setValue(sequence);
             
             SmppPdu pdu = new GNack();
-            pdu.setCommandId(CommandId.valueOf(commandId));
             pdu.setCommandStatus(CommandStatus.ESME_RTHROTTLED);
             pdu.setCommandSequence(commandSequence);
             
@@ -438,6 +437,8 @@ public abstract class EsmeHelper {
         }
         return;
     }
+    
+    
 
 
     public static String prettyPrint(byte[] serialized) {

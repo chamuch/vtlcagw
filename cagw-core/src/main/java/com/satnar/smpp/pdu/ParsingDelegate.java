@@ -3,7 +3,6 @@ package com.satnar.smpp.pdu;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelExecutionException;
