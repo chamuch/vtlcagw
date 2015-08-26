@@ -110,8 +110,9 @@ public class ReadHelper implements Runnable {
                                     } catch (RejectedExecutionException e) {
                                         LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + EsmeHelper.prettyPrint(pduPayload) + ", Reason: ", e);
                                         int commandId = parser.readInt();
-                                        parser.readInt(); // skip the status
+                                        int status = parser.readInt(); // skip the status
                                         int sequence = parser.readInt();
+                                        LogService.appLog.warn("Rejecting commandId: " + commandId + ", status: " + status + ", sequence: " + sequence);
                                         EsmeHelper.sendThrottledResponse(commandId, sequence, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_DROP, this.smppConnection.getEsmeLabel(), commandId, sequence);
                                         LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Threadpool congested. PDU Throttled (gnack_resp) with commandId: " + commandId + " & sequence: " + sequence);

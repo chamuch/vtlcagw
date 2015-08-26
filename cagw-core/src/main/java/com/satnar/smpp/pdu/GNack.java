@@ -16,16 +16,16 @@ public class GNack extends SmppPdu {
     private int commandLength = 0;
 
     public GNack() {
-        super.setCommandId(CommandId.GENERIC_NACK);
+        this.setCommandId(CommandId.GENERIC_NACK);
     }
     
     @Override
     public Integer getCommandLength() {
         if (this.commandLength == 0) {
             this.commandLength = 4 + // length of command length  
-                                    super.getCommandId().getLength() + 
-                                    super.getCommandStatus().getLength() + 
-                                    super.getCommandSequence().getLength();
+                                    this.getCommandId().getLength() + 
+                                    this.getCommandStatus().getLength() + 
+                                    this.getCommandSequence().getLength();
         }
 
         Integer len = (Integer) SmppParameter.getInstance(Type.INTEGER);
@@ -71,12 +71,22 @@ public class GNack extends SmppPdu {
     @Override
     public void validate() throws SmppCodecException {
         // check command sequence
-        if (super.getCommandSequence() == null)
+        if (this.getCommandSequence() == null)
             throw new SmppCodecException("'command_sequence' parameter is not set!!");
-        if (super.getCommandSequence().getValue() == 0x00000000)
+        if (this.getCommandSequence().getValue() == 0x00000000)
             throw new SmppCodecException("'command_sequence' parameter is not properly initialized or set!!");
         
     }
+
+    @Override
+    public String toString() {
+        return String.format("GNack [commandLength=%s, commandId()=%s, commandStatus()=%s, commandSequence()=%s]",
+                getCommandLength(),
+                getCommandId(),
+                getCommandStatus(),
+                getCommandSequence());
+    }
+    
     
     
 }

@@ -660,6 +660,11 @@ public class Esme {
             LogService.appLog.error("Esme-unbindTrx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.trxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+        } catch (Exception e) {
+            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
 
         while (this.trxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
@@ -686,6 +691,11 @@ public class Esme {
             LogService.appLog.error("Esme-unbindTx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.txChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+        }  catch (Exception e) {
+            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
 
         while (this.txChannel.getConnectionState() == SmppSessionState.UNBOUND || 
@@ -710,6 +720,11 @@ public class Esme {
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
             //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         } catch (SmppTransportException e) {
+            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
+        } catch (Exception e) {
             LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
             this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());

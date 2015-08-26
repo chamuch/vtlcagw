@@ -428,6 +428,8 @@ public abstract class EsmeHelper {
             SmppPdu pdu = new GNack();
             pdu.setCommandStatus(CommandStatus.ESME_RTHROTTLED);
             pdu.setCommandSequence(commandSequence);
+            LogService.appLog.info("Throttle from threadpool - pdu: " + pdu.toString());
+            
             
             Esme session = StackMap.getStack(esmeLabel);
             
