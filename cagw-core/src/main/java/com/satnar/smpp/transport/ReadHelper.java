@@ -1,5 +1,6 @@
 package com.satnar.smpp.transport;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -109,9 +110,14 @@ public class ReadHelper implements Runnable {
                                         LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - PDU handed over to facade in threadpool");
                                     } catch (RejectedExecutionException e) {
                                         LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - Unable to handover PDU into facade. " + EsmeHelper.prettyPrint(pduPayload) + ", Reason: ", e);
-                                        int commandId = parser.readInt();
-                                        int status = parser.readInt(); // skip the status
-                                        int sequence = parser.readInt();
+                                        ByteArrayInputStream baisReader = new ByteArrayInputStream(pduPayload);
+                                        DataInputStream throttleParser = new DataInputStream(baisReader);
+                                        int commandId = throttleParser.readInt();
+                                        int status = throttleParser.readInt(); // skip the status
+                                        int sequence = throttleParser.readInt();
+                                        throttleParser = null;
+                                        baisReader = null;
+                                        
                                         LogService.appLog.warn("Rejecting commandId: " + commandId + ", status: " + status + ", sequence: " + sequence);
                                         EsmeHelper.sendThrottledResponse(commandId, sequence, this.smppConnection.getEsmeLabel(), this.smppConnection.getMode());
                                         LogService.alarm(AlarmCode.SMS_CONGESTTION_DROP, this.smppConnection.getEsmeLabel(), commandId, sequence);
