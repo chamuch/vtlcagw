@@ -45,10 +45,10 @@ public class GNack extends SmppPdu {
         
         try {
             // Headers - Command Length, Command Id, Command Status, Command Sequence
-            writeBuffer.writeInt(this.getCommandLength().getValue());
-            writeBuffer.writeInt(super.getCommandId().getId());
-            writeBuffer.writeInt(super.getCommandStatus().getCode());
-            writeBuffer.writeInt(super.getCommandSequence().getValue());
+            writeBuffer.writeInt(getCommandLength().getValue());
+            writeBuffer.writeInt(getCommandId().getId());
+            writeBuffer.writeInt(getCommandStatus().getCode());
+            writeBuffer.writeInt(getCommandSequence().getValue());
 
             // Body - empty
            
@@ -71,9 +71,9 @@ public class GNack extends SmppPdu {
     @Override
     public void validate() throws SmppCodecException {
         // check command sequence
-        if (this.getCommandSequence() == null)
+        if (getCommandSequence() == null)
             throw new SmppCodecException("'command_sequence' parameter is not set!!");
-        if (this.getCommandSequence().getValue() == 0x00000000)
+        if (getCommandSequence().getValue() == 0x00000000)
             throw new SmppCodecException("'command_sequence' parameter is not properly initialized or set!!");
         
     }
