@@ -37,28 +37,18 @@ public class WriteHelper {
         try {
             ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
             byte[] serialized = payload.encode();
+            writeBuffer.put(serialized);
+            
             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - transmitting payload: " + EsmeHelper.prettyPrint(serialized));
-            synchronized (writeBuffer) {
-                writeBuffer.clear();
-                writeBuffer.put(serialized);
-                writeBuffer.flip();
-                this.smppConnection.write(writeBuffer);
-                writeBuffer.clear();
-            }
+            this.flushTransmission();
             
             LogService.appLog.info(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
-        }  catch (SmppTransportException e) {
-            if (e.getCause() != null && e.getCause() instanceof IOException) {
-                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
-                Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
-                if (!((TcpConnection)this.smppConnection).isShutdownMode())
-                    session.stop();
-            }
-            
+        } catch (SmppCodecException e) {
+            LogService.appLog.warn(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeImmediate: Encoding failed. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
         }
     }
     
-    public void writeLazy(SmppPdu payload) throws SmppCodecException, SmppTransportException  {
+    public void writeLazy(SmppPdu payload) throws SmppTransportException  {
         if (this.smppConnection.getConnectionState() == SmppSessionState.CLOSED ||
                 this.smppConnection.getConnectionState() == SmppSessionState.UNBOUND)
             throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
@@ -67,31 +57,40 @@ public class WriteHelper {
             byte[] serialized = payload.encode();
             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - buffering payload: " + EsmeHelper.prettyPrint(serialized));
             
-            
-            if (this.lazyWriteBuffer.readyToTransmit()) {
-                ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
-                synchronized (writeBuffer) {
-                    writeBuffer.clear();
-                    writeBuffer.put(this.lazyWriteBuffer.flush());
-                    writeBuffer.flip();
-                    this.smppConnection.write(writeBuffer);
-                    writeBuffer.clear();
-                    LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
-                }
+            if (this.lazyWriteBuffer.willOverflow(serialized.length)) {
+                this.flushTransmission();
+                this.lazyWriteBuffer.write(serialized);
+            } else {
+                this.lazyWriteBuffer.write(serialized);
             }
             
-            this.lazyWriteBuffer.write(serialized);
-            
+            if (this.lazyWriteBuffer.readyToTransmit()) {
+                this.flushTransmission();
+            }
             
             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
-        }  catch (SmppTransportException e) {
+        } catch (SmppCodecException e) {
+            LogService.appLog.warn(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy: Encoding failed. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
+        }
+    }
+    
+    private synchronized void flushTransmission() {
+        try {
+            ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
+            synchronized (writeBuffer) {
+                writeBuffer.clear();
+                writeBuffer.put(this.lazyWriteBuffer.flush());
+                writeBuffer.flip();
+                this.smppConnection.write(writeBuffer);
+                writeBuffer.clear();
+                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
+            }
+        }   catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
-                LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
+                LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken!!",e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                 session.stop();
             }
-        } catch (SmppCodecException e) {
-            LogService.appLog.warn(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy: Encoding failed. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
         }
     }
     

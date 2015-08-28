@@ -67,6 +67,20 @@ public class LazyWriteBuffer {
         }
     }
     
+    public boolean willOverflow(int payloadSize) {
+        if (this.lazyBuffer == null) {
+            if (LogService.appLog.isDebugEnabled())
+                LogService.appLog.debug(String.format("Session: %s - Lazy Buffer has no content!!", this.esmeLabel));
+            return false;
+        }
+        
+        if ((this.lazyBuffer.size() + payloadSize) > 1024) { //TODO: remove this hard code in final project.
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     public byte[] flush() {
         if (this.lazyBuffer == null) {
             if (LogService.appLog.isDebugEnabled())
