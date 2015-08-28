@@ -58,22 +58,23 @@
 		<property name="camelContext" ref="com.ericsson.raso.cac.mmsdccfe" />
 		<property name="maxTotalConnections" value="500" />
 		<property name="connectionsPerRoute" value="500" />
-		<property name="connectionTimeToLive" value="120000" />
+		<!-- <property name="connectionTimeToLive" value="120000" /> -->
 	</bean>
 
 	<!-- Routing request to cagw-backend over REST -->
 	<camel:camelContext id="com.ericsson.raso.cac.mmsdccfe"
 		xmlns="http://camel.apache.org/schema/spring">
 		<propertyPlaceholder id="properties" location="ref:cgProperties" />
-		<!-- <threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="1200" 
-			maxPoolSize="1200" maxQueueSize="10" /> <threadPool id="mmsdcc-frontend" 
-			poolSize="1200" maxPoolSize="1200" threadName="mmsdcc-frontend" camelContextId="com.ericsson.raso.cac.mmsdccfe" 
-			/> -->
+		<camel:threadPoolProfile id="defaultProfile" defaultProfile="true" poolSize="1200" 
+			maxPoolSize="1200" maxQueueSize="10" /> 
+		<camel:threadPool id="cagw-backend" poolSize="1200"
+			maxPoolSize="1200"  threadName="cagw-backend" camelContextId="com.ericsson.raso.cac.mmsdccfe" 
+			/>
 		<camel:route id="cg-mmsc-fe">
-			<camel:from uri="seda:cagw-backend?timeout=120000" />
+			<camel:from uri="seda:cagw-backend?limitConcurrentConsumers&amp;concurrentConsumers=200" />
 			<camel:doTry>
 				<camel:marshal ref="gson" />
-				<camel:log message="Entered mmsc front end camel route:${body}" />
+				<!-- <camel:log message="Entered mmsc front end camel route:${body}" /> -->
 				<setHeader headerName="CamelHttpMethod">
 					<constant>POST</constant>
 				</setHeader>
@@ -89,13 +90,13 @@
 				<camel:to uri="{{Mmsc_Cagw_BackendUrl}}"></camel:to>
 				<!-- <camel:to uri="http4://10.49.5.159:9090/cagw-backend/CgWeb/process"></camel:to> -->
 				<camel:unmarshal ref="gson" />
-				<camel:log message="Exit MMSC front end camel route:${body}" />				
+				<!-- <camel:log message="Exit MMSC front end camel route:${body}" />	 -->			
 				<camel:doCatch>
 					<camel:exception>java.lang.Exception</camel:exception>
 					<camel:log message="From MMSC FrontEnd Exception: ${exception.stacktrace}" />
 				</camel:doCatch>
 				<camel:doFinally>
-					<camel:log message="Leave MMSC Frontend:${body}" />
+					<!-- <camel:log message="Leave MMSC Frontend:${body}" /> -->
 				</camel:doFinally>
 			</camel:doTry>
 		</camel:route>
