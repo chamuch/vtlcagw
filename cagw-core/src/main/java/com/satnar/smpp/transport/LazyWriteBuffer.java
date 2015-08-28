@@ -79,7 +79,7 @@ public class LazyWriteBuffer {
             LogService.appLog.info(String.format("Session: %s - Lazy Buffer: %s, new_payload: %s, total: %s, decision: %s", 
                     this.esmeLabel, this.lazyBuffer.size(), payloadSize, newSize, (newSize > 1024)));
         
-        if (newSize > 1024) { //TODO: remove this hard code in final project.
+        if (newSize >= 1024) { //TODO: remove this hard code in final project.
             return true;
         } else {
             return false;
