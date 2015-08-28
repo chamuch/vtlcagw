@@ -62,11 +62,11 @@ public class SmsChargingProcessor implements Processor {
 			LogService.appLog.debug("Preparing SCAP Request for Auth ACC Request# " + smppRequest.getSmId().getString());
 	        Ccr scapRequest = this.getScapRequest(smppRequest);
 	        
-	        LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC: " + scapRequest.toString());
+	        LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC for Sequence: "+smppRequest.getCommandSequence().getValue()+": MSISDN :"+smppRequest.getSourceAddress().getString()+":" + scapRequest.toString());
 	        occStartTime = System.currentTimeMillis(); 
 	        Cca scapResponse = scapRequest.send();
 	        occEndTime = System.currentTimeMillis();
-	        LogService.stackTraceLog.info("Received SCAP CCA Response from OCC: " + scapResponse.toString());
+	        LogService.stackTraceLog.info("Received SCAP CCA Response from OCC for Sequence: "+smppRequest.getCommandSequence().getValue()+": MSISDN :"+smppRequest.getSourceAddress().getString()+":" + scapResponse.toString());
 	        
 	        LogService.appLog.debug("Preparing Auth ACC Response for Request# " + smppRequest.getSmId().getString());
 	        AuthAccResponse smppResponse = this.getSmppResponse(scapResponse, smppRequest);
@@ -77,7 +77,7 @@ public class SmsChargingProcessor implements Processor {
 	        LogService.appLog.debug("Verify Transaction pojo(" + smsChargingStatus + ") for Request# " + smppRequest.getSmId().getString());
 	        ConcurrencyControl.enqueueExecution(new PersistSmsChargeTransaction(smsChargingStatus));
 	        
-	        LogService.stackTraceLog.info("Response>> " + smppResponse.toString());
+	        LogService.stackTraceLog.info("Response>> for Sequence: "+smppRequest.getCommandSequence().getValue()+": MSISDN :"+smppRequest.getSourceAddress().getString()+":" + smppResponse.toString());
 	        
 	        long exitTime = System.currentTimeMillis();
 	        LogService.stackTraceLog.info("Request# " + smppRequest.getSmId().getString() + " - Processing Time: " + (exitTime - entryTime) + ", OCC Time: " + (occEndTime-occStartTime));

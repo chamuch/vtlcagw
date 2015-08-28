@@ -57,13 +57,15 @@ public class ChargeAmountProcessor implements Processor {
 		    LogService.appLog.debug("Preparing SCAP Request for MMS DCC Request# " + mmsRequest.getSessionId());
             Ccr scapRequest = this.getScapRequest(mmsRequest);
 	        
-            LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC>> " + scapRequest.toString());
+            LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"
+            								+":Requested Action:"+mmsRequest.getRequestedAction()+ scapRequest.toString());
             scapResponse = scapRequest.send();
-            LogService.stackTraceLog.info("Received SCAP CCA Response from OCC>> " + scapResponse.toString());
+            LogService.stackTraceLog.info("Received SCAP CCA Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":" 
+            								+":Requested Action:"+mmsRequest.getRequestedAction() + scapResponse.toString());
             
             response = this.getResponse(mmsRequest, scapResponse, scapResponse.getResultCode());
             
-            LogService.stackTraceLog.info("MMS DCC Response>> " + response.toString());
+            LogService.stackTraceLog.info("MMS DCC Response>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":" + response.toString());
             exchange.getOut().setBody(response);
 	        
 	        LogService.appLog.debug("ChargeAmountProcessor-process:Done.SessionId:"+scapRequest.getSessionId()

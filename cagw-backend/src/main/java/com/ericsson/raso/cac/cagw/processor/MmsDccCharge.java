@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdAvp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.Avp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
 import com.ericsson.pps.diameter.rfcapi.base.avp.ResultCodeAvp;
@@ -51,6 +52,16 @@ public class MmsDccCharge {
             return this.avpList.get(263).getAsUTF8String();
         } catch (AvpDataException e) {
             return "Unable to get value from diameter!";
+        }
+    }
+    
+    public String getSubscriptionId() {
+        try {
+        	SubscriptionIdAvp subscriberId = (SubscriptionIdAvp)this.avpList.get(SubscriptionIdAvp.AVP_CODE);
+        	String subscriberNumber = subscriberId.getSubscriptionIdData();
+            return subscriberNumber;
+        } catch (AvpDataException e) {
+            return "Unable to get subscriptionId value from diameter!";
         }
     }
     

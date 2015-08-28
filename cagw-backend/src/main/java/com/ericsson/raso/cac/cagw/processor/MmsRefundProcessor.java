@@ -42,9 +42,9 @@ public class MmsRefundProcessor implements Processor {
             refillRequest.setTransacCurrency("VND");  // hard-coded for mms refund as per Imtiaz inputs
             
 	        
-            LogService.stackTraceLog.info("Sending REFILL Request to OCC>> " + refillRequest.toString());
+            LogService.stackTraceLog.info("Sending REFILL Request to OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
             RefillResponse refillResponse = new RefillCommand(refillRequest).execute();
-            LogService.stackTraceLog.info("Received REFILL Response from OCC>> " + refillRequest.toString());
+            LogService.stackTraceLog.info("Received REFILL Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
             
             response = this.getResponse(mmsRequest, refillResponse, refillResponse.getResponseCode());
             
