@@ -61,9 +61,11 @@ public class RequestHandler implements ApplicationRequestListener {
             	DiameterAnswer response = null;
             	MmsDccCharge chargeResponse = null;
             	try {
-            	    LogService.stackTraceLog.info("BACKEND.REQ>> " + chargeRequest);
+            	    LogService.stackTraceLog.info("BACKEND.REQ>> for MSISDN:"+chargeRequest.getSubscriptionId() +":SessionId:"+chargeRequest.getSessionId()+":"
+            	    		+":Requested Action:"+chargeRequest.getRequestedAction()+":"+ chargeRequest);
             	    chargeResponse = this.producer.requestBodyAndHeader(BACKEND_ENDPOINT, chargeRequest, "fe", "mmsc", MmsDccCharge.class);
-            	    LogService.stackTraceLog.info("BACKEND.RES>> " + chargeRequest);
+            	    LogService.stackTraceLog.info("BACKEND.RES>> for MSISDN:"+chargeRequest.getSubscriptionId() +":SessionId:"+chargeRequest.getSessionId()+":"
+            	    		+":Requested Action:"+chargeRequest.getRequestedAction()+ chargeRequest);
             	    
             	    if (chargeResponse == null) {
                         LogService.appLog.error("Null Response for MMS DCC CCR. Could be timedout or unmarshall error");
