@@ -66,7 +66,6 @@ public class WriteHelper {
         try {
             byte[] serialized = payload.encode();
             LogService.stackTraceLog.info(this.smppConnection.getEsmeLabel() + " - buffering payload: " + EsmeHelper.prettyPrint(serialized));
-            this.lazyWriteBuffer.write(serialized);
             
             
             if (this.lazyWriteBuffer.readyToTransmit()) {
@@ -80,6 +79,9 @@ public class WriteHelper {
                     LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
                 }
             }
+            
+            this.lazyWriteBuffer.write(serialized);
+            
             
             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         }  catch (SmppTransportException e) {
