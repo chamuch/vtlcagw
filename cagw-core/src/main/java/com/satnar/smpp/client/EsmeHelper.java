@@ -41,16 +41,18 @@ public abstract class EsmeHelper {
             return false;
         } else if (session.isCanUseTrx()) {
             if (session.getTrxChannel() == null || session.getTrxChannel().getConnectionState() != SmppSessionState.BOUND_TRX) {
-                LogService.appLog.warn("SmppSession: " + esmeLabel + " was found down!");
+                LogService.appLog.warn("SmppSession: " + esmeLabel + " was found with trx_state: " + session.getTrxChannel().getConnectionState());
                 return false;
             }
         } else if (session.getRxChannel() == null || session.getRxChannel().getConnectionState() != SmppSessionState.BOUND_RX) {
             //TODO: in the final project, must refactor to handle ESME in tx_only, rx_only, tx_rx_pair, trx_mode so a seamless matrix handling is clean
-            LogService.appLog.warn("SmppSession: " + esmeLabel + " was found down!");
+            LogService.appLog.warn("SmppSession: " + esmeLabel + " was found with rx_state: " + session.getRxChannel().getConnectionState());
             StackMap.removeSession(esmeLabel);
             session = null; 
             return false;
         }
+
+        LogService.appLog.info("SmppSession: " + esmeLabel + " was found with rx_state: " + session.getRxChannel().getConnectionState());
         return true;
     }
     

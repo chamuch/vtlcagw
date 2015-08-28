@@ -1,14 +1,11 @@
 package com.ericsson.raso.cac.smpp.viettel;
 
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.ericsson.raso.cac.config.ConfigService;
 import com.ericsson.raso.cac.config.IConfig;
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
-import com.satnar.smpp.StackMap;
 import com.satnar.smpp.client.EsmeHelper;
 
 public class SessionWatchdog {
@@ -27,6 +24,7 @@ public class SessionWatchdog {
     public SessionWatchdog(String[] smppSessionList) {
         this.smppSessions = smppSessionList;
         this.configuration = SpringHelper.getConfig();
+        LogService.appLog.info("Number of SMPP Session to monitor: " + smppSessionList.length);
     }
 
     public void start() {
@@ -80,6 +78,7 @@ public class SessionWatchdog {
             LogService.appLog.info("Watchdog monitor cycle initiated...");
             for (String smppSession: smppSessions) {
                 String sessionLabel = this.configuration.getValue(smppSession, ESME_LABEL);
+                LogService.appLog.info("Checking session(" + smppSession + ") state of Esme: " + sessionLabel);
                 if (!EsmeHelper.checkSessionState(sessionLabel)) {
                     LogService.appLog.warn("SmppSession: " + sessionLabel + " was detected invalid state. Attempting (re)start...");
                     new Thread(new WatchdogSessionStart(smppSession)).start();
