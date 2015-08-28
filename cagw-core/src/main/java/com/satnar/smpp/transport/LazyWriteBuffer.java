@@ -25,7 +25,7 @@ public class LazyWriteBuffer {
         
         try {
             lazyBuffer.write(payload);
-            LogService.appLog.info(String.format("Session: %s - Buffering payload for size: %s, current lazy buffer size: %s", this.esmeLabel, this.lazyBuffer.size(), payload.length));
+            LogService.appLog.info(String.format("Session: %s - Buffering payload for size: %s, current lazy buffer size: %s", this.esmeLabel, payload.length, this.lazyBuffer.size()));
         } catch (IOException e) {
             LogService.appLog.error(String.format("Session: %s - Unable to buffer lazy write payload for size: %s", this.esmeLabel, payload.length));
         }
@@ -74,7 +74,12 @@ public class LazyWriteBuffer {
             return false;
         }
         
-        if ((this.lazyBuffer.size() + payloadSize) > 1024) { //TODO: remove this hard code in final project.
+        int newSize = this.lazyBuffer.size() + payloadSize;
+        if (LogService.appLog.isInfoEnabled())
+            LogService.appLog.info(String.format("Session: %s - Lazy Buffer: %s, new_payload: %s, total: %s, decision: %s", 
+                    this.esmeLabel, this.lazyBuffer.size(), payloadSize, newSize, (newSize > 1024)));
+        
+        if (newSize > 1024) { //TODO: remove this hard code in final project.
             return true;
         } else {
             return false;
