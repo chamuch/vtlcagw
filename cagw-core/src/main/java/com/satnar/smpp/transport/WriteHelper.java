@@ -29,7 +29,7 @@ public class WriteHelper {
         this.lazyWriteSchedule.schedule(new LazyWriterTask(this.smppConnection, this.lazyWriteBuffer), this.lazyWritePeriod, this.lazyWritePeriod);
     }
     
-    public void writeImmediate(SmppPdu payload) throws SmppTransportException  {
+    public synchronized void writeImmediate(SmppPdu payload) throws SmppTransportException  {
         if (this.smppConnection.getConnectionState() == SmppSessionState.CLOSED ||
                 this.smppConnection.getConnectionState() == SmppSessionState.UNBOUND)
             throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
@@ -48,7 +48,7 @@ public class WriteHelper {
         }
     }
     
-    public void writeLazy(SmppPdu payload) throws SmppTransportException  {
+    public synchronized void writeLazy(SmppPdu payload) throws SmppTransportException  {
         if (this.smppConnection.getConnectionState() == SmppSessionState.CLOSED ||
                 this.smppConnection.getConnectionState() == SmppSessionState.UNBOUND)
             throw new SmppTransportException(this.smppConnection.getEsmeLabel() + " - SMPP Session closed or Socket is broken. Reinitialize ESME now!!");
@@ -60,16 +60,13 @@ public class WriteHelper {
             if (this.lazyWriteBuffer.willOverflow(serialized.length)) {
                 LogService.appLog.info("Seems like will overflow. So first flushing out the transmission, before buffering!!");
                 this.flushTransmission();
-                this.lazyWriteBuffer.write(serialized);
-            } else {
-                this.lazyWriteBuffer.write(serialized);
-            }
+            }    
             
+            this.lazyWriteBuffer.write(serialized);
             if (this.lazyWriteBuffer.readyToTransmit()) {
                 LogService.appLog.info("LazyBuffer ready for transmission, flushing now...");
                 this.flushTransmission();
             }
-            
             LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:Done. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue());
         } catch (SmppCodecException e) {
             LogService.appLog.warn(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy: Encoding failed. Command Id:"+payload.getCommandId().name()+":Command Sequence:"+payload.getCommandSequence().getValue(),e);
@@ -79,14 +76,13 @@ public class WriteHelper {
     private void flushTransmission() {
         try {
             ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
-            synchronized (writeBuffer) {
-                writeBuffer.clear();
-                writeBuffer.put(this.lazyWriteBuffer.flush());
-                writeBuffer.flip();
-                this.smppConnection.write(writeBuffer);
-                writeBuffer.clear();
-                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
-            }
+            writeBuffer.clear();
+            writeBuffer.put(this.lazyWriteBuffer.flush());
+            writeBuffer.flip();
+            this.smppConnection.write(writeBuffer);
+            writeBuffer.clear();
+            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
+            
         }   catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken!!",e);
@@ -99,12 +95,11 @@ public class WriteHelper {
     private void transmitNow() {
         try {
             ByteBuffer writeBuffer = this.smppConnection.getSendBuffer();
-            synchronized (writeBuffer) {
-                writeBuffer.flip();
-                this.smppConnection.write(writeBuffer);
-                writeBuffer.clear();
-                LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
-            }
+            writeBuffer.flip();
+            this.smppConnection.write(writeBuffer);
+            writeBuffer.clear();
+            LogService.appLog.debug(this.smppConnection.getEsmeLabel() + " - flushed transmission window");
+            
         }   catch (SmppTransportException e) {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken!!",e);

@@ -38,7 +38,7 @@ public class LazyWriteBuffer {
             return false;
         }
         
-        if (this.lazyBuffer.size() > 1000) {
+        if (this.lazyBuffer.size() >= 1008) {
             if (LogService.appLog.isDebugEnabled())
                 LogService.appLog.debug(String.format("Session: %s - Current Lazy Buffer Size: %s, Ready for transmission!", this.esmeLabel, this.lazyBuffer.size()));
             return true;
