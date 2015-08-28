@@ -187,6 +187,8 @@ public class AuthAcc extends SmppPdu {
                 + ", MO MSC NOA: " + this.moMscNoa.getValue()
                 + ", MO MSC NPI: " + this.moMscNpi.getValue()
                 + ", MSCAddress: " + this.moMscAddress.getString()
+                + ", SourceAddress: " + this.sourceAddress.getString()
+                + ", DestinationAddress: " + this.destinationAddress.getString()
                 + ", MO MT Flag: " + this.moMtFlag.getValue()
                 + ", SM ID: " + this.smId.getString()
                 + ", SM Length: " + this.smLength.getValue()
