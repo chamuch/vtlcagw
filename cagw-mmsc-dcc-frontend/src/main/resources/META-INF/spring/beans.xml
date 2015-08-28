@@ -71,7 +71,7 @@
 			maxPoolSize="1200"  threadName="cagw-backend" camelContextId="com.ericsson.raso.cac.mmsdccfe" 
 			/>
 		<camel:route id="cg-mmsc-fe">
-			<camel:from uri="seda:cagw-backend?limitConcurrentConsumers&amp;concurrentConsumers=200" />
+			<camel:from uri="seda:cagw-backend?concurrentConsumers=200" />
 			<camel:doTry>
 				<camel:marshal ref="gson" />
 				<!-- <camel:log message="Entered mmsc front end camel route:${body}" /> -->

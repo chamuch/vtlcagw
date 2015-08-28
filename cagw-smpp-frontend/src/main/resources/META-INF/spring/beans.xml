@@ -88,7 +88,7 @@
 			maxPoolSize="1200"  threadName="cagw-backend" camelContextId="com.ericsson.raso.cac.smppfe" 
 			/>
 		<camel:route id="cagw-smppfe-backend">
-			<camel:from uri="seda:cagw-backend?limitConcurrentConsumers&amp;concurrentConsumers=600" />
+			<camel:from uri="seda:cagw-backend?limitConcurrentConsumers=false&amp;concurrentConsumers=600" />
 			<camel:doTry>
 				<camel:choice>
 				<camel:when>
