@@ -1,8 +1,11 @@
 package com.ericsson.raso.cac.smpp.viettel;
 
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.ericsson.raso.cac.config.ConfigService;
+import com.ericsson.raso.cac.config.IConfig;
 import com.satnar.common.LogService;
 import com.satnar.common.SpringHelper;
 import com.satnar.smpp.StackMap;
@@ -13,20 +16,23 @@ public class SessionWatchdog {
     private static final String GLOBAL = "GLOBAL";
     private static final String MONITOR_INTERVAL = "monitorInterval";
     private static final String MONITOR_INITIAL_WAIT = "monitorInitialWait";
+    private static final String ESME_LABEL = "rx.esmeLabel";
     
     private String[] smppSessions = null;
     private int monitorInteval = 0;
     private int monitorInitialWait = 0;
     private Timer watchdogSchedule = null;
+    private IConfig configuration = null;
     
     public SessionWatchdog(String[] smppSessionList) {
         this.smppSessions = smppSessionList;
+        this.configuration = SpringHelper.getConfig();
     }
 
     public void start() {
         String param = null;
         try {
-            param = SpringHelper.getConfig().getValue(GLOBAL, MONITOR_INITIAL_WAIT);
+            param = this.configuration.getValue(GLOBAL, MONITOR_INITIAL_WAIT);
             if (param == null) {
                 LogService.appLog.error("Watchdog not started. Configuration in Section: " + GLOBAL + ", Property: " + MONITOR_INITIAL_WAIT + " was not configured!");
                 return;
@@ -38,7 +44,7 @@ public class SessionWatchdog {
         }
         
         try {
-            param = SpringHelper.getConfig().getValue(GLOBAL, MONITOR_INTERVAL);
+            param = this.configuration.getValue(GLOBAL, MONITOR_INTERVAL);
             if (param == null) {
                 LogService.appLog.error("Watchdog not started. Configuration in Section: " + GLOBAL + ", Property: " + MONITOR_INTERVAL + " was not configured!");
                 return;
@@ -51,7 +57,7 @@ public class SessionWatchdog {
         
         
         this.watchdogSchedule = new Timer("SmppSessionsWatchdog");
-        this.watchdogSchedule.schedule(new SessionWatchdogTask(this.smppSessions), this.monitorInitialWait, this.monitorInteval);
+        this.watchdogSchedule.schedule(new SessionWatchdogTask(this.smppSessions, this.configuration), this.monitorInitialWait, this.monitorInteval);
         LogService.appLog.info("Watchdog successfully started!!");
     }
     
@@ -62,17 +68,20 @@ public class SessionWatchdog {
     
     class SessionWatchdogTask extends TimerTask {
         private String[] smppSessions = null;
+        private IConfig configuration = null;
         
-        SessionWatchdogTask(String[] sessions) {
+        SessionWatchdogTask(String[] sessions, IConfig config) {
             this.smppSessions = sessions;
+            this.configuration = config;
         }
 
         @Override
         public void run() {
             LogService.appLog.info("Watchdog monitor cycle initiated...");
-            for (String smppSession: StackMap.getSmppSessions()) {
-                if (!EsmeHelper.checkSessionState(smppSession)) {
-                    LogService.appLog.warn("SmppSession: " + smppSession + " was detected invalid state. Attempting (re)start...");
+            for (String smppSession: smppSessions) {
+                String sessionLabel = this.configuration.getValue(smppSession, ESME_LABEL);
+                if (!EsmeHelper.checkSessionState(sessionLabel)) {
+                    LogService.appLog.warn("SmppSession: " + sessionLabel + " was detected invalid state. Attempting (re)start...");
                     new Thread(new WatchdogSessionStart(smppSession)).start();
                 }
             }
