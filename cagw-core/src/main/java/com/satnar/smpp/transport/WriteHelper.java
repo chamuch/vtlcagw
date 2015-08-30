@@ -87,6 +87,12 @@ public class WriteHelper {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken!!",e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
+                try {
+                    this.smppConnection.setConnectionState(SmppSessionState.CLOSED);
+                } catch (SmppTransportException e1) {
+                    // ignore
+                    e1.printStackTrace();
+                }
                 session.stop();
             }
         }
@@ -104,6 +110,12 @@ public class WriteHelper {
             if (e.getCause() != null && e.getCause() instanceof IOException) {
                 LogService.appLog.error(this.smppConnection.getEsmeLabel() + " - WriteHelper-writeLazy:socket seems to be broken!!",e);
                 Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
+                try {
+                    this.smppConnection.setConnectionState(SmppSessionState.CLOSED);
+                } catch (SmppTransportException e1) {
+                    // ignore
+                    e1.printStackTrace();
+                }
                 session.stop();
             }
         }
