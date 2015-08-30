@@ -58,10 +58,10 @@ public class ChargeAmountProcessor implements Processor {
             Ccr scapRequest = this.getScapRequest(mmsRequest);
 	        
             LogService.stackTraceLog.info("Sending SCAP CCR Request to OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"
-            								+":Requested Action:"+mmsRequest.getRequestedAction()+ scapRequest.toString());
+            								+":Requested Action:"+mmsRequest.getRequestedAction() +":" + scapRequest.toString());
             scapResponse = scapRequest.send();
             LogService.stackTraceLog.info("Received SCAP CCA Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":" 
-            								+":Requested Action:"+mmsRequest.getRequestedAction() + scapResponse.toString());
+            								+":Requested Action:"+mmsRequest.getRequestedAction() +":" + scapResponse.toString());
             
             response = this.getResponse(mmsRequest, scapResponse, scapResponse.getResultCode());
             
