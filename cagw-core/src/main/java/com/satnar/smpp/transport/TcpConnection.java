@@ -198,6 +198,10 @@ public class TcpConnection extends Connection {
             readBuffer.clear();
             packetSize = this.connection.read(readBuffer);
             readBuffer.flip();
+            if (packetSize == -1) {
+                LogService.appLog.error("Seems like the Socket reached End-Of-Stream!! Must shutdown!!");
+                throw new SmppTransportException(this.getEsmeLabel() + " - TcpConnection-read:Socket reached EOS!!");
+            }
             return packetSize;
         } catch(NotYetConnectedException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-read:Socket not yet ready for reception!",e);

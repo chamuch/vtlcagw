@@ -30,7 +30,7 @@ public class WatchdogSessionStart implements Runnable {
             LogService.appLog.debug("Attempting to start smpp session in async mode. Stack: " + esmeLabel);
             
             session.start();
-            if (EsmeHelper.checkSessionState(esmeLabel)) {
+            if (EsmeHelper.checkSessionState(smppSessionProperties.getProperty("rx.esmeLabel"))) {
                 LogService.appLog.debug("Watchdog successfully restarted session: " + esmeLabel);
             } else {
                 LogService.appLog.warn("Watchdog failed attempting restart session: " + esmeLabel);
