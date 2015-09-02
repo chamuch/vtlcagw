@@ -1,6 +1,5 @@
 package com.ericsson.raso.cac.cagw.processor;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.camel.Exchange;
@@ -8,7 +7,6 @@ import org.apache.camel.Processor;
 
 import com.ericsson.pps.diameter.dccapi.avp.CCRequestTypeAvp;
 import com.ericsson.pps.diameter.dccapi.avp.CCServiceSpecificUnitsAvp;
-import com.ericsson.pps.diameter.dccapi.avp.CreditControlAvp;
 import com.ericsson.pps.diameter.dccapi.avp.RequestedActionAvp;
 import com.ericsson.pps.diameter.dccapi.avp.RequestedServiceUnitAvp;
 import com.ericsson.pps.diameter.dccapi.avp.ServiceParameterInfoAvp;
@@ -17,13 +15,8 @@ import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdDataAvp;
 import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdTypeAvp;
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
-import com.ericsson.pps.diameter.rfcapi.base.DiameterStack;
-import com.ericsson.pps.diameter.rfcapi.base.RouteInformation;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
 import com.ericsson.pps.diameter.rfcapi.base.avp.avpdatatypes.Time;
-import com.ericsson.pps.diameter.rfcapi.base.impl.OwnPeerInfo;
-import com.ericsson.pps.diameter.rfcapi.base.impl.realmhandling.RealmHandler;
-import com.ericsson.pps.diameter.rfcapi.base.impl.realmhandling.RealmRoutes;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdDataAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdNatureAvp;
@@ -31,7 +24,6 @@ import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdTypeAvp;
 import com.ericsson.pps.diameter.scapv2.avp.SubscriptionIdLocationAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TimeZoneAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TrafficCaseAvp;
-import com.ericsson.pps.diameter.scapv2.command.ScapCcr;
 import com.ericsson.raso.cac.cagw.SpringHelper;
 import com.ericsson.raso.cac.cagw.dao.ConcurrencyControl;
 import com.ericsson.raso.cac.cagw.dao.PersistSmsChargeTransaction;
@@ -49,6 +41,8 @@ import com.satnar.smpp.CommandStatus;
 public class SmsChargingProcessor implements Processor {
     
     private static int SCAP_SERVICE_IDENTIFIER = 4; //as per Mikael's inputs; no mail or written requirements though!!!
+    private static String defaultLocationAddress = null;
+    
     
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -258,7 +252,13 @@ public class SmsChargingProcessor implements Processor {
 	        spiAvp = ChargingHelper.createSPI(304, smppRequest.getSmscAddress().getString()); // smsc addr
 	        dccCcr.addAvp(spiAvp);
 
-            spiAvp = ChargingHelper.createSPI(305, smppRequest.getMoMscAddress().getString()); // mo msc addr
+	        String mscAddress = smppRequest.getMoMscAddress().getString();
+	        if (mscAddress == null || mscAddress.equals("")) {
+	            if (defaultLocationAddress == null)
+	                defaultLocationAddress = com.satnar.common.SpringHelper.getConfig().getValue("GLOBAL", "defaultLocationAddress");
+	            mscAddress = defaultLocationAddress;
+	        }
+            spiAvp = ChargingHelper.createSPI(305, mscAddress); // mo msc addr
             dccCcr.addAvp(spiAvp);
 
             // Event-Timestamp

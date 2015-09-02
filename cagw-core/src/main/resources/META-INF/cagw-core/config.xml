@@ -20,6 +20,7 @@
 		<property key="smppSectionsList" value="Esme_Props_Test1" />
 		<property key="monitorInterval" value="30000" />
 		<property key="monitorInitialWait" value="120000" />
+		<property key="defaultLocationAddress" value="84980200903" />
     </section>
 	
 	<section id="GLOBAL_Alarms" description="Alarms">
