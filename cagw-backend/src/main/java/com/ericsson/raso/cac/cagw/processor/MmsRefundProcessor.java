@@ -34,6 +34,7 @@ public class MmsRefundProcessor implements Processor {
             SubscriptionIdAvp subscriberId = (SubscriptionIdAvp) mmsRequest.getAvp(SubscriptionIdAvp.AVP_CODE);
             String subscriberNumber = subscriberId.getSubscriptionIdData();
             refillRequest.setSubscriberNumber(subscriberNumber);
+            refillRequest.setSubscriberNumberNAI(1);//This needs to be set as we are passing subscriber number as is in the input - international format 
             
             refillRequest.setExternalData1(mmsRequest.getSessionId());   // mapped for mms refund as per Imtiaz inputs
             
@@ -41,7 +42,6 @@ public class MmsRefundProcessor implements Processor {
             refillRequest.setTransacAmount("0");      // hard-coded for mms refund as per Imtiaz inputs
             refillRequest.setTransacCurrency("VND");  // hard-coded for mms refund as per Imtiaz inputs
             
-	        
             LogService.stackTraceLog.info("Sending REFILL Request to OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
             RefillResponse refillResponse = new RefillCommand(refillRequest).execute();
             LogService.stackTraceLog.info("Received REFILL Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
