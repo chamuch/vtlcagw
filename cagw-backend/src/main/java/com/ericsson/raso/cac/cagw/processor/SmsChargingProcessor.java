@@ -157,7 +157,7 @@ public class SmsChargingProcessor implements Processor {
             Avp extendedResult = scapResponse.getAvp(ResultCodeExtensionAvp.AVP_CODE);
             if (extendedResult != null) {
                 LogService.appLog.info("Received ResultCodeExtendedAvp. Will check value and map response. Check: " + extendedResult.toString());
-                resultCodeExtended = extendedResult.getAsLong();
+                resultCodeExtended = extendedResult.getAsInt();
             }
             
             
@@ -169,7 +169,7 @@ public class SmsChargingProcessor implements Processor {
 
             return smppResponse;
         } catch (AvpDataException e) {
-        	LogService.appLog.debug("SmsChargingProcessor-getSmppResponse:SmppCommandSequence:"+smppRequest.getCommandSequence().getValue()+
+        	LogService.appLog.error("SmsChargingProcessor-getSmppResponse:SmppCommandSequence:"+smppRequest.getCommandSequence().getValue()+
         			"Backed or Response Processing Failure!!",e);
             throw new ServiceLogicException("Unable to unpack SCAP Response!!", e);
         }
