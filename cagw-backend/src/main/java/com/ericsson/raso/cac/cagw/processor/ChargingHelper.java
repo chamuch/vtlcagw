@@ -44,12 +44,14 @@ public class ChargingHelper {
     }
 
     public static WinOperationResult getWinOperationResult(long scapResult, WinMoMtFlag moMtFlag) {
-        if (scapResult == ResultCode.DIAMETER_SUCCESS.getCode() || scapResult == ResultCode.DIAMETER_CREDIT_CONTROL_NOT_APPLICABLE.getCode()) { 
+        if (scapResult == ResultCode.DIAMETER_SUCCESS.getCode() || 
+                scapResult == ResultCode.DIAMETER_CREDIT_CONTROL_NOT_APPLICABLE.getCode()) { 
             LogService.appLog.info("Received DIAMETER_SUCCESS or DIAMETER_CREDIT_CONTROL_NOT_APPLICABLE. Assuming success!!");
             return WinOperationResult.SUCCESS;
         }
         
-        if (scapResult == ResultCode.SUBSCRIBER_NOT_FOUND.getCode()) {
+        if (scapResult == ResultCode.SUBSCRIBER_NOT_FOUND.getCode()
+                || scapResult == ResultCode.DIAMETER_USER_UNKNOWN.getCode()) {
             if (moMtFlag == WinMoMtFlag.MO) {
                 LogService.appLog.info("Received SUBSCRIBER_NOT_FOUND. Mapping to MO_USER_ACCT_NOT_EXIST!!");
                 return WinOperationResult.MO_USER_ACCT_NOT_EXIST;
@@ -59,7 +61,8 @@ public class ChargingHelper {
             }
         }
         
-        if (scapResult == ResultCode.SUBSCRIBER_GRACE_NOT_ALLOWED.getCode() || 
+        if (scapResult == ResultCode.DIAMETER_END_USER_SERVICE_DENIED.getCode() ||
+                scapResult == ResultCode.SUBSCRIBER_GRACE_NOT_ALLOWED.getCode() || 
                 scapResult == ResultCode.SUBSCRIBER_LOCKED.getCode() || 
                 scapResult == ResultCode.SUBSCRIBER_PREACTIVE_NOT_ALLOWED.getCode() || 
                 scapResult == ResultCode.SUBSCRIBER_RECYCLE_NOT_ALLOWED.getCode()) {
@@ -75,7 +78,8 @@ public class ChargingHelper {
             }
         }
         
-        if (scapResult == ResultCode.SUBSCRIBER_INSUFFICIENT_BALANCE.getCode() || scapResult == ResultCode.DIAMETER_CREDIT_LIMIT_REACHED.getCode()) {
+        if (scapResult == ResultCode.DIAMETER_CREDIT_LIMIT_REACHED.getCode() || 
+                scapResult == ResultCode.SUBSCRIBER_INSUFFICIENT_BALANCE.getCode() ) {
             if (moMtFlag == WinMoMtFlag.MO) {
                 LogService.appLog.info("Received SUBSCRIBER_INSUFFICIENT_BALANCE/ DIAMETER_CREDIT_LIMIT_REACHED. Mapping to MO_USER_ACCT_NOT_ENOUGH_CREDIT!!");
                 return WinOperationResult.MO_USER_ACCT_NOT_ENOUGH_CREDIT;
