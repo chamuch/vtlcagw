@@ -43,12 +43,13 @@ public class ChargingHelper {
         return spiAvp;
     }
 
-    public static WinOperationResult getWinOperationResult(long scapResult, WinMoMtFlag moMtFlag) {
+    public static WinOperationResult getWinOperationResult(long scapResult, long resultCodeExtended, WinMoMtFlag moMtFlag) {
         if (scapResult == ResultCode.DIAMETER_SUCCESS.getCode() || 
                 scapResult == ResultCode.DIAMETER_CREDIT_CONTROL_NOT_APPLICABLE.getCode()) { 
             LogService.appLog.info("Received DIAMETER_SUCCESS or DIAMETER_CREDIT_CONTROL_NOT_APPLICABLE. Assuming success!!");
             return WinOperationResult.SUCCESS;
         }
+        
         
         if (scapResult == ResultCode.SUBSCRIBER_NOT_FOUND.getCode()
                 || scapResult == ResultCode.DIAMETER_USER_UNKNOWN.getCode()) {
@@ -66,6 +67,17 @@ public class ChargingHelper {
                 scapResult == ResultCode.SUBSCRIBER_LOCKED.getCode() || 
                 scapResult == ResultCode.SUBSCRIBER_PREACTIVE_NOT_ALLOWED.getCode() || 
                 scapResult == ResultCode.SUBSCRIBER_RECYCLE_NOT_ALLOWED.getCode()) {
+            
+            // to identify shunted subscriber list from the OCC response code and return that first.
+            if (resultCodeExtended == 993) {
+                if (moMtFlag == WinMoMtFlag.MO) {
+                    LogService.appLog.info("Received resultCodeExtended(993). Mapping to MO_USER_ACCT_NOT_EXIST!!");
+                    return WinOperationResult.MO_USER_ACCT_NOT_EXIST;
+                } else {
+                    LogService.appLog.info("Received resultCodeExtended(993). Mapping to MT_USER_ACCT_NOT_EXIST!!");
+                    return WinOperationResult.MT_USER_ACCT_NOT_EXIST;
+                }
+            }
             
             if (moMtFlag == WinMoMtFlag.MO) {
                 LogService.appLog.info("Received SUBSCRIBER_GRACE_NOT_ALLOWED/ SUBSCRIBER_LOCKED/ SUBSCRIBER_PREACTIVE_NOT_ALLOWED/ SUBSCRIBER_RECYCLE_NOT_ALLOWED. "

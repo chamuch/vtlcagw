@@ -15,12 +15,14 @@ import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdDataAvp;
 import com.ericsson.pps.diameter.dccapi.avp.SubscriptionIdTypeAvp;
 import com.ericsson.pps.diameter.dccapi.command.Cca;
 import com.ericsson.pps.diameter.dccapi.command.Ccr;
+import com.ericsson.pps.diameter.rfcapi.base.avp.Avp;
 import com.ericsson.pps.diameter.rfcapi.base.avp.AvpDataException;
 import com.ericsson.pps.diameter.rfcapi.base.avp.avpdatatypes.Time;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdDataAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdNatureAvp;
 import com.ericsson.pps.diameter.scapv2.avp.OtherPartyIdTypeAvp;
+import com.ericsson.pps.diameter.scapv2.avp.ResultCodeExtensionAvp;
 import com.ericsson.pps.diameter.scapv2.avp.SubscriptionIdLocationAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TimeZoneAvp;
 import com.ericsson.pps.diameter.scapv2.avp.TrafficCaseAvp;
@@ -39,6 +41,9 @@ import com.satnar.common.charging.diameter.Peer;
 import com.satnar.smpp.CommandStatus;
 
 public class SmsChargingProcessor implements Processor {
+    
+    private final static String CFG_SECTION = "GLOBAL";
+    private final static String BYPASS_MSISDN_LIST = "bypassMsisdnList";
     
     private static int SCAP_SERVICE_IDENTIFIER = 4; //as per Mikael's inputs; no mail or written requirements though!!!
     private static String defaultLocationAddress = null;
@@ -98,6 +103,17 @@ public class SmsChargingProcessor implements Processor {
         return smppResponse;
     }
 
+	private AuthAccResponse getUnknownUserSmppResponse(AuthAcc smppRequest) {
+        AuthAccResponse smppResponse = new AuthAccResponse();
+        smppResponse.setCommandStatus(CommandStatus.ESME_ROK);
+        smppResponse.setOperationResult(WinOperationResult.MT_USER_ACCT_NOT_EXIST);
+        smppResponse.setNotifyMode(WinNotifyMode.NOTIFY_NEVER);   
+        smppResponse.setCommandSequence(smppRequest.getCommandSequence()); 
+        smppResponse.getCommandLength();
+        LogService.appLog.debug("Constructed Failure AuthAccResponse: " + smppResponse.toString());
+        return smppResponse;
+    }
+
     private Transaction getSmsChargingStatus(AuthAcc smppRequest, Ccr scapRequest, AuthAccResponse smppResponse) {
         Transaction status = new Transaction();
         LogService.appLog.debug("Preparing persistence pojo for transaction state - Req# " + smppRequest.getSmId().getString());
@@ -132,11 +148,20 @@ public class SmsChargingProcessor implements Processor {
 
     private AuthAccResponse getSmppResponse(Cca scapResponse, AuthAcc smppRequest) throws ServiceLogicException {
         AuthAccResponse smppResponse = new AuthAccResponse();
+        long resultCodeExtended = 0;
         
         try {
             smppResponse.setCommandStatus(CommandStatus.ESME_ROK);
             long scapResult = scapResponse.getResultCode();
-            smppResponse.setOperationResult(ChargingHelper.getWinOperationResult(scapResult, smppRequest.getMoMtFlag()));
+            
+            Avp extendedResult = scapResponse.getAvp(ResultCodeExtensionAvp.AVP_CODE);
+            if (extendedResult != null) {
+                LogService.appLog.info("Received ResultCodeExtendedAvp. Will check value and map response. Check: " + extendedResult.toString());
+                resultCodeExtended = extendedResult.getAsLong();
+            }
+            
+            
+            smppResponse.setOperationResult(ChargingHelper.getWinOperationResult(scapResult, resultCodeExtended, smppRequest.getMoMtFlag()));
             smppResponse.setNotifyMode(WinNotifyMode.NOTIFY_FAILURE);  
             smppResponse.setCommandSequence(smppRequest.getCommandSequence());
             smppResponse.getCommandLength();
