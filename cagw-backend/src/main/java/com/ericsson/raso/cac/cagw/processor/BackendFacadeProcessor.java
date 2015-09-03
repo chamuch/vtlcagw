@@ -33,7 +33,7 @@ public class BackendFacadeProcessor implements Processor {
         
         if (request instanceof MmsDccCharge) {
             MmsDccCharge dccRequest = (MmsDccCharge) request;
-            
+            LogService.appLog.info("SessionId:"+dccRequest.getSessionId() + ":RequestedAction:"+dccRequest.getRequestedAction());
             /*if (dccRequest.getAvp(CCRequestTypeAvp.AVP_CODE).getAsInt() == CCRequestTypeAvp.EVENT_REQUEST ||
                     dccRequest.getAvp(RequestedActionAvp.AVP_CODE).getAsInt() == RequestedActionAvp.DIRECT_DEBITING) {
                 delegate = Usecase.DIRECT_DEBIT.getProcessor();
