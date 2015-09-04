@@ -45,7 +45,7 @@ public class MmsRefundProcessor implements Processor {
             
             LogService.stackTraceLog.info("Sending REFILL Request to OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
             RefillResponse refillResponse = new RefillCommand(refillRequest).execute();
-            LogService.stackTraceLog.info("Received REFILL Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
+            LogService.stackTraceLog.info("Received REFILL Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillResponse.getResponseCode());
             
             response = this.getResponse(mmsRequest, refillResponse, refillResponse.getResponseCode());
             
@@ -96,6 +96,7 @@ public class MmsRefundProcessor implements Processor {
                 case 1:
                 case 2:
                     response.setResultCode(new ResultCodeAvp(2001));    // hard-coded for mms refund as per Imtiaz inputs
+                    break;
                 default:
                     response.setResultCode(new ResultCodeAvp(4010));    // hard-coded for mms refund as per Imtiaz inputs
             }
