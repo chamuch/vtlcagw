@@ -322,7 +322,7 @@ public class TcpConnection extends Connection {
             	LogService.appLog.debug("TcpConnection-validateInitializeConfig: 'threadPoolSize' configured too high to be stable!! Found: " + param + ", Allowed: " + maxThreadLimit);
                 throw new SmppTransportException("'threadPoolSize' configured too high to be stable!! Found: " + param + ", Allowed: " + maxThreadLimit);                           
             }
-            if (this.threadPoolSize < 20){
+            if (this.threadPoolSize < 5){
             	LogService.appLog.debug("TcpConnection-validateInitializeConfig: 'threadPoolSize' configured too low to be perform!! Found: " + param);
                 throw new SmppTransportException("'threadPoolSize' configured too low to be perform!! Found: " + param);
             }
