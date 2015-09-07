@@ -31,8 +31,9 @@ public class MmsRefundProcessor implements Processor {
           //TODO: MMS Refund semantic parameter mapping starts here...
             RefillRequest refillRequest = new RefillRequest();
             
-            SubscriptionIdAvp subscriberId = (SubscriptionIdAvp) mmsRequest.getAvp(SubscriptionIdAvp.AVP_CODE);
-            String subscriberNumber = subscriberId.getSubscriptionIdData();
+            //SubscriptionIdAvp subscriberId = (SubscriptionIdAvp) mmsRequest.getAvp(SubscriptionIdAvp.AVP_CODE);
+            //String subscriberNumber = subscriberId.getSubscriptionIdData();
+            String subscriberNumber = mmsRequest.getSubscriptionId();
             refillRequest.setSubscriberNumber(subscriberNumber);
             refillRequest.setSubscriberNumberNAI(1);//This needs to be set as we are passing subscriber number as is in the input - international format 
             
@@ -44,7 +45,7 @@ public class MmsRefundProcessor implements Processor {
             
             LogService.stackTraceLog.info("Sending REFILL Request to OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
             RefillResponse refillResponse = new RefillCommand(refillRequest).execute();
-            LogService.stackTraceLog.info("Received REFILL Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillRequest.toString());
+            LogService.stackTraceLog.info("Received REFILL Response from OCC>> for MSISDN:"+mmsRequest.getSubscriptionId() +":SessionId:"+mmsRequest.getSessionId()+":"+ refillResponse.getResponseCode());
             
             response = this.getResponse(mmsRequest, refillResponse, refillResponse.getResponseCode());
             
@@ -53,21 +54,21 @@ public class MmsRefundProcessor implements Processor {
             
             LogService.appLog.info("MMS DCC Response Success - sessionId: " + mmsRequest.getSessionId());
 		} catch (UcipException e) {
-            LogService.appLog.debug("ChargeAmountProcessor-process:Ucip Failure for Raquest!!",e);
+            LogService.appLog.error("ChargeAmountProcessor-process:Ucip Failure for Raquest!!",e);
             mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
             LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
             exchange.getOut().setBody(mmsRequest);
             LogService.appLog.info("MMS DCC Response Failed - sessionId: " + mmsRequest.getSessionId());
             return;
         } catch (Exception genE){//Added for debugging
-			LogService.appLog.debug("ChargeAmountProcessor-process:CatchAll Failure for Raquest!!",genE);
+			LogService.appLog.error("ChargeAmountProcessor-process:CatchAll Failure for Raquest!!",genE);
             mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
             LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
             exchange.getOut().setBody(mmsRequest);
             LogService.appLog.info("MMS DCC Response Failed - sessionId: " + mmsRequest.getSessionId());
             return;
 		} catch (Error genE){//Added for debugging
-            LogService.appLog.debug("ChargeAmountProcessor-process:CatchAll Error for Raquest!!",genE);
+            LogService.appLog.error("ChargeAmountProcessor-process:CatchAll Error for Raquest!!",genE);
             mmsRequest = this.getFailedResponse(mmsRequest, ResultCode.DIAMETER_UNABLE_TO_COMPLY.getCode());
             LogService.stackTraceLog.info("MMS DCC Response>> " + mmsRequest.toString());
             exchange.getOut().setBody(mmsRequest);
@@ -95,6 +96,7 @@ public class MmsRefundProcessor implements Processor {
                 case 1:
                 case 2:
                     response.setResultCode(new ResultCodeAvp(2001));    // hard-coded for mms refund as per Imtiaz inputs
+                    break;
                 default:
                     response.setResultCode(new ResultCodeAvp(4010));    // hard-coded for mms refund as per Imtiaz inputs
             }
