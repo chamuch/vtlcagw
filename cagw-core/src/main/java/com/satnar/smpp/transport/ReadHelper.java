@@ -144,14 +144,23 @@ public class ReadHelper implements Runnable {
                     LogService.appLog.error("Broken Pipe or Buffer!! Better to shutdown this stack", e);
                     Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                     LogService.appLog.debug("Session for " + this.smppConnection.getEsmeLabel() + " found: " + (session != null));
-                    if (session != null) session.stop();
+                    if (session != null) {
+                        try {
+                            ((TcpConnection)this.smppConnection).getConnection().close();
+                        } catch (IOException e1) {
+                            LogService.appLog.error("Ignoring socket close for esme: " + this.smppConnection.getEsmeLabel(), e1);
+                        }
+                        session.stop();
+                    }
                     this.canRun = false;
                     break;
                 } catch (SmppTransportException e) {
                     LogService.appLog.error("Sliding Window broken!! Better to shutdown this stack", e);
                     Esme session = StackMap.getStack(this.smppConnection.getEsmeLabel());
                     LogService.appLog.debug("Session for " + this.smppConnection.getEsmeLabel() + " found: " + (session != null));
-                    if (session != null) session.stop();
+                    if (session != null) {
+                        session.stop();
+                    }
                     this.canRun = false;
                     break;
                 } // end of try block

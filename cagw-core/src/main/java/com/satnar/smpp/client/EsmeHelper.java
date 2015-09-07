@@ -25,6 +25,7 @@ import com.satnar.smpp.pdu.EnquireLinkResponse;
 import com.satnar.smpp.pdu.GNack;
 import com.satnar.smpp.pdu.SmppPdu;
 import com.satnar.smpp.pdu.Unbind;
+import com.satnar.smpp.pdu.UnbindResponse;
 import com.satnar.smpp.transport.SmppSessionState;
 import com.satnar.smpp.transport.SmppTransportException;
 
@@ -238,21 +239,20 @@ public abstract class EsmeHelper {
     }
 
 
-    public static void handleBindTransceiverResponse(byte[] rawPdu) {
+    public static void handleBindTransceiverResponse(byte[] rawPdu, String esmeLabel) {
         try {
             SmppPdu bindTrxRespPdu = new BindTransceiverResponse();
             bindTrxRespPdu.decode(rawPdu);
             LogService.stackTraceLog.trace("Decoded Read Buffer - " + bindTrxRespPdu.toString());
             
-            String sessionId = StackMap.getEsmeLabel("" + bindTrxRespPdu.getCommandSequence().getValue());
-            Esme session = StackMap.getStack(sessionId);
+            Esme session = StackMap.getStack(esmeLabel);
             StackMap.removeMessageIndex("" + bindTrxRespPdu.getCommandSequence().getValue());
 
             if (bindTrxRespPdu.getCommandStatus() == CommandStatus.ESME_ROK) {
                 session.getTrxChannel().setConnectionState(SmppSessionState.BOUND_TRX);
-                LogService.appLog.info(sessionId + " is successfully boound TRX");
+                LogService.appLog.info(esmeLabel + " is successfully boound TRX");
             } else {
-                LogService.appLog.error(sessionId + " failed to bind TRX. Error: " + bindTrxRespPdu.getCommandStatus()); 
+                LogService.appLog.error(esmeLabel + " failed to bind TRX. Error: " + bindTrxRespPdu.getCommandStatus()); 
                 session.stop();
             }
             
@@ -264,20 +264,19 @@ public abstract class EsmeHelper {
         }
     }
     
-    public static void handleBindTransmitterResponse(byte[] rawPdu) {
+    public static void handleBindTransmitterResponse(byte[] rawPdu, String esmeLabel) {
         try {
             SmppPdu bindTxRespPdu = new BindTransmitterResponse();
             bindTxRespPdu.decode(rawPdu);
             
-            String sessionId = StackMap.getEsmeLabel("" + bindTxRespPdu.getCommandSequence().getValue());
-            Esme session = StackMap.getStack(sessionId);
+            Esme session = StackMap.getStack(esmeLabel);
             StackMap.removeMessageIndex("" + bindTxRespPdu.getCommandSequence().getValue());
 
             if (bindTxRespPdu.getCommandStatus() == CommandStatus.ESME_ROK) {
                 session.getTxChannel().setConnectionState(SmppSessionState.BOUND_TX);
-                LogService.appLog.info(sessionId + " is successfully boound TX");
+                LogService.appLog.info(esmeLabel + " is successfully boound TX");
             } else {
-                LogService.appLog.error(sessionId + " failed to bind TX. Error: " + bindTxRespPdu.getCommandStatus()); 
+                LogService.appLog.error(esmeLabel + " failed to bind TX. Error: " + bindTxRespPdu.getCommandStatus()); 
                session.stop();
             }
             
@@ -312,6 +311,52 @@ public abstract class EsmeHelper {
         	LogService.stackTraceLog.debug("EsmeHelper-handleBindReceiverResponse:Encountered exception",e);
         }
     }
+    
+    public static void handleUnbindResponse(byte[] rawPdu, String sessionId) {
+        Esme session = StackMap.getStack(sessionId);
+        try {
+            SmppPdu unbindRespPdu = new UnbindResponse();
+            unbindRespPdu.decode(rawPdu);
+            
+            if (session.isCanUseTrx()) {
+                session.getTrxChannel().setConnectionState(SmppSessionState.UNBOUND);
+            } else {
+                if (session.getTxChannel() != null)
+                    session.getTxChannel().setConnectionState(SmppSessionState.UNBOUND);
+                if (session.getRxChannel() != null)
+                    session.getRxChannel().setConnectionState(SmppSessionState.UNBOUND);
+            }
+        } catch (SmppCodecException e) {
+            LogService.stackTraceLog.debug("EsmeHelper-handleUnbindResponse:Encountered exception",e);
+        } catch (SmppTransportException e) {
+            LogService.stackTraceLog.debug("EsmeHelper-handleUnbindResponse:Encountered exception",e);
+        }
+    }
+    
+    public static void handleUnbind(byte[] rawPdu, String sessionId) {
+        Esme session = StackMap.getStack(sessionId);
+        try {
+            SmppPdu unbindPdu = new Unbind();
+            unbindPdu.decode(rawPdu);
+            
+            // will close the socket without unbindresp bcos we dont know which channel the request came from!!
+            if (session.isCanUseTrx()) {
+                session.getTrxChannel().setConnectionState(SmppSessionState.CLOSED);
+            } else {
+                if (session.getTxChannel() != null)
+                    session.getTxChannel().setConnectionState(SmppSessionState.CLOSED);
+                if (session.getRxChannel() != null)
+                    session.getRxChannel().setConnectionState(SmppSessionState.CLOSED);
+            }
+            session.stop();
+        } catch (SmppCodecException e) {
+            LogService.stackTraceLog.debug("EsmeHelper-handleUnbindResponse:Encountered exception",e);
+        } catch (SmppTransportException e) {
+            LogService.stackTraceLog.debug("EsmeHelper-handleUnbindResponse:Encountered exception",e);
+        }
+    }
+   
+
 
 
     public static void handleDeliverSmRequest(byte[] rawPdu) {
@@ -454,7 +499,7 @@ public abstract class EsmeHelper {
         }
         return sbPrettyPrint.toString();
     }
-   
+
     
     
 }

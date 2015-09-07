@@ -15,12 +15,12 @@ import com.satnar.smpp.codec.SmppCodecException;
 import com.satnar.smpp.codec.SmppParameter;
 import com.satnar.smpp.codec.SmppParameter.Type;
 
-public class Unbind extends SmppPdu {
+public class UnbindResponse extends SmppPdu {
     
     private int commandLength = 0;
 
-    public Unbind() {
-        super.setCommandId(CommandId.UNBIND);
+    public UnbindResponse() {
+        super.setCommandId(CommandId.UNBIND_RESP);
         super.setCommandStatus(CommandStatus.ESME_ROK);
     }
     
@@ -70,7 +70,7 @@ public class Unbind extends SmppPdu {
     @Override
     public void decode(byte[] payload) throws SmppCodecException {
         try {
-            LogService.appLog.debug("Unbind-decode:Entered");
+            LogService.appLog.debug("UnbindResp-decode:Entered");
             ByteArrayInputStream buffer = new ByteArrayInputStream(payload);
             DataInputStream parser = new DataInputStream(buffer);
             
@@ -82,11 +82,11 @@ public class Unbind extends SmppPdu {
             parser.close();
             parser=null;
             
-            LogService.appLog.debug("Unbind-decode:Success:Sequence:"+this.getCommandSequence().getValue()+":Status:"+this.getCommandStatus());
+            LogService.appLog.debug("UnbindResp-decode:Success:Sequence:"+this.getCommandSequence().getValue()+":Status:"+this.getCommandStatus());
       } catch (IOException e) {
-          LogService.appLog.debug("Unbind-decode:Failed to deserialize pdu",e);
+          LogService.appLog.debug("UnbindResp-decode:Failed to deserialize pdu",e);
           throw new SmppCodecException("Failed to serialize pdu", e);
-      }       
+      }
     }
     
     @Override

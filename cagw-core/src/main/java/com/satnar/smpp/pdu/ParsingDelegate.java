@@ -79,15 +79,25 @@ public class ParsingDelegate implements Runnable {
                         return;
                     case BIND_TRANSCEIVER_RESP:
                         LogService.appLog.debug(String.format("Session: %s - BIND_TRANSCEIVER_RESP Received and delegated", this.esmeLabel));
-                        EsmeHelper.handleBindTransceiverResponse(rawPdu);
+                        EsmeHelper.handleBindTransceiverResponse(rawPdu, esmeLabel);
                         this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
                         return;
                     case BIND_TRANSMITTER_RESP:
                         LogService.appLog.debug(String.format("Session: %s - BIND_TRANSMITTER_RESP Received and delegated", this.esmeLabel));
-                        EsmeHelper.handleBindTransmitterResponse(rawPdu);
+                        EsmeHelper.handleBindTransmitterResponse(rawPdu, esmeLabel);
                         this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         //return null;
+                        return;
+                    case UNBIND:
+                        LogService.appLog.debug(String.format("Session: %s - BIND_TRANSMITTER_RESP Received and delegated", this.esmeLabel));
+                        EsmeHelper.handleUnbind(rawPdu, esmeLabel);
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
+                        return;
+                    case UNBIND_RESP:
+                        LogService.appLog.debug(String.format("Session: %s - BIND_TRANSMITTER_RESP Received and delegated", this.esmeLabel));
+                        EsmeHelper.handleUnbindResponse(rawPdu, esmeLabel);
+                        this.printStats(System.currentTimeMillis(), esmeLabel, pduName);
                         return;
                     case DELIVER_SM:
                         LogService.appLog.debug(String.format("Session: %s - DELIVER_SM Received and delegated", this.esmeLabel));

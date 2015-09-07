@@ -99,6 +99,10 @@ public class Esme {
                 // lets try to connect...
                 this.trxChannel = new TcpConnection(this.trxConfig, ChannelMode.TRX);
                 this.trxChannel.connect();
+                if (!((TcpConnection)this.trxChannel).getConnection().isConnected()) {
+                    LogService.appLog.error("Socket was not connected for: " + this.getEsmeLabel());
+                    return;
+                }
                 LogService.appLog.debug("Socket Conneted for :" + this.getEsmeLabel() );
                 
                 
@@ -140,6 +144,10 @@ public class Esme {
                 
                 this.rxChannel = new TcpConnection(this.rxConfig, ChannelMode.RX);
                 this.rxChannel.connect();
+                if (!((TcpConnection)this.trxChannel).getConnection().isConnected()) {
+                    LogService.appLog.error("Socket was not connected for: " + this.getEsmeLabel());
+                    return;
+                }
                 LogService.appLog.debug("Socket Connected for :" + this.getEsmeLabel() );
                 
                 this.rxWriter = new WriteHelper(this.rxChannel);
@@ -633,82 +641,109 @@ public class Esme {
     
     private void unbindTrx() throws SmppServiceException, SmppTransportException {
         SmppPdu unbind = null;
-        try {
-            ((TcpConnection)this.rxChannel).setShutdownMode(true);
-            unbind = EsmeHelper.getUnbind();
-            this.trxWriter.writeImmediate(unbind);
-        } catch (SmppTransportException e) {
-            LogService.appLog.error("Esme-unbindTrx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
-            this.trxChannel.setConnectionState(SmppSessionState.CLOSED);
-            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-        } catch (Exception e) {
-            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
-            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
-            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
-        }
-
-        while (this.trxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
-                this.trxChannel.getConnectionState() == SmppSessionState.CLOSED) {
-            continue;
-        }
-        StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
         
+        if (((TcpConnection)this.trxChannel).getConnection().isConnected()) {
+            try {
+                ((TcpConnection)this.trxChannel).setShutdownMode(true);
+                unbind = EsmeHelper.getUnbind();
+                this.trxWriter.writeImmediate(unbind);
+            } catch (SmppTransportException e) {
+                LogService.appLog.error("Esme-unbindTrx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+                this.trxChannel.setConnectionState(SmppSessionState.CLOSED);
+                StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+            } catch (Exception e) {
+                LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+                this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+                StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+                //throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            }
+            
+            while (this.trxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
+                    this.trxChannel.getConnectionState() == SmppSessionState.CLOSED) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // ignore...
+                }
+                continue;
+            }
+            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+        }
+        
+        this.trxChannel.setConnectionState(SmppSessionState.CLOSED);
         LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now UNBOUND");
         LogService.alarm(AlarmCode.SMS_UNBOUND, this.getEsmeLabel(), ((TcpConnection)this.trxChannel).getAddress(), this.trxChannel.getConnectionState());
     }
     
     private void unbindTx() throws SmppServiceException, SmppTransportException {
         SmppPdu unbind = null;
-        try {
-            ((TcpConnection)this.rxChannel).setShutdownMode(true);
-            unbind = EsmeHelper.getUnbind();
-            this.txWriter.writeImmediate(unbind);
-        } catch (SmppTransportException e) {
-            LogService.appLog.error("Esme-unbindTx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
-            this.txChannel.setConnectionState(SmppSessionState.CLOSED);
+        
+        if (((TcpConnection)this.txChannel).getConnection().isConnected()) {
+            try {
+                ((TcpConnection)this.txChannel).setShutdownMode(true);
+                unbind = EsmeHelper.getUnbind();
+                this.txWriter.writeImmediate(unbind);
+            } catch (SmppTransportException e) {
+                LogService.appLog.error("Esme-unbindTx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+                this.txChannel.setConnectionState(SmppSessionState.CLOSED);
+                StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+            }  catch (Exception e) {
+                LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+                this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+                StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+                //throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            }
+            
+            while (this.txChannel.getConnectionState() == SmppSessionState.UNBOUND || 
+                    this.txChannel.getConnectionState() == SmppSessionState.CLOSED) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // ignore...
+                }
+                continue;
+            }
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-        }  catch (Exception e) {
-            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
-            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
-            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
-
-        while (this.txChannel.getConnectionState() == SmppSessionState.UNBOUND || 
-                this.txChannel.getConnectionState() == SmppSessionState.CLOSED) {
-            continue;
-        }
-        StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-
+        
+        this.txChannel.setConnectionState(SmppSessionState.CLOSED);
         LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now UNBOUND");
         LogService.alarm(AlarmCode.SMS_UNBOUND, this.getEsmeLabel(), ((TcpConnection)this.txChannel).getAddress(), this.trxChannel.getConnectionState());
     }
     
     private void unbindRx() throws SmppServiceException, SmppTransportException {
         SmppPdu unbind = null;
-        try {
-            ((TcpConnection)this.rxChannel).setShutdownMode(true);
-            unbind = EsmeHelper.getUnbind();
-            this.rxWriter.writeImmediate(unbind);
-        } catch (SmppTransportException e) {
-            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
-            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+        
+        if (((TcpConnection)this.rxChannel).getConnection().isConnected()) {
+            try {
+                ((TcpConnection)this.rxChannel).setShutdownMode(true);
+                unbind = EsmeHelper.getUnbind();
+                this.rxWriter.writeImmediate(unbind);
+            } catch (SmppTransportException e) {
+                LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+                this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+                StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+                //throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            } catch (Exception e) {
+                LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
+                this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
+                StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
+                //throw new SmppServiceException("Unable to request Unbind TRX!", e);
+            }
+            
+            while (this.rxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
+                    this.rxChannel.getConnectionState() == SmppSessionState.CLOSED) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // ignore...
+                }
+                continue;
+            }
             StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
-        } catch (Exception e) {
-            LogService.stackTraceLog.debug("Esme-unbindRx:Encountered exception:CommandSequence:"+unbind.getCommandSequence().getValue(),e);
-            this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
-            StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-            //throw new SmppServiceException("Unable to request Unbind TRX!", e);
         }
 
-        while (this.rxChannel.getConnectionState() == SmppSessionState.UNBOUND || 
-                this.rxChannel.getConnectionState() == SmppSessionState.CLOSED) {
-            continue;
-        }
-        StackMap.removeMessageIndex("" + unbind.getCommandSequence().getValue());
-
+        this.rxChannel.setConnectionState(SmppSessionState.CLOSED);
         LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now UNBOUND");
         LogService.alarm(AlarmCode.SMS_UNBOUND, this.getEsmeLabel(), ((TcpConnection)this.rxChannel).getAddress(), this.rxChannel.getConnectionState());
 

@@ -3,6 +3,8 @@ package com.satnar.smpp.transport;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketOption;
+import java.net.StandardSocketOptions;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -113,6 +115,12 @@ public class TcpConnection extends Connection {
         } catch (Exception e) {
             LogService.appLog.error("TcpConnection-connect:Transport Failure - Unforeseen Realtime Exception!!",e);
             throw new SmppTransportException("Transport Failure - Unforeseen Realtime Exception!!", e);
+        } finally {
+            try {
+                this.connection.close();
+            } catch (IOException e) {
+                LogService.appLog.error("Socket close failed for esme: " + this.label, e);
+            }
         }
         
     }
@@ -146,7 +154,13 @@ public class TcpConnection extends Connection {
                 
         } catch (IOException e) {
             LogService.appLog.error("TcpConnection-connect:Transport Failure - Localised in TCP Stack or Memory Buffers",e);
-            throw new SmppTransportException("Transport Failure - Localised in TCP Stack or Memory Buffers", e);
+            //throw new SmppTransportException("Transport Failure - Localised in TCP Stack or Memory Buffers", e);
+        } finally {
+            try {
+                this.connection.close();
+            } catch (IOException e) {
+                LogService.appLog.error("Socket close failed for esme: " + this.label, e);
+            }
         }
     }
     
@@ -187,7 +201,16 @@ public class TcpConnection extends Connection {
         } catch (Exception e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Unknown error!!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Unknown error!!", e);
-        } 
+        }  finally {
+            if (!this.connection.isConnected()) {
+                try {
+                    this.connection.close();
+                } catch (IOException e) {
+                    LogService.appLog.error("Socket close failed with exception:", e);
+                }
+                this.setConnectionState(SmppSessionState.CLOSED);
+            }
+        }
         
     }
 
@@ -209,6 +232,15 @@ public class TcpConnection extends Connection {
         } catch(IOException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-read:Failed receiving the payload!",e);
             throw new SmppTransportException(this.getEsmeLabel() + " - Failed receiving the payload!", e);
+        } finally {
+            if (!this.connection.isConnected()) {
+                try {
+                    this.connection.close();
+                } catch (IOException e) {
+                    LogService.appLog.error("Socket close failed with exception:", e);
+                }
+                this.setConnectionState(SmppSessionState.CLOSED);
+            }
         }
     }
 
