@@ -161,7 +161,8 @@ public class TcpConnection extends Connection {
         } catch (IOException e) {
             LogService.appLog.error("TcpConnection-connect:Transport Failure - Localised in TCP Stack or Memory Buffers",e);
             try {
-                this.connection.close();
+                if (this.connection != null)
+                    this.connection.close();
             } catch (IOException e1) {
                 LogService.appLog.error("Socket close failed for esme: " + this.label, e1);
             }
