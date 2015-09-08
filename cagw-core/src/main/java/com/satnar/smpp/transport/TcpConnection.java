@@ -160,13 +160,12 @@ public class TcpConnection extends Connection {
                 
         } catch (IOException e) {
             LogService.appLog.error("TcpConnection-connect:Transport Failure - Localised in TCP Stack or Memory Buffers",e);
-            //throw new SmppTransportException("Transport Failure - Localised in TCP Stack or Memory Buffers", e);
-        } finally {
             try {
                 this.connection.close();
-            } catch (IOException e) {
-                LogService.appLog.error("Socket close failed for esme: " + this.label, e);
+            } catch (IOException e1) {
+                LogService.appLog.error("Socket close failed for esme: " + this.label, e1);
             }
+            //throw new SmppTransportException("Transport Failure - Localised in TCP Stack or Memory Buffers", e);
         }
     }
     
