@@ -207,8 +207,7 @@ public class ParsingDelegate implements Runnable {
                         }
                         
                         if ((commandId & EsmeHelper.REQUEST_MASK) == EsmeHelper.REQUEST_MASK) {                         
-                            LogService.appLog.debug(String.format("Session: %s - Sending response for CommandId: %s, Sequence: %s, with Status: %s", this.esmeLabel, 
-                                    pdu.getCommandId(), pdu.getCommandSequence(), response.getCommandStatus()));
+                            LogService.appLog.debug(String.format("Session: %s - Sending response pdu: %s", this.esmeLabel, response));
                             Esme session = StackMap.getStack(this.esmeLabel);
                             if (session != null) {
                                 LogService.appLog.debug(String.format("Found session %s is available: %s", this.esmeLabel, (session != null)));
