@@ -21,7 +21,7 @@ public enum SmppSessionState {
             case BOUND_RX:
             case BOUND_TRX:
             case BOUND_TX:
-                return (state == UNBOUND);
+                return (state == UNBOUND || state == CLOSED);
             case UNBOUND:
                 return (state == CLOSED);
             case CLOSED:

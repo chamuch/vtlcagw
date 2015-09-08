@@ -185,31 +185,28 @@ public class TcpConnection extends Connection {
             LogService.appLog.debug(this.getEsmeLabel() + " - Successfully transmitted writeBuffer Window Size: " + windowSize);
         } catch (ClosedByInterruptException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket closed by interruption!!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket closed by interruption!!", e);
         } catch (AsynchronousCloseException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket is in closing phase!!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket is in closing phase!!", e);
         } catch (ClosedChannelException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket already closed!!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket already closed!!", e);
         } catch (NotYetConnectedException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Socket not yet ready for transmission!!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket not yet ready for transmission!!", e);
         } catch (IOException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Failed transmitting the payload!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Failed transmitting the payload!", e);
         } catch (Exception e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-write:Unknown error!!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Unknown error!!", e);
-        }  finally {
-            if (!this.connection.isConnected()) {
-                try {
-                    this.connection.close();
-                } catch (IOException e) {
-                    LogService.appLog.error("Socket close failed with exception:", e);
-                }
-                this.setConnectionState(SmppSessionState.CLOSED);
-            }
         }
         
     }
@@ -223,28 +220,33 @@ public class TcpConnection extends Connection {
             readBuffer.flip();
             if (packetSize == -1) {
                 LogService.appLog.error("Seems like the Socket reached End-Of-Stream!! Must shutdown!!");
+                this.close();
                 throw new SmppTransportException(this.getEsmeLabel() + " - TcpConnection-read:Socket reached EOS!!");
             }
             return packetSize;
         } catch(NotYetConnectedException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-read:Socket not yet ready for reception!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Socket not yet ready for reception!", e);
         } catch(IOException e) {
             LogService.appLog.error(this.getEsmeLabel() + " - TcpConnection-read:Failed receiving the payload!",e);
+            this.close();
             throw new SmppTransportException(this.getEsmeLabel() + " - Failed receiving the payload!", e);
-        } finally {
-            if (!this.connection.isConnected()) {
-                try {
-                    this.connection.close();
-                } catch (IOException e) {
-                    LogService.appLog.error("Socket close failed with exception:", e);
-                }
-                this.setConnectionState(SmppSessionState.CLOSED);
-            }
         }
     }
 
-
+    private void close() {
+        if (!this.connection.isConnected()) {
+            try {
+                this.setConnectionState(SmppSessionState.CLOSED);
+                this.connection.close();
+            } catch (IOException e) {
+                LogService.appLog.error("Socket close failed with exception:", e);
+            } catch (SmppTransportException e) {
+                LogService.appLog.error("Stack Session State change validation failed with exception:", e);
+                           }
+        }
+    }
 
     @Override
     public ByteBuffer getSendBuffer() {
