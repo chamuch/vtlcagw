@@ -73,7 +73,11 @@ public class TcpConnection extends Connection {
             this.connection.configureBlocking(false);
             this.connection.connect(new InetSocketAddress(this.address, this.port));
             while (!this.connection.finishConnect()) {
-                Thread.sleep(50);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    LogService.appLog.warn("Ignoring sleep interruption while connect!");
+                }
                 continue;
             }
             this.setConnectionState(SmppSessionState.OPEN);
