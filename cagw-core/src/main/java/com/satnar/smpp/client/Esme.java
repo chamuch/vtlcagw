@@ -144,7 +144,7 @@ public class Esme {
                 
                 this.rxChannel = new TcpConnection(this.rxConfig, ChannelMode.RX);
                 this.rxChannel.connect();
-                if (!((TcpConnection)this.trxChannel).getConnection().isConnected()) {
+                if (!((TcpConnection)this.rxChannel).getConnection().isConnected()) {
                     LogService.appLog.error("Socket was not connected for: " + this.getEsmeLabel());
                     return;
                 }
