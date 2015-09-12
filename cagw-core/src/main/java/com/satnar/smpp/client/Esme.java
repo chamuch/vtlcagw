@@ -636,8 +636,13 @@ public class Esme {
 			}
             if (this.rxChannel == null)
                 break;
-        } while ( this.rxChannel.getConnectionState() != SmppSessionState.BOUND_RX || 
-                this.rxChannel.getConnectionState() != SmppSessionState.CLOSED);
+            
+            if (this.rxChannel.getConnectionState() == SmppSessionState.BOUND_RX)
+                break;
+            
+            if (this.rxChannel.getConnectionState() == SmppSessionState.CLOSED)
+                break;
+        } while (true);
         StackMap.removeMessageIndex("" + bindRx.getCommandSequence().getValue());
         
         LogService.appLog.info("SMSC: " + this.getEsmeLabel() + " is now BOUND_RX");
