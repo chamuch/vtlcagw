@@ -25,7 +25,7 @@ public enum SmppSessionState {
             case UNBOUND:
                 return (state == CLOSED);
             case CLOSED:
-                return false;
+                return (state == CLOSED);
             default:
                 return false;
         } 
